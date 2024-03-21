@@ -31,7 +31,9 @@
         "strictFunctionTypes": true,
         "esModuleInterop": true,
         "noPropertyAccessFromIndexSignature": true,
-        "noUncheckedIndexedAccess": false
+        "noUncheckedIndexedAccess": false,
+        "target": "ES2015",
+        "module": "NodeNext"
     },
     "include": ["src"]
 }

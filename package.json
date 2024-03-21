@@ -3,6 +3,8 @@
     "version": "0.1.0",
     "private": true,
     "dependencies": {
+        "@types/react": "^18.2.67",
+        "@types/react-dom": "^18.2.22",
         "axios": "^1.6.7",
         "eslint-config-react-app": "^7.0.1",
         "react": "^18.2.0",
@@ -12,13 +14,12 @@
         "react-scripts": "^5.0.1",
         "react-toastify": "^10.0.4",
         "serve": "^14.2.1",
-        "typescript": "^3.2.1"
+        "typescript": "^3.9.10"
     },
     "scripts": {
         "dev": "react-scripts start",
         "start": "serve -s build",
         "build": "react-scripts build",
-        "gcp-build": "",
         "eject": "react-scripts eject",
         "test": "react-scripts test --env=jsdom"
     },
@@ -41,6 +42,8 @@
     ],
     "devDependencies": {
         "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+        "@babel/preset-typescript": "^7.24.1",
+        "@types/jest": "^29.5.12",
         "sass": "^1.70.0"
     }
 }

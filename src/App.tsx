@@ -1,7 +1,7 @@
-import React from "react";
+import * as React from "react";
 import "styles/index.scss";
 
-const App = () => {
+const App: React.FC = () => {
     return <div>SoPra Lab FS24 Group 26 Client</div>;
 };
 
