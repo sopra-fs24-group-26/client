@@ -9,4 +9,8 @@ const container: Nullable<HTMLElement> = document.getElementById("app");
 assert(container);
 
 const root: ReactDOM.Root = ReactDOM.createRoot(container);
-root.render(<App />);
+root.render(
+    <React.StrictMode>
+        <App />
+    </React.StrictMode>,
+);
