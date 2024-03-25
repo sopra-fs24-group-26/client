@@ -1,4 +1,4 @@
-import axios from "axios";
+import Axios from "axios";
 
 export const isProduction = () => {
     return process.env["NODE_ENV"] === "production";
@@ -11,7 +11,7 @@ export const getDomain = () => {
     return isProduction() ? prodUrl : devUrl;
 };
 
-export const api = axios.create({
+export const api: Axios.AxiosInstance = Axios.create({
     baseURL: getDomain(),
     headers: {
         "Content-Type": "application/json",
