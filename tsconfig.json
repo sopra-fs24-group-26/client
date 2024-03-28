@@ -1,7 +1,39 @@
 {
-  "compilerOptions": {
-    "jsx": "react",
-    "baseUrl": "src"
-  },
-  "include": ["src"]
+    "compilerOptions": {
+        "jsx": "react",
+        "baseUrl": "src",
+
+        "skipLibCheck": true,
+        "removeComments": false,
+        "preserveConstEnums": true,
+        "sourceMap": true,
+        "inlineSourceMap": false,
+        "allowUnreachableCode": false,
+        "allowUnusedLabels": false,
+        "alwaysStrict": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitAny": true,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "strict": true,
+        "strictPropertyInitialization": true,
+        "allowJs": false,
+        "checkJs": false,
+        "forceConsistentCasingInFileNames": true,
+        "pretty": true,
+        "diagnostics": false,
+        "exactOptionalPropertyTypes": true,
+        "strictBindCallApply": true,
+        "strictNullChecks": true,
+        "strictFunctionTypes": true,
+        "esModuleInterop": true,
+        "noPropertyAccessFromIndexSignature": true,
+        "noUncheckedIndexedAccess": false,
+        "target": "ES2015",
+        "module": "NodeNext"
+    },
+    "include": ["src"]
 }

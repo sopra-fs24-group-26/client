@@ -1,46 +1,50 @@
 {
-  "name": "sopra-lab-fs24-group-26-client",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "axios": "^1.6.7",
-    "eslint-config-react-app": "^7.0.1",
-    "react": "^18.2.0",
-    "react-datepicker": "^6.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.21.3",
-    "react-scripts": "^5.0.1",
-    "react-toastify": "^10.0.4",
-    "serve": "^14.2.1",
-    "typescript": "^3.2.1"
-  },
-  "scripts": {
-    "dev": "react-scripts start",
-    "start": "serve -s build",
-    "build": "react-scripts build",
-    "gcp-build": "",
-    "eject": "react-scripts eject",
-    "test": "react-scripts test --env=jsdom"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
-  "jest": {
-    "moduleNameMapper": {
-      "^axios$": "axios/dist/node/axios.cjs"
+    "name": "sopra-lab-fs24-group-26-client",
+    "version": "0.1.0",
+    "private": true,
+    "dependencies": {
+        "@types/react": "^18.2.67",
+        "@types/react-dom": "^18.2.22",
+        "axios": "^1.6.7",
+        "eslint-config-react-app": "^7.0.1",
+        "phaser": "^3.80.1",
+        "react": "^18.2.0",
+        "react-datepicker": "^6.2.0",
+        "react-dom": "^18.2.0",
+        "react-router-dom": "^6.21.3",
+        "react-scripts": "^5.0.1",
+        "react-toastify": "^10.0.4",
+        "serve": "^14.2.1",
+        "typescript": "^3.9.10"
+    },
+    "scripts": {
+        "dev": "react-scripts start",
+        "start": "serve -s build",
+        "build": "react-scripts build",
+        "eject": "react-scripts eject",
+        "test": "react-scripts test --env=jsdom"
+    },
+    "eslintConfig": {
+        "extends": "react-app"
+    },
+    "jest": {
+        "moduleNameMapper": {
+            "^axios$": "axios/dist/node/axios.cjs"
+        }
+    },
+    "engines": {
+        "node": "20.11.0"
+    },
+    "browserslist": [
+        ">0.2%",
+        "not dead",
+        "not ie <= 11",
+        "not op_mini all"
+    ],
+    "devDependencies": {
+        "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+        "@babel/preset-typescript": "^7.24.1",
+        "@types/jest": "^29.5.12",
+        "sass": "^1.70.0"
     }
-  },
-  "engines": {
-    "node": "20.11.0"
-  },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ],
-  "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "sass": "^1.70.0"
-  }
 }

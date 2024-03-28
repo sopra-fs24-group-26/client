@@ -5,45 +5,45 @@ on:
     branches:
       - master
 
-  # run the workflow manually from the Actions tab
-  workflow_dispatch:
+    # run the workflow manually from the Actions tab
+    workflow_dispatch:
 
 jobs:
-  sonarcloud:
-    name: SonarCloud
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    sonarcloud:
+        name: SonarCloud
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+              with:
+                  fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+            - name: SonarCloud Scan
+              uses: SonarSource/sonarcloud-github-action@master
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
+                  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-  deploy:
-    name: Deploying to Google Cloud
-    runs-on: ubuntu-latest
+    deploy:
+        name: Deploying to Google Cloud
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
 
-      - name: Use Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: "20.x"
-      - run: npm install
-      - run: npm run build
+            - name: Use Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: "20.x"
+            - run: npm install
+            - run: npm run build
 
-      - name: Deploy to App Engine
-        id: deploy
-        uses: google-github-actions/deploy-appengine@v0.2.0
-        with:
-          deliverables: app.yaml
-          version: v1
-          credentials: ${{ secrets.GCP_SERVICE_CREDENTIALS }}
+            - name: Deploy to App Engine
+              id: deploy
+              uses: google-github-actions/deploy-appengine@v0.2.0
+              with:
+                  deliverables: app.yaml
+                  version: v1
+                  credentials: ${{ secrets.GCP_SERVICE_CREDENTIALS }}
 
-      - name: Test
-        run: curl "${{ steps.deploy.outputs.url }}"
+            - name: Test
+              run: curl "${{ steps.deploy.outputs.url }}"
