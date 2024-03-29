@@ -1,29 +1,28 @@
 import { int, UUID, Nullable } from "definitions/utils";
 
 export type DataInformation = {
-    player: PlayerInformation;
     session: SessionInformation;
-    players: Array<PlayerInformation>;
-    tiles: Array<TileInformation>;
+    players: PlayerInformation[];
+    tiles: TileInformation[];
 };
 
 export type PlayerInformation = {
-    id: UUID; //playerID
-    name: string; //playername
+    id: UUID;
+    name: string;
     sessionId: UUID;
     role: Nullable<int>;
     orderIndex: Nullable<int>;
 };
 
 export type SessionInformation = {
-    sessionId: UUID; //empty is default
-    turnPlayer: Nullable<UUID>; // the player who is at turn
+    id: UUID;
     playerCount: int; // number of players in session
+    turnPlayer: Nullable<UUID>; // the player who is at turn
 };
 
 export type TileInformation = {
-    id: UUID; //tileID
-    sessionID: UUID; //to which session the tile belongs to
+    id: UUID;
+    sessionID: UUID;
     type: int; //the type of tile, represents the kind of path
     isPlaced: boolean; //whether the tile is placed in game frame
     rotation: Nullable<int>; //how to turn the tile before placing

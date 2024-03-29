@@ -1,85 +1,49 @@
-import { MasterTick } from "core/masterTick";
-import { Nullable } from "definitions/utils";
-import { EventEmitter } from "utilities/EventEmitter";
-import { int, Nullable } from "../definitions/utils";
+import { int, Nullable, UUID } from "../definitions/utils";
 import { PlayerInformation } from "definitions/information";
-import { playersNotEqual } from "utilities/information";
-import { log } from "utilities/logger";
-import { generateRandomString } from "utilities/utils";
 import GeneralManager from "./GeneralManager";
 
 class PlayerManager {
-    public readonly onSync: EventEmitter;
-    private players: Nullable<PlayerInformation[]>;
-    private me: Nullable<PlayerInformation>;
-
-    public constructor() {
-        this.players = null;
-        this.me = null;
-        this.onSync = new EventEmitter();
-        this.beginSync();
+    public saveId(id: UUID): void {
+        localStorage.setItem("playerId", id);
     }
 
-    private mock(): boolean {
-        //purpose of function mock: simulate fetch data from server (GeneralManager) and update fields
+    public removeId(): void {
+        localStorage.removeItem("playerId");
+    }
 
-        const randomname = generateRandomString(10);
-        //replace next line with result of get request
-        if ((this.players?.length ?? 0) < 10) {
-            let p = {
-                sessionId: "mockSessionID",
-                id: "ID" + randomname,
-                name: randomname,
-                role: null,
-                orderIndex: null,
-            } as PlayerInformation;
-            this.players?.push(p);
-            //for testing purpose
-            log("Update playername: " + randomname);
-            return true;
-        } else {
-            return false;
+    public getId(): Nullable<UUID> {
+        return localStorage.getItem("playerId") || null;
+    }
+
+    public getAll(): Nullable<PlayerInformation[]> {
+        return GeneralManager.getPlayers();
+    }
+
+    public getMe(): Nullable<PlayerInformation> {
+        const players: Nullable<PlayerInformation[]> = this.getAll();
+        if (!players) {
+            return null;
         }
+        return (
+            players.filter(
+                (player: PlayerInformation) => player.id === this.getId(),
+            )[0] || null
+        );
     }
 
-    private mockCreater(): void {
-        const mockPlayer = {
-            sessionId: "mockSessionID",
-            id: "IDMockLongname",
-            name: "Longname_Lancelotmylady_Poopybutthole",
-            role: null,
-            orderIndex: null,
-        } as PlayerInformation;
-        this.players = [mockPlayer];
-        this.me = mockPlayer;
-    }
-
-    private beginSync(): void {
-        this.mockCreater();
-        MasterTick.on(() => {
-            //fetch data from GeneralManager and update fields
-
-            const b = this.mock();
-            //mock players joining lobby, emit update players event if there is a change in playername
-            if (b) {
-                // no need to update this.playernames here because it is updated in this.mock()
-                this.onSync.emit();
-            }
-
-            // official version
-
-            // update this.players if necessary
-            const updatePlayers: boolean = this.checkPlayersUpdate(
-                GeneralManager.getPlayersFromServer(),
-            );
-            //update this.me if necessary
-            const updateMe: boolean = this.checkMeUpdate(
-                GeneralManager.getMeFromServer(),
-            );
-            if (updatePlayers || updateMe) {
-                this.onSync.emit();
-            }
-        });
+    /** return:
+     * null if players is null
+     * empty array if no other players exist
+     * normal array if other players exist
+     */
+    public getOthers(): Nullable<PlayerInformation[]> {
+        const players: Nullable<PlayerInformation[]> = this.getAll();
+        if (!players) {
+            return null;
+        }
+        return players.filter(
+            (player: PlayerInformation) => player.id !== this.getId(),
+        );
     }
 
     public generateName(): string {
@@ -124,18 +88,6 @@ class PlayerManager {
             prefix[randomPrefix] + title[randomTitle] + names[randomName];
 
         return username;
-    }
-
-    public getPlayerId(): Nullable<string> {
-        return localStorage.getItem("playerId") || null;
-    }
-
-    public getPlayers(): Nullable<PlayerInformation[]> {
-        return this.players?.slice(0) ?? null;
-    }
-
-    public getMe(): Nullable<PlayerInformation> {
-        return this.me;
     }
 }
 

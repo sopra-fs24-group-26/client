@@ -1,20 +1,10 @@
-import { MasterTick } from "core/masterTick";
-import { EventEmitter } from "utilities/EventEmitter";
-import { log } from "utilities/logger";
+import { TileInformation } from "definitions/information";
+import { Nullable } from "definitions/utils";
+import GeneralManager from "./GeneralManager";
 
 class TileManager {
-    public readonly onSync: EventEmitter;
-
-    public constructor() {
-        this.onSync = new EventEmitter();
-        this.beginSync();
-    }
-
-    private beginSync(): void {
-        MasterTick.on(() => {
-            //fetch data from GeneralManager and update fields
-            this.onSync.emit();
-        });
+    public getAll(): Nullable<TileInformation[]> {
+        return GeneralManager.getTiles();
     }
 }
 

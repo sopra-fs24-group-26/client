@@ -3,65 +3,35 @@ import Phaser from "phaser";
 import { log } from "utilities/logger";
 import SessionManager from "managers/SessionManager";
 import PlayerManager from "managers/PlayerManager";
-import { PlayerInformation, SessionInformation } from "definitions/information";
-import { interactify } from "utilities/utils";
+import { PlayerInformation } from "definitions/information";
+import { assert, interactify } from "utilities/utils";
+import { ScreenHeight, ScreenWidth } from "core/main";
+import GeneralManager from "managers/GeneralManager";
 
 export class LobbyScreen extends Phaser.Scene {
-    private text: Nullable<Phaser.GameObjects.Text>;
-    private players: Nullable<PlayerInformation[]>;
-    private me: Nullable<PlayerInformation>;
-    private session: Nullable<SessionInformation>;
-    private graphics: Nullable<Phaser.GameObjects.Graphics>;
+    private title: Nullable<Phaser.GameObjects.Text>;
+    private quitButton: Nullable<Phaser.GameObjects.Image>;
+    private shareButton: Nullable<Phaser.GameObjects.Image>;
+    private startButton: Nullable<Phaser.GameObjects.Image>;
+    private container: Phaser.GameObjects.Container;
 
     public constructor() {
         super("LobbyScreen");
-        this.text = null;
-        this.players = null;
-        this.me = null;
-        this.session = null;
-        this.graphics = null;
-    }
-
-    public syncPlayers(): void {
-        this.players = PlayerManager.getPlayers();
-    }
-
-    public syncMe(): void {
-        this.me = PlayerManager.getMe();
-    }
-
-    public syncSession(): void {
-        this.session = SessionManager.getSessionInformation();
-    }
-
-    private onQuitButton(): void {
-        log("Quit");
-    }
-
-    private onStartButton(): void {
-        log("Start");
-    }
-
-    private onInviteButton(): void {
-        navigator.clipboard.writeText("URL/join/" + this.me?.sessionId);
-        log("copy link to clipboard");
+        this.title = null;
+        this.quitButton = null;
+        this.shareButton = null;
+        this.startButton = null;
+        this.container = this.add.container(100, 100);
     }
 
     public init(): void {
-        const playerManagerListener: UUID = PlayerManager.onSync.on(() => {
-            this.syncPlayers();
-            this.syncMe();
-            this.updateFrame();
-        });
-        const sessionManagerListener: UUID = SessionManager.onSync.on(() => {
-            this.syncSession();
+        const generalManagerListener: UUID = GeneralManager.onSync.on(() => {
             this.updateFrame();
         });
 
         // on scene destroy free listener
         this.events.on("destroy", () => {
-            PlayerManager.onSync.off(playerManagerListener);
-            SessionManager.onSync.off(sessionManagerListener);
+            GeneralManager.onSync.off(generalManagerListener);
         });
     }
 
@@ -70,8 +40,8 @@ export class LobbyScreen extends Phaser.Scene {
     }
 
     public create(): void {
-        this.text = this.add
-            .text(350, 80, "Saboteur Lobby", {
+        this.title = this.add
+            .text(ScreenWidth / 2, ScreenHeight / 8, "Saboteur Lobby", {
                 fontFamily: "Goudy",
                 fontSize: 38,
                 color: "#ffffff",
@@ -81,57 +51,77 @@ export class LobbyScreen extends Phaser.Scene {
             })
             .setOrigin(0.5);
 
-        const startButton: Phaser.GameObjects.Image = this.add.image(
-            150,
-            540,
+        this.quitButton = this.add.image(
+            ScreenWidth / 4,
+            ScreenHeight / 1.25,
             "testButton",
         );
-        startButton.setInteractive();
-        interactify(startButton, 1, this.onInviteButton);
+        interactify(this.quitButton, 1, () => this.onQuitButton());
+
+        this.shareButton = this.add.image(
+            ScreenWidth / 2,
+            ScreenHeight / 1.25,
+            "testButton",
+        );
+        interactify(this.shareButton, 1, () => this.onShareButton());
+
+        this.startButton = this.add.image(
+            ScreenWidth / 1.25,
+            ScreenHeight / 1.25,
+            "testButton",
+        );
+        interactify(this.startButton, 1, () => this.onStartButton());
     }
 
-    private playerBackground(ypos: integer): void {
-        // Placeholder for the background on player display
-        this.graphics = this.add.graphics();
-        this.graphics.lineStyle(1, 0x000000, 1);
-        this.graphics.fillStyle(0x5c4033, 1.0);
-        // xpos, ypos, horizontal length, vertical length, corner radius
-        this.graphics.fillRoundedRect(100, ypos, 600, 27, 5);
-        this.graphics.strokeRoundedRect(100, ypos, 600, 27, 5);
+    private onQuitButton(): void {
+        PlayerManager.removeId();
+        log("playerId in local storage removed");
+        log("delete player info in backend");
     }
 
+    private onShareButton(): void {
+        const sessionId: Nullable<UUID> = SessionManager.getId();
+        assert(sessionId);
+        const link: string = `${location.origin}/${sessionId}`;
+        navigator.clipboard.writeText(link);
+        log("copy link to clipboard");
+    }
+
+    private onStartButton(): void {
+        log("Start");
+    }
+
+    /**
+     * Deletes every child in this.container
+     */
     public clearFrame(): void {
-        this.graphics?.clear();
-        this.text?.destroy();
-        this.children.each(function (child) {
-            if (child instanceof Phaser.GameObjects.Image) {
-                // Check if the child is an image
-                child.destroy(); // Remove the image from the scene
-            }
-        });
+        this.container.list.forEach(function (child) {
+            child.destroy();
+        }, this);
+        this.container.removeAll();
     }
 
     public updateFrame(): void {
         this.clearFrame();
-        this.create();
-        const currentLength = this.players?.length ?? 0;
-        for (let i: int = 0; i < currentLength; i++) {
+        const me: Nullable<PlayerInformation> = PlayerManager.getMe();
+        const others: Nullable<PlayerInformation[]> = PlayerManager.getOthers();
+        assert(me && this.title && others);
+        this.title.text = `Saboteur Lobby\n${me.name}`;
+
+        for (let i: int = 0; i < others.length; i++) {
             let ypos: int = 150 + i * 30;
-            let playername: string = (this.players ?? [])[i].name;
+            let playername: string = others[i].name;
             let fontstyle: string = "normal";
-            if (playername === this.me?.name) {
-                playername = "You are: " + playername + ", Role: TBD";
-                fontstyle = "oblique";
-            }
-            this.playerBackground(ypos);
-            this.add.text(100, ypos, playername, {
-                fontFamily: "Arial Black",
-                fontSize: 20,
-                color: "#e1e1e1",
-                stroke: "#000000",
-                strokeThickness: 3,
-                fontStyle: fontstyle,
-            });
+            this.container.add(
+                this.add.text(100, ypos, playername, {
+                    fontFamily: "Arial Black",
+                    fontSize: 20,
+                    color: "#e1e1e1",
+                    stroke: "#000000",
+                    strokeThickness: 3,
+                    fontStyle: fontstyle,
+                }),
+            );
         }
     }
 }
