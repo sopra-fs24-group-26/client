@@ -6,27 +6,66 @@ import PlayerManager from "../managers/PlayerManager";
 import axios from "axios";
 import { api } from "../utilities/api";
 import { PlayerDTO } from "../definitions/dto";
+import { SessionInformation } from "definitions/information";
+import { JoinDTO } from "definitions/dto";
+import GeneralManager from "./GeneralManager";
+import PlayerManager from "./PlayerManager";
+import { api } from "utilities/api";
+import { generateRandomString } from "utilities/utils";
 
 class SessionManager {
     public readonly onSync: EventEmitter;
 
+    private information: Nullable<SessionInformation>;
+
     public constructor() {
         this.onSync = new EventEmitter();
+        this.information = null;
         this.analyseURL();
         this.beginSync();
     }
 
     private analyseURL(): void {
         const sessionId: UUID = location.pathname.slice(1);
-        log(sessionId);
+        const playername: string = generateRandomString(10);
+        const requestBody: JoinDTO = {
+            sessionId: sessionId,
+            playername: playername,
+        };
+        //handshake(join)
+        //const response = api.post("/join", requestBody);
+        log("Simulate post request with: ");
+        log(sessionId + playername);
     }
+
+    /*
+    private mock(): boolean {
+        //fetch data from GeneralManager and update fields
+        log("Request server for session information");
+
+        this.information = {
+            sessionId: "123",
+            playerCount: 1,
+            turnPlayer: null,
+        } as SessionInformation;
+        return false;
+    }
+    */
 
     private beginSync(): void {
         MasterTick.on(() => {
-            //fetch data from server and update fields
-            this.onSync.emit();
+            //fetch data from GeneralManager and update fields
+            const b: boolean = this.checkSessionUpdate(
+                GeneralManager.getSessionFromServer(),
+            );
+            if (b) {
+                this.onSync.emit();
+            }
         });
-        log(MasterTick);
+    }
+
+    public getSessionInformation(): Nullable<SessionInformation> {
+        return this.information;
     }
 
     public async createSession(): Promise<string> {

@@ -31,7 +31,7 @@ export class TitleScreen extends Phaser.Scene {
     public create(): void {
         this.text = this.add
             .text(ScreenWidth / 2, ScreenHeight / 4, "Saboteur", {
-                fontFamily: "Arial Black",
+                font: "Arial Black",
                 fontSize: 38,
                 color: "#ffffff",
                 stroke: "#000000",

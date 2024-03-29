@@ -158,17 +158,15 @@ export function interactify(
     callback: EmptyCallback,
 ): void {
     let dirty: boolean = true;
-
     function expand(): void {
         dirty = true;
         image.setScale(scale);
+        image.scene.game.canvas.style.cursor = "default";
     }
-
     function shrink(): void {
         dirty = false;
         image.setScale(scale * 0.9);
     }
-
     function up(): void {
         const wasDirty: boolean = dirty;
         expand();
@@ -177,11 +175,26 @@ export function interactify(
         }
         callback();
     }
-
     image.setInteractive();
     image.on("pointerdown", shrink);
     image.on("pointerup", up);
     image.on("pointerout", expand);
+    image.on("pointerover", () => {
+        image.scene.game.canvas.style.cursor = "pointer";
+    });
     image.on("pointercancel", expand);
     image.setScale(scale);
+}
+
+export function generateRandomString(length: int): string {
+    const characters: string =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let randomString: string = "";
+
+    for (let i = 0; i < length; i++) {
+        const randomIndex: int = Math.floor(Math.random() * characters.length);
+        randomString += characters[randomIndex];
+    }
+
+    return randomString;
 }
