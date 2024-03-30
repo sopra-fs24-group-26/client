@@ -4,6 +4,7 @@
 **Issue:** "Userstory: Issue Summary" <br>
 **Branch:** "Issuenumber-issue-description" [^1] <br>
 **Commit:** "Issuenumber: Commit message" <br>
+**PR:** "Userstory: PR/Issue description" <br>
 
 [^1]: This should get out-created by GitHub when fomring a branch for an issue
 
