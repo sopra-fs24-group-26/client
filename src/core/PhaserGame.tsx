@@ -1,7 +1,6 @@
 import * as React from "react";
 import "styles/index.scss";
-import { StartGame } from "./main";
-import { EventBus } from "./EventBus";
+import { StartGame, EventBus } from "./main";
 import { Nullable } from "definitions/utils";
 
 export interface IRefPhaserGame {

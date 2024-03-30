@@ -3,7 +3,7 @@
  * Written by Noah Mattia Bussinger, October 2023
  */
 
-import { int, float, UUID, Nullable } from "../definitions/utils.js";
+import { float, UUID, int, Nullable } from "definitions/utils";
 
 export const PHI: float = (1 + 5 ** 0.5) / 2;
 

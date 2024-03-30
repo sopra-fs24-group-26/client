@@ -10,4 +10,7 @@ const config: Phaser.Types.Core.GameConfig = {
     scene: [TitleScreen],
 };
 
+export const EventBus: Phaser.Events.EventEmitter =
+    new Phaser.Events.EventEmitter();
+
 export const StartGame = () => new Phaser.Game(config);

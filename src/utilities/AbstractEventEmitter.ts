@@ -3,8 +3,8 @@
  * Written by Noah Mattia Bussinger, October 2023
  */
 
-import { UUID } from "../definitions/utils.js";
-import { UUIDv4 } from "./utils.js";
+import { UUID } from "definitions/utils";
+import { UUIDv4 } from "./utils";
 
 export abstract class AbstractEventEmitter<T> {
     protected readonly listeners: Map<UUID, T>;
