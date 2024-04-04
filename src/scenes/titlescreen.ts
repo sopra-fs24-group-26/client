@@ -6,7 +6,7 @@ import { interactify } from "../utilities/utils";
 
 export class TitleScreen extends Phaser.Scene {
     private text: Nullable<Phaser.GameObjects.Text>;
-    private button: Nullable<Phaser.GameObjects.image>;
+    private button: Nullable<Phaser.GameObjects.Image>;
     private clientW: number;
     private clientH: number;
 
@@ -16,6 +16,7 @@ export class TitleScreen extends Phaser.Scene {
         this.clientW = document.body.clientWidth;
         this.clientH = document.body.clientHeight;
     }
+
     public preload(): void {
         this.load.image("createLobby", "create.png");
     }
@@ -49,8 +50,9 @@ export class TitleScreen extends Phaser.Scene {
         interactify(this.button, 0.2, () => this.onButton());
         log(this, this.text);
     }
+
     private async onButton(): Promise<void> {
-        const sessionId = await SessionManager.createSession();
+        const sessionId: string = await SessionManager.createSession();
         this.input.stopPropagation();
         this.scene.start("LobbyScreen");
     }

@@ -1,6 +1,6 @@
 import { MasterTick } from "core/masterTick";
 import { EventEmitter } from "utilities/EventEmitter";
-import { Nullable } from "../definitions/utils";
+import { int, Nullable } from "../definitions/utils";
 
 class PlayerManager {
     public readonly onSync: EventEmitter;
@@ -16,12 +16,8 @@ class PlayerManager {
             this.onSync.emit();
         });
     }
-    static getPlayerId(): Nullable<string> {
-        let playerId: Nullable<string>;
-        playerId = localStorage.getItem("playerId");
-        return playerId;
-    }
-    generateName(): string {
+
+    public GenerateName(): string {
         const prefix = [
             "Sir ",
             "Dr. ",
@@ -51,18 +47,24 @@ class PlayerManager {
             "Poopybutthole",
             "of the Migros",
         ];
-        let maxPrefix = prefix.length;
-        let maxTitle = title.length;
-        let maxName = names.length;
+        let maxPrefix: int = prefix.length;
+        let maxTitle: int = title.length;
+        let maxName: int = names.length;
 
-        const randomPrefix = Math.floor(Math.random() * maxPrefix);
-        const randomTitle = Math.floor(Math.random() * maxTitle);
-        const randomName = Math.floor(Math.random() * maxName);
+        const randomPrefix: int = Math.floor(Math.random() * maxPrefix);
+        const randomTitle: int = Math.floor(Math.random() * maxTitle);
+        const randomName: int = Math.floor(Math.random() * maxName);
 
-        let username =
+        let username: string =
             prefix[randomPrefix] + title[randomTitle] + names[randomName];
 
         return username;
+    }
+
+    public getPlayerId(): Nullable<string> {
+        let playerId: Nullable<string>;
+        playerId = localStorage.getItem("playerId") || null;
+        return playerId;
     }
 }
 

@@ -5,6 +5,7 @@ import { log } from "utilities/logger";
 import PlayerManager from "../managers/PlayerManager";
 import axios from "axios";
 import { api } from "../utilities/api";
+import { PlayerDTO } from "../definitions/dto";
 
 class SessionManager {
     public readonly onSync: EventEmitter;
@@ -27,23 +28,20 @@ class SessionManager {
         });
         log(MasterTick);
     }
-    async createSession(): Promise<string> {
-        const playerName = PlayerManager.generateName();
 
-        const requestBody = playerName;
+    public async createSession(): Promise<string> {
+        const playerName: string = PlayerManager.GenerateName();
+
+        const requestBody: string = playerName;
         log(playerName);
         const response: axios.AxiosResponse<PlayerDTO> = await api.post(
-            "/user",
+            "/create",
             requestBody,
         );
         localStorage.setItem("playerId", response.data.playerId);
-        return response.data.sessionId;
+        const session: string = response.data.sessionId;
+        return session;
     }
 }
-type PlayerDTO = {
-    username: string;
-    playerId: string;
-    sessionId: string;
-};
 
 export default new SessionManager();
