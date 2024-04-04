@@ -3,7 +3,8 @@
  * Written by Noah Mattia Bussinger, October 2023
  */
 
-import { float, UUID, int, Nullable } from "definitions/utils";
+import { int, float, UUID, Nullable,EmptyCallback } from "../definitions/utils.js";
+import Phaser from "phaser";
 
 export const PHI: float = (1 + 5 ** 0.5) / 2;
 
@@ -143,4 +144,33 @@ export function deepImmutable<T extends object>(root: T): T {
         }
     }
     return Object.freeze(root);
+}
+export function interactify(
+    image: Phaser.GameObjects.Image,
+    scale: float,
+    callback: EmptyCallback,
+): void {
+    let dirty: boolean = true;
+    function expand(): void {
+        dirty = true;
+        image.setScale(scale);
+    }
+    function shrink(): void {
+        dirty = false;
+        image.setScale(scale * 0.9);
+    }
+    function up(): void {
+        const wasDirty: boolean = dirty;
+        expand();
+        if (wasDirty) {
+            return;
+        }
+        callback();
+    }
+    image.setInteractive();
+    image.on("pointerdown", shrink);
+    image.on("pointerup", up);
+    image.on("pointerout", expand);
+    image.on("pointercancel", expand);
+    image.setScale(scale);
 }
