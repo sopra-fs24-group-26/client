@@ -1,20 +1,49 @@
-import { MasterTick } from "core/masterTick";
-import { EventEmitter } from "utilities/EventEmitter";
-import { int, Nullable } from "../definitions/utils";
+import { int, Nullable, UUID } from "../definitions/utils";
+import { PlayerInformation } from "definitions/information";
+import GeneralManager from "./GeneralManager";
 
 class PlayerManager {
-    public readonly onSync: EventEmitter;
-
-    public constructor() {
-        this.onSync = new EventEmitter();
-        this.beginSync();
+    public saveId(id: UUID): void {
+        localStorage.setItem("playerId", id);
     }
 
-    private beginSync(): void {
-        MasterTick.on(() => {
-            //fetch data from server and update fields
-            this.onSync.emit();
-        });
+    public removeId(): void {
+        localStorage.removeItem("playerId");
+    }
+
+    public getId(): Nullable<UUID> {
+        return localStorage.getItem("playerId") || null;
+    }
+
+    public getAll(): Nullable<PlayerInformation[]> {
+        return GeneralManager.getPlayers();
+    }
+
+    public getMe(): Nullable<PlayerInformation> {
+        const players: Nullable<PlayerInformation[]> = this.getAll();
+        if (!players) {
+            return null;
+        }
+        return (
+            players.filter(
+                (player: PlayerInformation) => player.id === this.getId(),
+            )[0] || null
+        );
+    }
+
+    /** return:
+     * null if players is null
+     * empty array if no other players exist
+     * normal array if other players exist
+     */
+    public getOthers(): Nullable<PlayerInformation[]> {
+        const players: Nullable<PlayerInformation[]> = this.getAll();
+        if (!players) {
+            return null;
+        }
+        return players.filter(
+            (player: PlayerInformation) => player.id !== this.getId(),
+        );
     }
 
     public generateName(): string {
@@ -59,10 +88,6 @@ class PlayerManager {
             prefix[randomPrefix] + title[randomTitle] + names[randomName];
 
         return username;
-    }
-
-    public getPlayerId(): Nullable<string> {
-        return localStorage.getItem("playerId") || null;
     }
 }
 

@@ -1,9 +1,6 @@
-import { int } from "../definitions/utils";
+import { UUID } from "./utils";
 
-export type PlayerDTO = {
-    username: string;
-    playerId: string;
-    sessionId: string;
-    role: int;
-    orderIndex: int;
+export type JoinDTO = {
+    sessionId: UUID;
+    playerName: string;
 };
