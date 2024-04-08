@@ -1,13 +1,18 @@
 import Phaser from "phaser";
 import { TitleScreen } from "scenes/titlescreen";
+import { LobbyScreen } from "scenes/lobbyscreen";
+import { int } from "../definitions/utils";
+
+export const ScreenWidth: int = document.body.clientWidth;
+export const ScreenHeight: int = document.body.clientHeight;
 
 const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
-    width: 800,
-    height: 600,
+    width: ScreenWidth,
+    height: ScreenHeight,
     parent: "game-container",
     backgroundColor: "#028af8",
-    scene: [TitleScreen],
+    scene: [TitleScreen, LobbyScreen],
 };
 
 export const EventBus: Phaser.Events.EventEmitter =

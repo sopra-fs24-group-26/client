@@ -20,3 +20,5 @@ export type Nullable<T> = T | null;
 export type FloatArray = float[] | Float32Array | Float64Array;
 
 export type Modify<T, R> = Omit<T, keyof R> & R;
+
+export type EmptyCallback = () => void;
