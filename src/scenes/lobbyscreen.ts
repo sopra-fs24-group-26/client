@@ -13,7 +13,7 @@ export class LobbyScreen extends Phaser.Scene {
     private quitButton: Nullable<Phaser.GameObjects.Image>;
     private shareButton: Nullable<Phaser.GameObjects.Image>;
     private startButton: Nullable<Phaser.GameObjects.Image>;
-    private container: Phaser.GameObjects.Container;
+    private nameContainer: Nullable<Phaser.GameObjects.Container>;
 
     public constructor() {
         super("LobbyScreen");
@@ -21,7 +21,7 @@ export class LobbyScreen extends Phaser.Scene {
         this.quitButton = null;
         this.shareButton = null;
         this.startButton = null;
-        this.container = this.add.container(100, 100);
+        this.nameContainer = null;
     }
 
     public init(): void {
@@ -71,12 +71,15 @@ export class LobbyScreen extends Phaser.Scene {
             "testButton",
         );
         interactify(this.startButton, 1, () => this.onStartButton());
+
+        this.nameContainer = this.add.container();
     }
 
     private onQuitButton(): void {
         PlayerManager.removeId();
         log("playerId in local storage removed");
         log("delete player info in backend");
+        this.scene.start("TitleScreen");
     }
 
     private onShareButton(): void {
@@ -95,32 +98,33 @@ export class LobbyScreen extends Phaser.Scene {
      * Deletes every child in this.container
      */
     public clearFrame(): void {
-        this.container.list.forEach(function (child) {
-            child.destroy();
-        }, this);
-        this.container.removeAll();
+        assert(this.nameContainer);
+        this.nameContainer.list.forEach((child) => child.destroy());
+        this.nameContainer.removeAll();
     }
 
     public updateFrame(): void {
         this.clearFrame();
         const me: Nullable<PlayerInformation> = PlayerManager.getMe();
         const others: Nullable<PlayerInformation[]> = PlayerManager.getOthers();
-        assert(me && this.title && others);
+        assert(me && this.title && others && this.nameContainer);
         this.title.text = `Saboteur Lobby\n${me.name}`;
 
         for (let i: int = 0; i < others.length; i++) {
-            let ypos: int = 150 + i * 30;
+            let ypos: int = ScreenHeight / 6 + (i * ScreenHeight) / 20;
             let playername: string = others[i].name;
             let fontstyle: string = "normal";
-            this.container.add(
-                this.add.text(100, ypos, playername, {
-                    fontFamily: "Arial Black",
-                    fontSize: 20,
-                    color: "#e1e1e1",
-                    stroke: "#000000",
-                    strokeThickness: 3,
-                    fontStyle: fontstyle,
-                }),
+            this.nameContainer.add(
+                this.add
+                    .text(ScreenWidth / 2, ypos, playername, {
+                        fontFamily: "Arial Black",
+                        fontSize: 20,
+                        color: "#e1e1e1",
+                        stroke: "#000000",
+                        strokeThickness: 3,
+                        fontStyle: fontstyle,
+                    })
+                    .setOrigin(0.5, 0.5),
             );
         }
     }
