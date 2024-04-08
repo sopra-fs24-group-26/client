@@ -17,8 +17,8 @@ class PlayerManager {
         });
     }
 
-    public GenerateName(): string {
-        const prefix = [
+    public generateName(): string {
+        const prefix: string[] = [
             "Sir ",
             "Dr. ",
             "Madam ",
@@ -28,7 +28,7 @@ class PlayerManager {
             "Blue ",
             "Lady ",
         ];
-        const title = [
+        const title: string[] = [
             "Lord ",
             "med. ",
             "Knight ",
@@ -37,7 +37,7 @@ class PlayerManager {
             "King ",
             "Queen ",
         ];
-        const names = [
+        const names: string[] = [
             "Nightingale",
             "Einstein",
             "of Rivia",
@@ -47,24 +47,22 @@ class PlayerManager {
             "Poopybutthole",
             "of the Migros",
         ];
-        let maxPrefix: int = prefix.length;
-        let maxTitle: int = title.length;
-        let maxName: int = names.length;
+        const maxPrefix: int = prefix.length;
+        const maxTitle: int = title.length;
+        const maxName: int = names.length;
 
         const randomPrefix: int = Math.floor(Math.random() * maxPrefix);
         const randomTitle: int = Math.floor(Math.random() * maxTitle);
         const randomName: int = Math.floor(Math.random() * maxName);
 
-        let username: string =
+        const username: string =
             prefix[randomPrefix] + title[randomTitle] + names[randomName];
 
         return username;
     }
 
     public getPlayerId(): Nullable<string> {
-        let playerId: Nullable<string>;
-        playerId = localStorage.getItem("playerId") || null;
-        return playerId;
+        return localStorage.getItem("playerId") || null;
     }
 }
 

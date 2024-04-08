@@ -30,7 +30,7 @@ class SessionManager {
     }
 
     public async createSession(): Promise<string> {
-        const playerName: string = PlayerManager.GenerateName();
+        const playerName: string = PlayerManager.generateName();
 
         const requestBody: string = playerName;
         log(playerName);

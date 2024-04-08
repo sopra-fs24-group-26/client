@@ -3,18 +3,15 @@ import SessionManager from "managers/SessionManager";
 import Phaser from "phaser";
 import { log } from "utilities/logger";
 import { interactify } from "../utilities/utils";
+import { ScreenHeight, ScreenWidth } from "../core/main";
 
 export class TitleScreen extends Phaser.Scene {
     private text: Nullable<Phaser.GameObjects.Text>;
     private button: Nullable<Phaser.GameObjects.Image>;
-    private clientW: number;
-    private clientH: number;
 
     public constructor() {
         super("TitleScreen");
         this.text = null;
-        this.clientW = document.body.clientWidth;
-        this.clientH = document.body.clientHeight;
     }
 
     public preload(): void {
@@ -33,7 +30,7 @@ export class TitleScreen extends Phaser.Scene {
 
     public create(): void {
         this.text = this.add
-            .text(this.clientW / 2, this.clientH / 4, "Saboteur", {
+            .text(ScreenWidth / 2, ScreenHeight / 4, "Saboteur", {
                 fontFamily: "Arial Black",
                 fontSize: 38,
                 color: "#ffffff",
@@ -43,8 +40,8 @@ export class TitleScreen extends Phaser.Scene {
             })
             .setOrigin(0.5);
         this.button = this.add.image(
-            this.clientW / 2,
-            this.clientH / 1.5,
+            ScreenWidth / 2,
+            ScreenHeight / 1.5,
             "createLobby",
         );
         interactify(this.button, 0.2, () => this.onButton());
