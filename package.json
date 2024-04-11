@@ -5,6 +5,7 @@
     "dependencies": {
         "@types/react": "^18.2.67",
         "@types/react-dom": "^18.2.22",
+        "@types/seedrandom": "^3.0.8",
         "axios": "^1.6.7",
         "eslint-config-react-app": "^7.0.1",
         "phaser": "^3.80.1",
@@ -14,6 +15,7 @@
         "react-router-dom": "^6.21.3",
         "react-scripts": "^5.0.1",
         "react-toastify": "^10.0.4",
+        "seedrandom": "^3.0.5",
         "serve": "^14.2.1",
         "typescript": "^3.9.10"
     },
