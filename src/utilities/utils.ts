@@ -3,6 +3,7 @@
  * Written by Noah Mattia Bussinger, October 2023
  */
 
+import seedrandom from "seedrandom";
 import {
     int,
     float,
@@ -197,4 +198,13 @@ export function generateRandomString(length: int): string {
     }
 
     return randomString;
+}
+
+export function seededShuffle<T>(list: T[], seed: string): T[] {
+    const random: seedrandom.PRNG = seedrandom(seed);
+    for (let i: int = list.length - 1; i > 0; i--) {
+        const j: int = Math.floor(random() * (i + 1));
+        [list[i], list[j]] = [list[j], list[i]];
+    }
+    return list;
 }

@@ -17,7 +17,8 @@ export type PlayerInformation = {
 export type SessionInformation = {
     id: UUID;
     playerCount: int; // number of players in session
-    turnPlayer: Nullable<UUID>; // the player who is at turn
+    turnPlayer: Nullable<int>; // the player who is at turn
+    seed: string;
 };
 
 export type TileInformation = {
