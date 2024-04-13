@@ -1,7 +1,8 @@
 import { int, Nullable, UUID } from "../definitions/utils";
-import { seededShuffle } from "../utilities/utils";
+import { seededShuffle, assert } from "../utilities/utils";
 import { PlayerInformation, SessionInformation } from "definitions/information";
 import GeneralManager from "./GeneralManager";
+import SessionManager from "./SessionManager";
 
 class PlayerManager {
     public saveId(id: UUID): void {
@@ -47,8 +48,16 @@ class PlayerManager {
         );
     }
 
+    public distributeRoles() {
+        const roles: string[] = this.getRoles();
+        const me: Nullable<PlayerInformation> = this.getMe();
+        assert(me);
+        const order: Nullable<int> = me.orderIndex;
+        me.role = roles[order];
+    }
+
     public getRoles(): string[] {
-        const seed: string = GeneralManager.getSeed();
+        const seed: string = SessionManager.getSeed();
         const allRoles: string[] = this.generateRoles();
         const shuffledRoles: string[] = seededShuffle(allRoles, seed);
         return shuffledRoles;
@@ -58,9 +67,8 @@ class PlayerManager {
         let roles: string[] = [];
         const session: Nullable<SessionInformation> =
             GeneralManager.getSession();
-        if (session === null) {
-            throw new Error("Couldn't get Session");
-        }
+        console.log(session);
+        assert(session);
         const playerCount: int = session.playerCount;
         if (playerCount <= 4) {
             roles.push("Saboteur");
