@@ -23,7 +23,7 @@ export type SessionInformation = {
 
 export type TileInformation = {
     id: UUID;
-    sessionID: UUID;
+    sessionId: UUID;
     type: int; //the type of tile, represents the kind of path
     isPlaced: boolean; //whether the tile is placed in game frame
     rotation: Nullable<int>; //how to turn the tile before placing

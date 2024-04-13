@@ -30,6 +30,7 @@
         "strictNullChecks": true,
         "strictFunctionTypes": true,
         "esModuleInterop": true,
+        "resolveJsonModule": true,
         "noPropertyAccessFromIndexSignature": true,
         "noUncheckedIndexedAccess": false,
         "target": "ES2015",
