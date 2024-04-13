@@ -58,7 +58,7 @@ class PlayerManager {
         let roles: string[] = [];
         const session: Nullable<SessionInformation> =
             GeneralManager.getSession();
-        if (session == null) {
+        if (session === null) {
             throw new Error("Couldn't get Session");
         }
         const playerCount: int = session.playerCount;
@@ -71,7 +71,7 @@ class PlayerManager {
         } else {
             roles.push("Saboteur", "Saboteur", "Saboteur", "Saboteur");
         }
-        while (roles.length != playerCount) {
+        while (roles.length !== playerCount) {
             roles.push("Miner");
         }
         return roles;

@@ -100,7 +100,7 @@ class GeneralManager {
 
     public getSeed(): string {
         const session: Nullable<SessionInformation> = this.getSession();
-        if (session == null) {
+        if (session === null) {
             throw new Error("Couldn't get Session");
         } else {
             return session.seed;
