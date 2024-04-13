@@ -51,8 +51,8 @@ class PlayerManager {
     public distributeRoles() {
         const roles: string[] = this.getRoles();
         const me: Nullable<PlayerInformation> = this.getMe();
-        assert(me);
         const order: Nullable<int> = me.orderIndex;
+        assert(me && order);
         me.role = roles[order];
     }
 
