@@ -13,6 +13,8 @@ export class LobbyScreen extends Phaser.Scene {
     private quitButton: Nullable<Phaser.GameObjects.Image>;
     private shareButton: Nullable<Phaser.GameObjects.Image>;
     private startButton: Nullable<Phaser.GameObjects.Image>;
+    private editNameButton: Nullable<Phaser.GameObjects.Image>;
+    private nameInputField: Nullable<Phaser.GameObjects.DOMElement>;
     private nameContainer: Nullable<Phaser.GameObjects.Container>;
 
     public constructor() {
@@ -21,6 +23,8 @@ export class LobbyScreen extends Phaser.Scene {
         this.quitButton = null;
         this.shareButton = null;
         this.startButton = null;
+        this.editNameButton = null;
+        this.nameInputField = null;
         this.nameContainer = null;
     }
 
@@ -37,6 +41,7 @@ export class LobbyScreen extends Phaser.Scene {
 
     public preload(): void {
         this.load.image("testButton", "assets/testButton.png");
+        this.load.html("nameform", "assets/text/nameform.html");
     }
 
     public create(): void {
@@ -73,6 +78,13 @@ export class LobbyScreen extends Phaser.Scene {
         interactify(this.startButton, 1, () => this.onStartButton());
 
         this.nameContainer = this.add.container();
+
+        this.editNameButton = this.add.image(
+            ScreenWidth / 1.25,
+            ScreenHeight / 5,
+            "testButton",
+        );
+        interactify(this.editNameButton, 1, () => this.onEditNameButton());
     }
 
     private onQuitButton(): void {
@@ -92,6 +104,38 @@ export class LobbyScreen extends Phaser.Scene {
 
     private onStartButton(): void {
         log("Start");
+        if (PlayerManager.getNumberOfPlayers() >= 3) {
+            this.scene.start("GameScreen");
+        }
+    }
+
+    private onEditNameButton(): void {
+        if (this.nameInputField) {
+            this.nameInputField.removeListener("click");
+            this.nameInputField.setVisible(false);
+            this.nameInputField = null;
+        }
+        this.nameInputField = this.add
+            .dom(ScreenWidth / 2, ScreenHeight / 8 + 60)
+            .createFromCache("nameform");
+
+        this.nameInputField.addListener("click");
+        this.nameInputField.on("click", (event: Event) => {
+            if ((event.target as HTMLElement).name === "playButton") {
+                assert(this.nameInputField);
+                const inputText: HTMLInputElement =
+                    this.nameInputField.getChildByName(
+                        "nameField",
+                    ) as HTMLInputElement;
+
+                if (inputText.value !== "") {
+                    PlayerManager.updatePlayerName(inputText.value);
+                }
+                this.nameInputField.removeListener("click");
+                this.nameInputField.setVisible(false);
+                this.nameInputField = null;
+            }
+        });
     }
 
     /**
@@ -105,6 +149,7 @@ export class LobbyScreen extends Phaser.Scene {
 
     public updateFrame(): void {
         this.clearFrame();
+        log(true);
         const me: Nullable<PlayerInformation> = PlayerManager.getMe();
         const others: Nullable<PlayerInformation[]> = PlayerManager.getOthers();
         assert(me && this.title && others && this.nameContainer);

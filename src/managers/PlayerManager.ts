@@ -1,6 +1,9 @@
 import { int, Nullable, UUID } from "../definitions/utils";
 import { PlayerInformation } from "definitions/information";
 import GeneralManager from "./GeneralManager";
+import { UpdatePlayerNameDTO } from "definitions/dto";
+import axios from "axios";
+import { api } from "utilities/api";
 
 class PlayerManager {
     public saveId(id: UUID): void {
@@ -43,6 +46,26 @@ class PlayerManager {
         }
         return players.filter(
             (player: PlayerInformation) => player.id !== this.getId(),
+        );
+    }
+
+    /**
+     *
+     * @returns an integer of the total amount of players in this session
+     */
+    public getNumberOfPlayers(): int {
+        const res: int = GeneralManager.getPlayers.length;
+        return res;
+    }
+
+    public async updatePlayerName(playername: string): Promise<void> {
+        const requestBody: UpdatePlayerNameDTO = {
+            playerId: this.getId(),
+            playerName: playername,
+        } as UpdatePlayerNameDTO;
+        const response: axios.AxiosResponse<PlayerInformation> = await api.put(
+            "/playername",
+            requestBody,
         );
     }
 
