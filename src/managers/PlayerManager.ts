@@ -1,5 +1,6 @@
 import { int, Nullable, UUID } from "../definitions/utils";
-import { PlayerInformation } from "definitions/information";
+import { seededShuffle } from "../utilities/utils";
+import { PlayerInformation, SessionInformation } from "definitions/information";
 import GeneralManager from "./GeneralManager";
 
 class PlayerManager {
@@ -44,6 +45,36 @@ class PlayerManager {
         return players.filter(
             (player: PlayerInformation) => player.id !== this.getId(),
         );
+    }
+
+    public getRoles(): string[] {
+        const seed: string = GeneralManager.getSeed();
+        const allRoles: string[] = this.generateRoles();
+        const shuffledRoles: string[] = seededShuffle(allRoles, seed);
+        return shuffledRoles;
+    }
+
+    public generateRoles(): string[] {
+        let roles: string[] = [];
+        const session: Nullable<SessionInformation> =
+            GeneralManager.getSession();
+        if (session == null) {
+            throw new Error("Couldn't get Session");
+        }
+        const playerCount: int = session.playerCount;
+        if (playerCount <= 4) {
+            roles.push("Saboteur");
+        } else if (playerCount <= 6) {
+            roles.push("Saboteur", "Saboteur");
+        } else if (playerCount <= 9) {
+            roles.push("Saboteur", "Saboteur", "Saboteur");
+        } else {
+            roles.push("Saboteur", "Saboteur", "Saboteur", "Saboteur");
+        }
+        while (roles.length != playerCount) {
+            roles.push("Miner");
+        }
+        return roles;
     }
 
     public generateName(): string {

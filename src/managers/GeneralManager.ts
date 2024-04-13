@@ -97,6 +97,15 @@ class GeneralManager {
     public getPlayers(): Nullable<PlayerInformation[]> {
         return this.data?.players || null;
     }
+
+    public getSeed(): string {
+        const session: Nullable<SessionInformation> = this.getSession();
+        if (session == null) {
+            throw new Error("Couldn't get Session");
+        } else {
+            return session.seed;
+        }
+    }
 }
 
 export default new GeneralManager();

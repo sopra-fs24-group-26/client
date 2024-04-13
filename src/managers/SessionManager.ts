@@ -48,6 +48,10 @@ class SessionManager {
         );
         PlayerManager.saveId(response.data.id);
     }
+
+    public startGame() {
+        const roles: string[] = PlayerManager.getRoles();
+    }
 }
 
 export default new SessionManager();
