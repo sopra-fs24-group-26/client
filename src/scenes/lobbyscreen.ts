@@ -89,8 +89,6 @@ export class LobbyScreen extends Phaser.Scene {
 
     private onQuitButton(): void {
         PlayerManager.removeId();
-        log("playerId in local storage removed");
-        log("delete player info in backend");
         this.scene.start("TitleScreen");
     }
 
@@ -99,11 +97,9 @@ export class LobbyScreen extends Phaser.Scene {
         assert(sessionId);
         const link: string = `${location.origin}/${sessionId}`;
         navigator.clipboard.writeText(link);
-        log("copy link to clipboard");
     }
 
     private onStartButton(): void {
-        log("Start");
         if (PlayerManager.getNumberOfPlayers() >= 3) {
             this.scene.start("GameScreen");
         }
@@ -149,7 +145,6 @@ export class LobbyScreen extends Phaser.Scene {
 
     public updateFrame(): void {
         this.clearFrame();
-        log(true);
         const me: Nullable<PlayerInformation> = PlayerManager.getMe();
         const others: Nullable<PlayerInformation[]> = PlayerManager.getOthers();
         assert(me && this.title && others && this.nameContainer);
