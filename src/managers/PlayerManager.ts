@@ -64,7 +64,7 @@ class PlayerManager {
             playerName: playername,
         } as UpdatePlayerNameDTO;
         const response: axios.AxiosResponse<PlayerInformation> = await api.put(
-            "/playername",
+            "/name",
             requestBody,
         );
     }
