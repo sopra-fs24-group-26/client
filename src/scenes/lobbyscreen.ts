@@ -91,6 +91,7 @@ export class LobbyScreen extends Phaser.Scene {
     }
 
     private onStartButton(): void {
+        PlayerManager.distributeRoles();
         log("Start");
     }
 

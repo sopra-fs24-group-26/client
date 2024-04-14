@@ -5,6 +5,7 @@ import { api } from "../utilities/api";
 import { PlayerInformation, SessionInformation } from "definitions/information";
 import { JoinDTO } from "definitions/dto";
 import GeneralManager from "./GeneralManager";
+import { assert } from "utilities/utils";
 
 class SessionManager {
     public constructor() {
@@ -47,6 +48,14 @@ class SessionManager {
             requestBody,
         );
         PlayerManager.saveId(response.data.id);
+    }
+
+    public getSeed(): string {
+        const session: Nullable<SessionInformation> =
+            GeneralManager.getSession();
+        assert(session);
+
+        return session.seed;
     }
 }
 

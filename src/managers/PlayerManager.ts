@@ -1,6 +1,8 @@
 import { int, Nullable, UUID } from "../definitions/utils";
-import { PlayerInformation } from "definitions/information";
+import { seededShuffle, assert } from "../utilities/utils";
+import { PlayerInformation, SessionInformation } from "definitions/information";
 import GeneralManager from "./GeneralManager";
+import SessionManager from "./SessionManager";
 
 class PlayerManager {
     public saveId(id: UUID): void {
@@ -44,6 +46,43 @@ class PlayerManager {
         return players.filter(
             (player: PlayerInformation) => player.id !== this.getId(),
         );
+    }
+
+    public distributeRoles() {
+        const roles: string[] = this.getRoles();
+        const me: Nullable<PlayerInformation> = this.getMe();
+        const order: Nullable<int> = me.orderIndex;
+        assert(me && order);
+        me.role = roles[order];
+    }
+
+    public getRoles(): string[] {
+        const seed: string = SessionManager.getSeed();
+        const allRoles: string[] = this.generateRoles();
+        const shuffledRoles: string[] = seededShuffle(allRoles, seed);
+        return shuffledRoles;
+    }
+
+    public generateRoles(): string[] {
+        let roles: string[] = [];
+        const session: Nullable<SessionInformation> =
+            GeneralManager.getSession();
+        console.log(session);
+        assert(session);
+        const playerCount: int = session.playerCount;
+        if (playerCount <= 4) {
+            roles.push("Saboteur");
+        } else if (playerCount <= 6) {
+            roles.push("Saboteur", "Saboteur");
+        } else if (playerCount <= 9) {
+            roles.push("Saboteur", "Saboteur", "Saboteur");
+        } else {
+            roles.push("Saboteur", "Saboteur", "Saboteur", "Saboteur");
+        }
+        while (roles.length !== playerCount) {
+            roles.push("Miner");
+        }
+        return roles;
     }
 
     public generateName(): string {

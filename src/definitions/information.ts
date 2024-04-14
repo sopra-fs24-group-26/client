@@ -10,7 +10,7 @@ export type PlayerInformation = {
     id: UUID;
     name: string;
     sessionId: UUID;
-    role: Nullable<int>;
+    role: Nullable<string>;
     orderIndex: Nullable<int>;
 };
 
