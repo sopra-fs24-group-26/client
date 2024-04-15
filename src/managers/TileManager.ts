@@ -3,17 +3,18 @@ import GeneralManager from "./GeneralManager";
 import tileConfigs from "configs/tiles.json";
 import { TileConfig } from "definitions/config";
 import { assert, seededShuffle } from "utilities/utils";
-import { TileDTO } from "definitions/dto";
+import { SessionDTO, TileDTO } from "definitions/dto";
 import { Tile } from "entities/Tile";
 import seedrandom from "seedrandom";
-import { Session } from "entities/Session";
-import SessionManager from "./SessionManager";
 import { TileState } from "definitions/enums";
+import { EventEmitter } from "utilities/EventEmitter";
 
 class TileManager {
+    public readonly onSync: EventEmitter;
     private list: Nullable<Tile[]>;
 
     public constructor() {
+        this.onSync = new EventEmitter();
         this.list = null;
     }
 
@@ -27,7 +28,7 @@ class TileManager {
 
     private listen(): void {
         GeneralManager.onSync.on(() => {
-            const session: Nullable<Session> = SessionManager.getSession();
+            const session: Nullable<SessionDTO> = GeneralManager.getSession();
             const dtos: Nullable<TileDTO[]> = GeneralManager.getTiles();
             assert(session && dtos);
             const random: seedrandom.PRNG = seedrandom(session.seed);
@@ -41,9 +42,9 @@ class TileManager {
                 const state: TileState = TileState.Unused; // TODO
                 const dto: Nullable<TileDTO> =
                     dtos.find((dto: TileDTO) => dto.id === tile.id) || null;
-                assert(dto);
                 tile.apply(state, dto);
             });
+            this.onSync.emit();
         });
     }
 

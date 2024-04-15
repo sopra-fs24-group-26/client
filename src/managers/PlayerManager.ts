@@ -5,11 +5,14 @@ import GeneralManager from "./GeneralManager";
 import { Player } from "entities/Player";
 import { api } from "utilities/api";
 import axios from "axios";
+import { EventEmitter } from "utilities/EventEmitter";
 
 class PlayerManager {
+    public readonly onSync: EventEmitter;
     private list: Nullable<Player[]>;
 
     public constructor() {
+        this.onSync = new EventEmitter();
         this.list = null;
     }
 
@@ -59,6 +62,7 @@ class PlayerManager {
             this.list = dtos.map(
                 (dto: PlayerDTO) => new Player(dto, dtos.length),
             );
+            this.onSync.emit();
         });
     }
 
@@ -75,6 +79,16 @@ class PlayerManager {
         if (!response.data) {
             this.removeId();
         }
+    }
+
+    public async delete(): Promise<void> {
+        const id: Nullable<UUID> = this.getId();
+        if (!id) {
+            return;
+        }
+        this.removeId();
+        const requestBody: string = id;
+        await api.post("/deletePlayer", requestBody);
     }
 
     public generateName(): string {

@@ -6,16 +6,27 @@ import { JoinDTO, SessionDTO } from "definitions/dto";
 import GeneralManager from "./GeneralManager";
 import { assert } from "utilities/utils";
 import { Session } from "entities/Session";
+import { EventEmitter } from "utilities/EventEmitter";
 
 class SessionManager {
+    public readonly onSync: EventEmitter;
     private session: Nullable<Session>;
 
     public constructor() {
+        this.onSync = new EventEmitter();
         this.session = null;
     }
 
     public getSession(): Nullable<Session> {
         return this.session;
+    }
+
+    public hasStarted(): Nullable<boolean> {
+        const session: Nullable<Session> = this.getSession();
+        if (!session) {
+            return null;
+        }
+        return session.turnPlayer !== null;
     }
 
     public async initialize(): Promise<void> {
@@ -26,6 +37,9 @@ class SessionManager {
     private async handleJoin(): Promise<void> {
         await PlayerManager.validateId();
         if (PlayerManager.getId() !== null) {
+            if (location.pathname.slice(1) !== "") {
+                location.pathname = "";
+            }
             return;
         }
         const sessionId: UUID = location.pathname.slice(1);
@@ -45,6 +59,7 @@ class SessionManager {
             requestBody,
         );
         PlayerManager.saveId(response.data);
+        location.pathname = "";
     }
 
     private listen(): void {
@@ -52,6 +67,7 @@ class SessionManager {
             const dto: Nullable<SessionDTO> = GeneralManager.getSession();
             assert(dto);
             this.session = new Session(dto);
+            this.onSync.emit();
         });
     }
 

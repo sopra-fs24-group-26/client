@@ -26,13 +26,12 @@ export class LobbyScreen extends Phaser.Scene {
     }
 
     public init(): void {
-        const generalManagerListener: UUID = GeneralManager.onSync.on(() => {
-            this.updateFrame();
-        });
-
+        const updateListener: UUID = PlayerManager.onSync.on(() =>
+            this.updateFrame(),
+        );
         // on scene destroy free listener
         this.events.on("destroy", () => {
-            GeneralManager.onSync.off(generalManagerListener);
+            GeneralManager.onSync.off(updateListener);
         });
     }
 
@@ -74,14 +73,26 @@ export class LobbyScreen extends Phaser.Scene {
             "start",
         );
         interactify(this.startButton, 0.5, () => this.onStartButton());
-
         this.nameContainer = this.add.container();
+        this.portToCorrectScene();
+    }
+
+    private portToCorrectScene(): void {
+        const listener: UUID = SessionManager.onSync.on(() => {
+            const hasStarted: Nullable<boolean> = SessionManager.hasStarted();
+            assert(hasStarted !== null);
+            if (!hasStarted) {
+                return;
+            }
+            /*
+            this.scene.start("GameScreen");
+            */
+            SessionManager.onSync.off(listener);
+        });
     }
 
     private onQuitButton(): void {
-        PlayerManager.removeId();
-        log("playerId in local storage removed");
-        log("delete player info in backend");
+        PlayerManager.delete();
         this.scene.start("TitleScreen");
     }
 
@@ -90,7 +101,6 @@ export class LobbyScreen extends Phaser.Scene {
         assert(session);
         const link: string = `${location.origin}/${session.id}`;
         navigator.clipboard.writeText(link);
-        log("copy link to clipboard");
     }
 
     private onStartButton(): void {
@@ -98,21 +108,16 @@ export class LobbyScreen extends Phaser.Scene {
         log("Start");
     }
 
-    public clearFrame(): void {
-        assert(this.nameContainer);
-        this.nameContainer.list.forEach((child) => child.destroy());
-        this.nameContainer.removeAll();
-    }
-
     public updateFrame(): void {
-        this.clearFrame();
+        assert(this.nameContainer);
+        this.nameContainer.removeAll(true);
         const me: Nullable<Player> = PlayerManager.getMe();
         const others: Nullable<Player[]> = PlayerManager.getOthers();
         assert(me && this.title && others && this.nameContainer);
         this.title.text = `Saboteur Lobby\n${me.name}`;
 
         for (let i: int = 0; i < others.length; i++) {
-            let ypos: int = ScreenHeight / 6 + (i * ScreenHeight) / 20;
+            let ypos: int = ScreenHeight / 4 + (i * ScreenHeight) / 20;
             let playername: string = others[i].name;
             let fontstyle: string = "normal";
             this.nameContainer.add(

@@ -15,23 +15,26 @@ class GeneralManager {
         this.data = null;
     }
 
-    public initialize(): void {
-        this.fetchData();
+    public async initialize(): Promise<void> {
+        await this.fetchData();
     }
 
-    private fetchData(): void {
-        MasterTick.on(async () => {
-            const requestBody: Nullable<UUID> = PlayerManager.getId();
-            if (requestBody === null) {
-                return;
-            }
-            const response: axios.AxiosResponse<DataDTO> = await api.post(
-                "/ping",
-                requestBody,
-            );
-            this.data = response.data;
-            this.onSync.emit();
-        });
+    private async fetchData(): Promise<void> {
+        await this.ping();
+        MasterTick.on(async () => await this.ping());
+    }
+
+    private async ping(): Promise<void> {
+        const requestBody: Nullable<UUID> = PlayerManager.getId();
+        if (requestBody === null) {
+            return;
+        }
+        const response: axios.AxiosResponse<DataDTO> = await api.post(
+            "/ping",
+            requestBody,
+        );
+        this.data = response.data;
+        this.onSync.emit();
     }
 
     public getSession(): Nullable<SessionDTO> {
