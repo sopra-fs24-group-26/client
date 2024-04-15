@@ -3,10 +3,11 @@ import Phaser from "phaser";
 import { log } from "utilities/logger";
 import SessionManager from "managers/SessionManager";
 import PlayerManager from "managers/PlayerManager";
-import { PlayerInformation } from "definitions/information";
 import { assert, interactify } from "utilities/utils";
 import { ScreenHeight, ScreenWidth } from "core/main";
 import GeneralManager from "managers/GeneralManager";
+import { Player } from "entities/Player";
+import { Session } from "entities/Session";
 
 export class LobbyScreen extends Phaser.Scene {
     private title: Nullable<Phaser.GameObjects.Text>;
@@ -36,7 +37,9 @@ export class LobbyScreen extends Phaser.Scene {
     }
 
     public preload(): void {
-        this.load.image("testButton", "assets/testButton.png");
+        this.load.image("quit", "assets/quit.png");
+        this.load.image("share", "assets/share.png");
+        this.load.image("start", "assets/start.png");
     }
 
     public create(): void {
@@ -54,23 +57,23 @@ export class LobbyScreen extends Phaser.Scene {
         this.quitButton = this.add.image(
             ScreenWidth / 4,
             ScreenHeight / 1.25,
-            "testButton",
+            "quit",
         );
-        interactify(this.quitButton, 1, () => this.onQuitButton());
+        interactify(this.quitButton, 0.5, () => this.onQuitButton());
 
         this.shareButton = this.add.image(
             ScreenWidth / 2,
             ScreenHeight / 1.25,
-            "testButton",
+            "share",
         );
-        interactify(this.shareButton, 1, () => this.onShareButton());
+        interactify(this.shareButton, 0.5, () => this.onShareButton());
 
         this.startButton = this.add.image(
             ScreenWidth / 1.25,
             ScreenHeight / 1.25,
-            "testButton",
+            "start",
         );
-        interactify(this.startButton, 1, () => this.onStartButton());
+        interactify(this.startButton, 0.5, () => this.onStartButton());
 
         this.nameContainer = this.add.container();
     }
@@ -83,21 +86,18 @@ export class LobbyScreen extends Phaser.Scene {
     }
 
     private onShareButton(): void {
-        const sessionId: Nullable<UUID> = SessionManager.getId();
-        assert(sessionId);
-        const link: string = `${location.origin}/${sessionId}`;
+        const session: Nullable<Session> = SessionManager.getSession();
+        assert(session);
+        const link: string = `${location.origin}/${session.id}`;
         navigator.clipboard.writeText(link);
         log("copy link to clipboard");
     }
 
     private onStartButton(): void {
-        PlayerManager.distributeRoles();
+        //server distribute roles
         log("Start");
     }
 
-    /**
-     * Deletes every child in this.container
-     */
     public clearFrame(): void {
         assert(this.nameContainer);
         this.nameContainer.list.forEach((child) => child.destroy());
@@ -106,8 +106,8 @@ export class LobbyScreen extends Phaser.Scene {
 
     public updateFrame(): void {
         this.clearFrame();
-        const me: Nullable<PlayerInformation> = PlayerManager.getMe();
-        const others: Nullable<PlayerInformation[]> = PlayerManager.getOthers();
+        const me: Nullable<Player> = PlayerManager.getMe();
+        const others: Nullable<Player[]> = PlayerManager.getOthers();
         assert(me && this.title && others && this.nameContainer);
         this.title.text = `Saboteur Lobby\n${me.name}`;
 

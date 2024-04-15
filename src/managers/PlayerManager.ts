@@ -1,10 +1,18 @@
+import { PlayerDTO } from "definitions/dto";
 import { int, Nullable, UUID } from "../definitions/utils";
-import { seededShuffle, assert } from "../utilities/utils";
-import { PlayerInformation, SessionInformation } from "definitions/information";
+import { assert } from "../utilities/utils";
 import GeneralManager from "./GeneralManager";
-import SessionManager from "./SessionManager";
+import { Player } from "entities/Player";
+import { api } from "utilities/api";
+import axios from "axios";
 
 class PlayerManager {
+    private list: Nullable<Player[]>;
+
+    public constructor() {
+        this.list = null;
+    }
+
     public saveId(id: UUID): void {
         localStorage.setItem("playerId", id);
     }
@@ -17,72 +25,56 @@ class PlayerManager {
         return localStorage.getItem("playerId") || null;
     }
 
-    public getAll(): Nullable<PlayerInformation[]> {
-        return GeneralManager.getPlayers();
+    public getAll(): Nullable<Player[]> {
+        return this.list;
     }
 
-    public getMe(): Nullable<PlayerInformation> {
-        const players: Nullable<PlayerInformation[]> = this.getAll();
+    public getMe(): Nullable<Player> {
+        const players: Nullable<Player[]> = this.getAll();
         if (!players) {
             return null;
         }
         return (
-            players.filter(
-                (player: PlayerInformation) => player.id === this.getId(),
-            )[0] || null
+            players.filter((player: Player) => player.id === this.getId())[0] ||
+            null
         );
     }
 
-    /** return:
-     * null if players is null
-     * empty array if no other players exist
-     * normal array if other players exist
-     */
-    public getOthers(): Nullable<PlayerInformation[]> {
-        const players: Nullable<PlayerInformation[]> = this.getAll();
+    public getOthers(): Nullable<Player[]> {
+        const players: Nullable<Player[]> = this.getAll();
         if (!players) {
             return null;
         }
-        return players.filter(
-            (player: PlayerInformation) => player.id !== this.getId(),
+        return players.filter((player: Player) => player.id !== this.getId());
+    }
+
+    public initialize(): void {
+        this.listen();
+    }
+
+    private listen(): void {
+        GeneralManager.onSync.on(() => {
+            const dtos: Nullable<PlayerDTO[]> = GeneralManager.getPlayers();
+            assert(dtos);
+            this.list = dtos.map(
+                (dto: PlayerDTO) => new Player(dto, dtos.length),
+            );
+        });
+    }
+
+    public async validateId(): Promise<void> {
+        const id: Nullable<UUID> = this.getId();
+        if (!id) {
+            return;
+        }
+        const requestBody: string = id;
+        const response: axios.AxiosResponse<boolean> = await api.post(
+            "/validate",
+            requestBody,
         );
-    }
-
-    public distributeRoles() {
-        const roles: string[] = this.getRoles();
-        const me: Nullable<PlayerInformation> = this.getMe();
-        const order: Nullable<int> = me.orderIndex;
-        assert(me && order);
-        me.role = roles[order];
-    }
-
-    public getRoles(): string[] {
-        const seed: string = SessionManager.getSeed();
-        const allRoles: string[] = this.generateRoles();
-        const shuffledRoles: string[] = seededShuffle(allRoles, seed);
-        return shuffledRoles;
-    }
-
-    public generateRoles(): string[] {
-        let roles: string[] = [];
-        const session: Nullable<SessionInformation> =
-            GeneralManager.getSession();
-        console.log(session);
-        assert(session);
-        const playerCount: int = session.playerCount;
-        if (playerCount <= 4) {
-            roles.push("Saboteur");
-        } else if (playerCount <= 6) {
-            roles.push("Saboteur", "Saboteur");
-        } else if (playerCount <= 9) {
-            roles.push("Saboteur", "Saboteur", "Saboteur");
-        } else {
-            roles.push("Saboteur", "Saboteur", "Saboteur", "Saboteur");
+        if (!response.data) {
+            this.removeId();
         }
-        while (roles.length !== playerCount) {
-            roles.push("Miner");
-        }
-        return roles;
     }
 
     public generateName(): string {

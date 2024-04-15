@@ -2,35 +2,29 @@ import { Nullable, UUID } from "definitions/utils";
 import PlayerManager from "../managers/PlayerManager";
 import axios from "axios";
 import { api } from "../utilities/api";
-import { PlayerInformation, SessionInformation } from "definitions/information";
-import { JoinDTO } from "definitions/dto";
+import { JoinDTO, SessionDTO } from "definitions/dto";
 import GeneralManager from "./GeneralManager";
 import { assert } from "utilities/utils";
+import { Session } from "entities/Session";
 
 class SessionManager {
+    private session: Nullable<Session>;
+
     public constructor() {
-        this.analyseURL();
+        this.session = null;
     }
 
-    public get(): Nullable<SessionInformation> {
-        return GeneralManager.getSession();
+    public getSession(): Nullable<Session> {
+        return this.session;
     }
 
-    public getId(): Nullable<UUID> {
-        return GeneralManager.getSession()?.id || null;
+    public async initialize(): Promise<void> {
+        await this.handleJoin();
+        this.listen();
     }
 
-    public async createSession(): Promise<void> {
-        const playerName: string = PlayerManager.generateName();
-        const requestBody: string = playerName;
-        const response: axios.AxiosResponse<PlayerInformation> = await api.post(
-            "/create",
-            requestBody,
-        );
-        PlayerManager.saveId(response.data.id);
-    }
-
-    private async analyseURL(): Promise<void> {
+    private async handleJoin(): Promise<void> {
+        await PlayerManager.validateId();
         if (PlayerManager.getId() !== null) {
             return;
         }
@@ -38,24 +32,36 @@ class SessionManager {
         if (sessionId === "") {
             return;
         }
-        const playername: string = PlayerManager.generateName();
+        await this.join(sessionId);
+    }
+
+    private async join(sessionId: UUID): Promise<void> {
         const requestBody: JoinDTO = {
             sessionId: sessionId,
-            playerName: playername,
+            playerName: PlayerManager.generateName(),
         } as JoinDTO;
-        const response: axios.AxiosResponse<PlayerInformation> = await api.post(
+        const response: axios.AxiosResponse<UUID> = await api.post(
             "/join",
             requestBody,
         );
-        PlayerManager.saveId(response.data.id);
+        PlayerManager.saveId(response.data);
     }
 
-    public getSeed(): string {
-        const session: Nullable<SessionInformation> =
-            GeneralManager.getSession();
-        assert(session);
+    private listen(): void {
+        GeneralManager.onSync.on(() => {
+            const dto: Nullable<SessionDTO> = GeneralManager.getSession();
+            assert(dto);
+            this.session = new Session(dto);
+        });
+    }
 
-        return session.seed;
+    public async createSession(): Promise<void> {
+        const requestBody: string = PlayerManager.generateName();
+        const response: axios.AxiosResponse<UUID> = await api.post(
+            "/create",
+            requestBody,
+        );
+        PlayerManager.saveId(response.data);
     }
 }
 

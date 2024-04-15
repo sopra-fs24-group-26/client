@@ -208,3 +208,13 @@ export function seededShuffle<T>(list: T[], seed: string): T[] {
     }
     return list;
 }
+
+export function deepEqual<T>(a: Nullable<T>, b: Nullable<T>): boolean {
+    return JSON.stringify(a) === JSON.stringify(b);
+}
+
+export function seededUUIDv4(random: seedrandom.PRNG): UUID {
+    return `${1e7}-${1e3}-${4e3}-${8e3}-${1e11}`.replace(/[018]/g, (c: any) =>
+        (c ^ (Math.floor(random() * 256) & (15 >> (c / 4)))).toString(16),
+    );
+}
