@@ -1,41 +1,61 @@
-import { SessionInformation, TileInformation } from "definitions/information";
-import { Nullable, UUID, int } from "definitions/utils";
+import { Nullable, int } from "definitions/utils";
 import GeneralManager from "./GeneralManager";
-import tiles from "configs/tiles.json";
+import tileConfigs from "configs/tiles.json";
 import { TileConfig } from "definitions/config";
-import { log } from "utilities/logger";
 import { assert, seededShuffle } from "utilities/utils";
+import { SessionDTO, TileDTO } from "definitions/dto";
+import { Tile } from "entities/Tile";
+import seedrandom from "seedrandom";
+import { TileState } from "definitions/enums";
+import { EventEmitter } from "utilities/EventEmitter";
 
 class TileManager {
-    private readonly config: TileConfig[];
+    public readonly onSync: EventEmitter;
+    private list: Nullable<Tile[]>;
 
     public constructor() {
-        this.config = tiles;
+        this.onSync = new EventEmitter();
+        this.list = null;
     }
 
-    public getAll(): Nullable<TileInformation[]> {
-        return GeneralManager.getTiles();
+    public getAll(): Nullable<Tile[]> {
+        return this.list;
     }
 
-    public getUnfolded(): TileConfig[] {
-        const session: Nullable<SessionInformation> =
-            GeneralManager.getSession();
+    public initialize(): void {
+        this.listen();
+    }
+
+    private listen(): void {
+        GeneralManager.onSync.on(() => {
+            const session: Nullable<SessionDTO> = GeneralManager.getSession();
+            const dtos: Nullable<TileDTO[]> = GeneralManager.getTiles();
+            assert(session && dtos);
+            const random: seedrandom.PRNG = seedrandom(session.seed);
+            this.list = seededShuffle(
+                this.getUnfolded().map(
+                    (config: TileConfig) => new Tile(random, config.type),
+                ),
+                session.seed,
+            );
+            this.list.forEach((tile: Tile) => {
+                const state: TileState = TileState.Unused; // TODO
+                const dto: Nullable<TileDTO> =
+                    dtos.find((dto: TileDTO) => dto.id === tile.id) || null;
+                tile.apply(state, dto);
+            });
+            this.onSync.emit();
+        });
+    }
+
+    private getUnfolded(): TileConfig[] {
         const result: TileConfig[] = [];
-        assert(session);
-        for (const tile of this.config) {
-            for (let i: int = 0; i < tile.amount; i++) {
-                result.push(tile);
+        for (const config of tileConfigs) {
+            for (let i: int = 0; i < config.amount; i++) {
+                result.push(config);
             }
-            log(tile);
         }
         return result;
-    }
-
-    public getShuffled(): TileConfig[] {
-        const session: Nullable<SessionInformation> =
-            GeneralManager.getSession();
-        assert(session);
-        return seededShuffle(this.getUnfolded(), session.seed);
     }
 }
 

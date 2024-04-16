@@ -1,4 +1,4 @@
-import { Nullable, UUID } from "definitions/utils";
+import { Nullable } from "definitions/utils";
 import SessionManager from "managers/SessionManager";
 import Phaser from "phaser";
 import { interactify } from "../utilities/utils";
@@ -34,7 +34,24 @@ export class TitleScreen extends Phaser.Scene {
             ScreenHeight / 1.5,
             "createLobby",
         );
-        interactify(this.button, 0.2, () => this.onButton());
+        interactify(this.button, 0.5, () => this.onButton());
+        this.portToCorrectScene();
+    }
+
+    private portToCorrectScene(): void {
+        SessionManager.onSync.once(() => {
+            const hasStarted: Nullable<boolean> = SessionManager.hasStarted();
+            if (hasStarted === null) {
+                return;
+            }
+            if (hasStarted === false) {
+                this.scene.start("LobbyScreen");
+                return;
+            }
+            /*
+            this.scene.start("GameScreen");
+            */
+        });
     }
 
     private async onButton(): Promise<void> {
