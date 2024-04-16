@@ -10,6 +10,12 @@ export class GameScreen extends Phaser.Scene {
         this.dragStart = null;
     }
 
+    public preload(): void {
+        for (let i: int = 0; i < 9; i++) {
+            this.load.image(`tile${i}`, `assets/tiles/tile${i}.png`);
+        }
+    }
+
     public create(): void {
         this.createWorld();
         this.createCameraDrag();
@@ -17,11 +23,11 @@ export class GameScreen extends Phaser.Scene {
     }
 
     private createWorld(): void {
-        for (let i: int = 0; i < 8; i++) {
+        for (let i: int = 0; i < 9; i++) {
             this.add.image(
-                Math.random() * ScreenWidth,
-                Math.random() * ScreenHeight,
-                "share",
+                Math.floor(Math.random() * 8) * 128,
+                Math.floor(Math.random() * 8) * 128,
+                `tile${i}`,
             );
         }
     }
