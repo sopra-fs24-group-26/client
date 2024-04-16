@@ -1,6 +1,5 @@
 import { Nullable, UUID, int } from "definitions/utils";
 import Phaser from "phaser";
-import { log } from "utilities/logger";
 import SessionManager from "managers/SessionManager";
 import PlayerManager from "managers/PlayerManager";
 import { assert, interactify } from "utilities/utils";
@@ -11,17 +10,11 @@ import { Session } from "entities/Session";
 
 export class LobbyScreen extends Phaser.Scene {
     private title: Nullable<Phaser.GameObjects.Text>;
-    private quitButton: Nullable<Phaser.GameObjects.Image>;
-    private shareButton: Nullable<Phaser.GameObjects.Image>;
-    private startButton: Nullable<Phaser.GameObjects.Image>;
     private nameContainer: Nullable<Phaser.GameObjects.Container>;
 
     public constructor() {
         super("LobbyScreen");
         this.title = null;
-        this.quitButton = null;
-        this.shareButton = null;
-        this.startButton = null;
         this.nameContainer = null;
     }
 
@@ -53,27 +46,29 @@ export class LobbyScreen extends Phaser.Scene {
             })
             .setOrigin(0.5);
 
-        this.quitButton = this.add.image(
+        const quitButton: Phaser.GameObjects.Image = this.add.image(
             ScreenWidth / 4,
             ScreenHeight / 1.25,
             "quit",
         );
-        interactify(this.quitButton, 0.5, () => this.onQuitButton());
+        interactify(quitButton, 0.5, () => this.onQuitButton());
 
-        this.shareButton = this.add.image(
+        const shareButton: Phaser.GameObjects.Image = this.add.image(
             ScreenWidth / 2,
             ScreenHeight / 1.25,
             "share",
         );
-        interactify(this.shareButton, 0.5, () => this.onShareButton());
+        interactify(shareButton, 0.5, () => this.onShareButton());
 
-        this.startButton = this.add.image(
+        const startButton: Phaser.GameObjects.Image = this.add.image(
             ScreenWidth / 1.25,
             ScreenHeight / 1.25,
             "start",
         );
-        interactify(this.startButton, 0.5, () => this.onStartButton());
+        interactify(startButton, 0.5, () => this.onStartButton());
+
         this.nameContainer = this.add.container();
+
         this.portToCorrectScene();
     }
 
@@ -84,9 +79,7 @@ export class LobbyScreen extends Phaser.Scene {
             if (!hasStarted) {
                 return;
             }
-            /*
             this.scene.start("GameScreen");
-            */
             SessionManager.onSync.off(listener);
         });
     }
@@ -103,14 +96,19 @@ export class LobbyScreen extends Phaser.Scene {
         navigator.clipboard.writeText(link);
     }
 
-    private onStartButton(): void {
-        //server distribute roles
-        log("Start");
+    private async onStartButton(): Promise<void> {
+        const all: Nullable<Player[]> = PlayerManager.getAll();
+        if (!all || all.length < 3) {
+            //return;
+        }
+        await SessionManager.start();
+        this.scene.start("GameScreen");
     }
 
     public updateFrame(): void {
         assert(this.nameContainer);
         this.nameContainer.removeAll(true);
+
         const me: Nullable<Player> = PlayerManager.getMe();
         const others: Nullable<Player[]> = PlayerManager.getOthers();
         assert(me && this.title && others && this.nameContainer);

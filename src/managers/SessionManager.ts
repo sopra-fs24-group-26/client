@@ -79,6 +79,14 @@ class SessionManager {
         );
         PlayerManager.saveId(response.data);
     }
+
+    public async start(): Promise<void> {
+        const session: Nullable<Session> = this.getSession();
+        assert(session);
+        const requestBody: string = session.id;
+        await api.put("/distributeOrderIndex", requestBody);
+        // here on server also begin turn?
+    }
 }
 
 export default new SessionManager();

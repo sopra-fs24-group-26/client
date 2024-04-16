@@ -5,13 +5,8 @@ import { interactify } from "../utilities/utils";
 import { ScreenHeight, ScreenWidth } from "../core/main";
 
 export class TitleScreen extends Phaser.Scene {
-    private title: Nullable<Phaser.GameObjects.Text>;
-    private button: Nullable<Phaser.GameObjects.Image>;
-
     public constructor() {
         super("TitleScreen");
-        this.title = null;
-        this.button = null;
     }
 
     public preload(): void {
@@ -19,7 +14,7 @@ export class TitleScreen extends Phaser.Scene {
     }
 
     public create(): void {
-        this.title = this.add
+        this.add
             .text(ScreenWidth / 2, ScreenHeight / 4, "Saboteur", {
                 font: "Arial Black",
                 fontSize: 38,
@@ -29,12 +24,14 @@ export class TitleScreen extends Phaser.Scene {
                 align: "center",
             })
             .setOrigin(0.5);
-        this.button = this.add.image(
+
+        const button: Phaser.GameObjects.Image = this.add.image(
             ScreenWidth / 2,
             ScreenHeight / 1.5,
             "createLobby",
         );
-        interactify(this.button, 0.5, () => this.onButton());
+        interactify(button, 0.5, () => this.onButton());
+
         this.portToCorrectScene();
     }
 
@@ -48,9 +45,7 @@ export class TitleScreen extends Phaser.Scene {
                 this.scene.start("LobbyScreen");
                 return;
             }
-            /*
             this.scene.start("GameScreen");
-            */
         });
     }
 
