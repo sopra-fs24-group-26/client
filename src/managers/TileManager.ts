@@ -51,6 +51,7 @@ class TileManager {
                 );
                 tile.apply(state, dto);
             }
+            this.getTilesInHand(); //TODO where to save/use
             this.onSync.emit();
         });
     }
@@ -71,6 +72,24 @@ class TileManager {
             return TileState.Drawn;
         }
         return TileState.Unused;
+    }
+
+    private getTilesInHand(): TileDTO[] {
+        const playerAmount: int = GeneralManager.getPlayers.length;
+        const orderIndex: int = PlayerManager.getMe()!.orderIndex!;
+        const allTiles: TileDTO[] = GeneralManager.getTiles()!;
+        const tilesInHand: TileDTO[] = [];
+
+        for (let i = 0; i < allTiles.length; i++) {
+            if (
+                allTiles![i].state === TileState.Drawn &&
+                i % playerAmount === orderIndex
+            ) {
+                tilesInHand.push(allTiles[i]);
+            }
+        }
+
+        return tilesInHand;
     }
 
     private getStartOfGameTilesAmount(playerAmount: int): int {
