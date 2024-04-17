@@ -6,6 +6,8 @@ import SessionManager from "managers/SessionManager";
 import PlayerManager from "managers/PlayerManager";
 import GeneralManager from "managers/GeneralManager";
 import TileManager from "managers/TileManager";
+import { GameScreen } from "scenes/gamescreen";
+import { GameUiScreen } from "scenes/gameuiscreen";
 
 export const ScreenWidth: int = document.body.clientWidth;
 export const ScreenHeight: int = document.body.clientHeight;
@@ -15,8 +17,8 @@ const config: Phaser.Types.Core.GameConfig = {
     width: ScreenWidth,
     height: ScreenHeight,
     parent: "game-container",
-    backgroundColor: "black",
-    scene: [TitleScreen, LobbyScreen],
+    backgroundColor: "#black",
+    scene: [TitleScreen, LobbyScreen, GameScreen, GameUiScreen],
 };
 
 export const EventBus: Phaser.Events.EventEmitter =

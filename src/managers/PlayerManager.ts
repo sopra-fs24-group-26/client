@@ -1,4 +1,4 @@
-import { PlayerDTO } from "definitions/dto";
+import { PlayerDTO, SessionDTO } from "definitions/dto";
 import { int, Nullable, UUID } from "../definitions/utils";
 import { assert } from "../utilities/utils";
 import GeneralManager from "./GeneralManager";
@@ -57,10 +57,11 @@ class PlayerManager {
 
     private listen(): void {
         GeneralManager.onSync.on(() => {
+            const session: Nullable<SessionDTO> = GeneralManager.getSession();
             const dtos: Nullable<PlayerDTO[]> = GeneralManager.getPlayers();
-            assert(dtos);
+            assert(session && dtos);
             this.list = dtos.map(
-                (dto: PlayerDTO) => new Player(dto, dtos.length),
+                (dto: PlayerDTO) => new Player(dto, dtos.length, session.seed),
             );
             this.onSync.emit();
         });

@@ -1,9 +1,7 @@
 import { PlayerDTO } from "definitions/dto";
 import { Role } from "definitions/enums";
 import { UUID, Nullable, int } from "definitions/utils";
-import { Session } from "./Session";
-import SessionManager from "managers/SessionManager";
-import { assert, seededShuffle } from "utilities/utils";
+import { seededShuffle } from "utilities/utils";
 
 export class Player {
     public readonly id: UUID;
@@ -11,36 +9,38 @@ export class Player {
     public readonly orderIndex: Nullable<int>;
     public readonly role: Nullable<Role>;
 
-    public constructor(dto: PlayerDTO, count: int) {
+    public constructor(dto: PlayerDTO, playerCount: int, seed: string) {
         this.id = dto.id;
         this.name = dto.name;
         this.orderIndex = dto.orderIndex;
-        this.role = this.getRole(count, this.orderIndex);
+        this.role = this.getRole(playerCount, this.orderIndex, seed);
     }
 
-    private getRole(count: int, index: Nullable<int>): Nullable<Role> {
+    private getRole(
+        playerCount: int,
+        index: Nullable<int>,
+        seed: string,
+    ): Nullable<Role> {
         if (index === null) {
             return null;
         }
-        const session: Nullable<Session> = SessionManager.getSession();
-        assert(session);
-        const roles: Role[] = this.generateRoles(count);
-        return seededShuffle(roles, session.seed)[index];
+        const roles: Role[] = this.generateRoles(playerCount);
+        return seededShuffle(roles, seed)[index];
     }
 
-    private generateRoles(count: int): Role[] {
+    private generateRoles(playerCount: int): Role[] {
         const roles: Role[] = [];
         let saboteurs: int = 0;
-        if (count <= 4) {
+        if (playerCount <= 4) {
             saboteurs = 1;
-        } else if (count <= 6) {
+        } else if (playerCount <= 6) {
             saboteurs = 2;
-        } else if (count <= 9) {
+        } else if (playerCount <= 9) {
             saboteurs = 3;
         } else {
             saboteurs = 4;
         }
-        while (roles.length !== count) {
+        while (roles.length !== playerCount) {
             if (saboteurs-- > 0) {
                 roles.push(Role.Saboteur);
                 continue;

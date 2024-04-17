@@ -17,12 +17,12 @@ class SessionManager {
         this.session = null;
     }
 
-    public getSession(): Nullable<Session> {
+    public get(): Nullable<Session> {
         return this.session;
     }
 
     public hasStarted(): Nullable<boolean> {
-        const session: Nullable<Session> = this.getSession();
+        const session: Nullable<Session> = this.get();
         if (!session) {
             return null;
         }
@@ -71,13 +71,21 @@ class SessionManager {
         });
     }
 
-    public async createSession(): Promise<void> {
+    public async create(): Promise<void> {
         const requestBody: string = PlayerManager.generateName();
         const response: axios.AxiosResponse<UUID> = await api.post(
             "/create",
             requestBody,
         );
         PlayerManager.saveId(response.data);
+    }
+
+    public async start(): Promise<void> {
+        const session: Nullable<Session> = this.get();
+        assert(session);
+        const requestBody: string = session.id;
+        await api.put("/distributeOrderIndex", requestBody);
+        // here on server also begin turn?
     }
 }
 

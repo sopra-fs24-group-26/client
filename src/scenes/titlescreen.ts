@@ -5,36 +5,33 @@ import { interactify } from "../utilities/utils";
 import { ScreenHeight, ScreenWidth } from "../core/main";
 
 export class TitleScreen extends Phaser.Scene {
-    private button: Nullable<Phaser.GameObjects.Image>;
-
     public constructor() {
         super("TitleScreen");
-        this.button = null;
     }
 
     public preload(): void {
-        this.load.image("createLobby", "assets/create.png");
-        this.load.image("titlescreen", "assets/sabo.png");
+        this.load.image("create", "assets/buttons/create.png");
+        this.load.image("backdrop", "assets/sabo.png");
     }
 
     public create(): void {
-        const backgroundImage: Phaser.GameObjects.Image = this.add.image(
+        const background: Phaser.GameObjects.Image = this.add.image(
             ScreenWidth / 2,
             ScreenHeight / 2,
-            "titlescreen",
+            "backdrop",
         );
-
-        const maxWidthScale: float = ScreenWidth / backgroundImage.width;
-        const maxHeightScale: float = ScreenHeight / backgroundImage.height;
+        const maxWidthScale: float = ScreenWidth / background.width;
+        const maxHeightScale: float = ScreenHeight / background.height;
         const scale: float = Math.max(maxWidthScale, maxHeightScale);
-        backgroundImage.setScale(scale);
+        background.setScale(scale);
 
-        this.button = this.add.image(
+        const button: Phaser.GameObjects.Image = this.add.image(
             ScreenWidth / 1.4,
             ScreenHeight / 1.1,
-            "createLobby",
+            "create",
         );
-        interactify(this.button, 0.5, () => this.onButton());
+        interactify(button, 0.5, () => this.onButton());
+
         this.portToCorrectScene();
     }
 
@@ -48,14 +45,12 @@ export class TitleScreen extends Phaser.Scene {
                 this.scene.start("LobbyScreen");
                 return;
             }
-            /*
             this.scene.start("GameScreen");
-            */
         });
     }
 
     private async onButton(): Promise<void> {
-        await SessionManager.createSession();
+        await SessionManager.create();
         this.scene.start("LobbyScreen");
     }
 }
