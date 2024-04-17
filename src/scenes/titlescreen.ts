@@ -50,7 +50,7 @@ export class TitleScreen extends Phaser.Scene {
     }
 
     private async onButton(): Promise<void> {
-        await SessionManager.createSession();
+        await SessionManager.create();
         this.scene.start("LobbyScreen");
     }
 }

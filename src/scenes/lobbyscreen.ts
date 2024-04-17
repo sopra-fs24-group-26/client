@@ -90,7 +90,7 @@ export class LobbyScreen extends Phaser.Scene {
     }
 
     private onShareButton(): void {
-        const session: Nullable<Session> = SessionManager.getSession();
+        const session: Nullable<Session> = SessionManager.get();
         assert(session);
         const link: string = `${location.origin}/${session.id}`;
         navigator.clipboard.writeText(link);
