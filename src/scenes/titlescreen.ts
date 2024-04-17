@@ -1,4 +1,4 @@
-import { Nullable } from "definitions/utils";
+import { float, Nullable } from "definitions/utils";
 import SessionManager from "managers/SessionManager";
 import Phaser from "phaser";
 import { interactify } from "../utilities/utils";
@@ -10,25 +10,25 @@ export class TitleScreen extends Phaser.Scene {
     }
 
     public preload(): void {
-        this.load.image("createLobby", "assets/buttons/create.png");
+        this.load.image("create", "assets/create.png");
+        this.load.image("backdrop", "assets/sabo.png");
     }
 
     public create(): void {
-        this.add
-            .text(ScreenWidth / 2, ScreenHeight / 4, "Saboteur", {
-                font: "Arial Black",
-                fontSize: 38,
-                color: "#ffffff",
-                stroke: "#000000",
-                strokeThickness: 8,
-                align: "center",
-            })
-            .setOrigin(0.5);
+        const background: Phaser.GameObjects.Image = this.add.image(
+            ScreenWidth / 2,
+            ScreenHeight / 2,
+            "backdrop",
+        );
+        const maxWidthScale: float = ScreenWidth / background.width;
+        const maxHeightScale: float = ScreenHeight / background.height;
+        const scale: float = Math.max(maxWidthScale, maxHeightScale);
+        background.setScale(scale);
 
         const button: Phaser.GameObjects.Image = this.add.image(
-            ScreenWidth / 2,
-            ScreenHeight / 1.5,
-            "createLobby",
+            ScreenWidth / 1.4,
+            ScreenHeight / 1.1,
+            "create",
         );
         interactify(button, 0.5, () => this.onButton());
 
