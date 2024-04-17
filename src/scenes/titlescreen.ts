@@ -26,7 +26,7 @@ export class TitleScreen extends Phaser.Scene {
 
         const maxWidthScale: float = ScreenWidth / backgroundImage.width;
         const maxHeightScale: float = ScreenHeight / backgroundImage.height;
-        const scale: float = Math.min(maxWidthScale, maxHeightScale);
+        const scale: float = Math.max(maxWidthScale, maxHeightScale);
         backgroundImage.setScale(scale);
 
         this.button = this.add.image(
