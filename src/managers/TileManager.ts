@@ -8,7 +8,7 @@ import { Tile } from "entities/Tile";
 import seedrandom from "seedrandom";
 import { TileState } from "definitions/enums";
 import { EventEmitter } from "utilities/EventEmitter";
-
+import PlayerManager from "./PlayerManager";
 class TileManager {
     public readonly onSync: EventEmitter;
     private list: Nullable<Tile[]>;
@@ -38,14 +38,51 @@ class TileManager {
                 ),
                 session.seed,
             );
-            this.list.forEach((tile: Tile) => {
-                const state: TileState = TileState.Unused; // TODO
+
+            for (let i = 0; i < this.list.length; i++) {
+                const tile: Tile = this.list[i];
                 const dto: Nullable<TileDTO> =
                     dtos.find((dto: TileDTO) => dto.id === tile.id) || null;
+
+                let state: TileState = this.identifyTiles(
+                    dto,
+                    session.turnPlayer!,
+                    i,
+                );
                 tile.apply(state, dto);
-            });
+            }
             this.onSync.emit();
         });
+    }
+
+    private identifyTiles(
+        dto: Nullable<TileDTO>,
+        turnPlayer: int,
+        i: int,
+    ): TileState {
+        if (dto !== null) {
+            return TileState.Placed;
+        }
+        if (
+            i <
+            turnPlayer +
+                this.getStartOfGameTilesAmount(GeneralManager.getPlayers.length)
+        ) {
+            return TileState.Drawn;
+        }
+        return TileState.Unused;
+    }
+
+    private getStartOfGameTilesAmount(playerAmount: int): int {
+        let amountPerPlayer: int = 4;
+
+        if (playerAmount <= 5) {
+            amountPerPlayer = 6;
+        }
+        if (playerAmount <= 7) {
+            amountPerPlayer = 5;
+        }
+        return amountPerPlayer * playerAmount;
     }
 
     private getUnfolded(): TileConfig[] {
