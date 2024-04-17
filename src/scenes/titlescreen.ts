@@ -18,7 +18,7 @@ export class TitleScreen extends Phaser.Scene {
     }
 
     public create(): void {
-        const backgroundImage: Phaser.GameObject.Image = this.add.image(
+        const backgroundImage: Phaser.GameObjects.Image = this.add.image(
             ScreenWidth / 2,
             ScreenHeight / 2,
             "titlescreen",
