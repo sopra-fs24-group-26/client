@@ -34,7 +34,24 @@ export class TitleScreen extends Phaser.Scene {
             ScreenHeight / 1.1,
             "createLobby",
         );
-        interactify(this.button, 0.2, () => this.onButton());
+        interactify(this.button, 0.5, () => this.onButton());
+        this.portToCorrectScene();
+    }
+
+    private portToCorrectScene(): void {
+        SessionManager.onSync.once(() => {
+            const hasStarted: Nullable<boolean> = SessionManager.hasStarted();
+            if (hasStarted === null) {
+                return;
+            }
+            if (hasStarted === false) {
+                this.scene.start("LobbyScreen");
+                return;
+            }
+            /*
+            this.scene.start("GameScreen");
+            */
+        });
     }
 
     private async onButton(): Promise<void> {
