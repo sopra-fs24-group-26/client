@@ -15,7 +15,7 @@ const config: Phaser.Types.Core.GameConfig = {
     width: ScreenWidth,
     height: ScreenHeight,
     parent: "game-container",
-    backgroundColor: "#028af8",
+    backgroundColor: "black",
     scene: [TitleScreen, LobbyScreen],
 };
 
