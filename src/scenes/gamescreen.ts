@@ -1,27 +1,19 @@
 import { ScreenHeight, ScreenWidth } from "core/main";
-import { SessionDTO } from "definitions/dto";
 import { Nullable, UUID, int } from "definitions/utils";
 import { Tile } from "entities/Tile";
-import GeneralManager from "managers/GeneralManager";
-import SessionManager from "managers/SessionManager";
 import TileManager from "managers/TileManager";
 import Phaser from "phaser";
-import seedrandom from "seedrandom";
-import { assert, interactify } from "utilities/utils";
+import { assert } from "utilities/utils";
 
 export class GameScreen extends Phaser.Scene {
     private dragStart: Nullable<Phaser.Math.Vector2>;
     private placedTilesContainer: Nullable<Phaser.GameObjects.Container>;
     private static tilePixels: int = 128;
 
-    private testingPlacedTiles: Nullable<Tile[]>; //test
-    static testingCount: int = 1; //test
-
     public constructor() {
         super("GameScreen");
         this.dragStart = null;
         this.placedTilesContainer = null;
-        this.testingPlacedTiles = null; //test
     }
 
     /**
@@ -96,33 +88,6 @@ export class GameScreen extends Phaser.Scene {
     }
 
     /**
-     * Mock function for testing purpose
-     *
-     * When clicking on the test button on top left corner, it simulates that a new tile is placed.\
-     * The tiles are placed one next to each other
-     *
-     * @returns nothing, but updates the local array that holds every placed tiles
-     */
-    private mockTileInfoChange(): void {
-        if (!this.testingPlacedTiles) {
-            this.testingPlacedTiles = [];
-        }
-        assert(this.testingPlacedTiles && SessionManager.get());
-        const session: Nullable<SessionDTO> = GeneralManager.getSession();
-        assert(session);
-        const random: seedrandom.PRNG = seedrandom(session.seed);
-        const newTile: Tile = new Tile(
-            random,
-            (GameScreen.testingCount - 1) % 9,
-        );
-        newTile.coordinateX = GameScreen.testingCount;
-        GameScreen.testingCount++;
-        newTile.coordinateY = 2;
-        this.testingPlacedTiles.push(newTile);
-        this.displayPlacedTiles();
-    }
-
-    /**
      * All tiles are kept in a placedTilesContainer.\
      * To update display, first remove all existing images, then create new ones using placed tiles from Tilemanager\
      *
@@ -136,12 +101,7 @@ export class GameScreen extends Phaser.Scene {
         assert(this.placedTilesContainer);
         this.placedTilesContainer.removeAll(true);
 
-        // official
         const placedTiles: Nullable<Tile[]> = TileManager.getPlaced();
-
-        // test - remove comment here and comment out line under //official
-        // const placedTiles: Nullable<Tile[]> = this.testingPlacedTiles;
-
         if (!placedTiles) {
             return;
         }
