@@ -5,9 +5,8 @@ import { Tile } from "entities/Tile";
 import GeneralManager from "managers/GeneralManager";
 import SessionManager from "managers/SessionManager";
 import TileManager from "managers/TileManager";
-import Phaser, { Game } from "phaser";
+import Phaser from "phaser";
 import seedrandom from "seedrandom";
-import { log } from "utilities/logger";
 import { assert, interactify } from "utilities/utils";
 
 export class GameScreen extends Phaser.Scene {
@@ -23,7 +22,6 @@ export class GameScreen extends Phaser.Scene {
         this.dragStart = null;
         this.placedTilesContainer = null;
         this.testingPlacedTiles = null; //test
-        GameScreen.tilePixels = 128;
     }
 
     /**
@@ -31,11 +29,13 @@ export class GameScreen extends Phaser.Scene {
      * Whenever there is a change in tile information, this means someone has made a move\
      * Call displayPlacedTiles() to get updated view\
      * The event listener is freed from memory on destroy scene event
+     *
+     * Can be extended to do more things when tile info changes
      */
     public init(): void {
-        const tileUpdateListener: UUID = TileManager.onSync.on(() =>
-            this.displayPlacedTiles(),
-        );
+        const tileUpdateListener: UUID = TileManager.onSync.on(() => {
+            this.displayPlacedTiles();
+        });
         // on scene destroy free listener
         this.events.on("destroy", () => {
             TileManager.onSync.off(tileUpdateListener);
@@ -59,7 +59,7 @@ export class GameScreen extends Phaser.Scene {
     }
 
     /**
-     * Temporary: Create three tiles on top of screen that represents the goal tiles\
+     * Temporary: Create three tiles on top of screen that represent the goal tiles\
      * Need to add starting tile and correct positioning
      */
     private createWorld(): void {
@@ -120,7 +120,7 @@ export class GameScreen extends Phaser.Scene {
         );
         newTile.coordinateX = GameScreen.testingCount;
         GameScreen.testingCount++;
-        newTile.coordinateY = 3;
+        newTile.coordinateY = 2;
         this.testingPlacedTiles.push(newTile);
         this.displayPlacedTiles();
     }
@@ -140,10 +140,10 @@ export class GameScreen extends Phaser.Scene {
         this.placedTilesContainer.removeAll(true);
 
         // official
-        // const placedTiles: Nullable<Tile[]> = TileManager.getPlaced();
+        const placedTiles: Nullable<Tile[]> = TileManager.getPlaced();
 
-        // test
-        const placedTiles = this.testingPlacedTiles;
+        // test - remove comment here and comment out line under //official
+        // const placedTiles: Nullable<Tile[]> = this.testingPlacedTiles;
 
         if (!placedTiles) {
             return;
