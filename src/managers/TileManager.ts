@@ -39,18 +39,13 @@ class TileManager {
     }
 
     public getPlaced(): Nullable<Tile[]> {
-        let res: Nullable<Tile[]> = null;
         if (!this.list) {
-            return res;
+            return null;
         }
         assert(this.list);
-        res = [];
-        this.list.forEach(function (tile) {
-            if (tile.state === TileState.Placed) {
-                res.push(tile);
-            }
-        });
-        return res;
+        return this.list.filter(
+            (tile: Tile) => tile.state === TileState.Placed,
+        );
     }
 
     public initialize(): void {

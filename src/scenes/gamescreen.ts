@@ -12,7 +12,7 @@ import { assert, interactify } from "utilities/utils";
 export class GameScreen extends Phaser.Scene {
     private dragStart: Nullable<Phaser.Math.Vector2>;
     private placedTilesContainer: Nullable<Phaser.GameObjects.Container>;
-    static tilePixels: int = 128;
+    private static tilePixels: int = 128;
 
     private testingPlacedTiles: Nullable<Tile[]>; //test
     static testingCount: int = 1; //test
@@ -53,9 +53,6 @@ export class GameScreen extends Phaser.Scene {
         this.createCameraDrag();
         this.scene.launch("GameUiScreen");
         this.placedTilesContainer = this.add.container();
-        // test
-        const button: Phaser.GameObjects.Image = this.add.image(0, 0, "start");
-        interactify(button, 0.5, () => this.mockTileInfoChange());
     }
 
     /**
