@@ -23,7 +23,6 @@ export type TileDTO = {
     rotation: Nullable<int>;
     coordinateX: Nullable<int>;
     coordinateY: Nullable<int>;
-    state: int;
 };
 
 export type JoinDTO = {

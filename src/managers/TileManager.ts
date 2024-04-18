@@ -9,6 +9,7 @@ import seedrandom from "seedrandom";
 import { TileState } from "definitions/enums";
 import { EventEmitter } from "utilities/EventEmitter";
 import PlayerManager from "./PlayerManager";
+import { Player } from "entities/Player";
 class TileManager {
     public readonly onSync: EventEmitter;
     private list: Nullable<Tile[]>;
@@ -30,6 +31,7 @@ class TileManager {
         GeneralManager.onSync.on(() => {
             const session: Nullable<SessionDTO> = GeneralManager.getSession();
             const dtos: Nullable<TileDTO[]> = GeneralManager.getTiles();
+
             assert(session && dtos);
             const random: seedrandom.PRNG = seedrandom(session.seed);
             this.list = seededShuffle(
@@ -44,46 +46,47 @@ class TileManager {
                 const dto: Nullable<TileDTO> =
                     dtos.find((dto: TileDTO) => dto.id === tile.id) || null;
 
-                let state: TileState = this.identifyTiles(
+                let state: TileState = this.determineState(
                     dto,
-                    session.turnPlayer!,
+                    session.turnPlayer,
                     i,
                 );
                 tile.apply(state, dto);
             }
-            this.getTilesInHand(); //TODO where to save/use
             this.onSync.emit();
         });
     }
 
-    private identifyTiles(
+    private determineState(
         dto: Nullable<TileDTO>,
-        turnPlayer: int,
-        i: int,
+        turnPlayer: Nullable<int>,
+        index: int,
     ): TileState {
+        const InitialAmount: int = this.getInitialAmount(
+            GeneralManager.getPlayers.length,
+        );
+
         if (dto !== null) {
             return TileState.Placed;
         }
-        if (
-            i <
-            turnPlayer +
-                this.getStartOfGameTilesAmount(GeneralManager.getPlayers.length)
-        ) {
+        assert(turnPlayer);
+        if (index < turnPlayer + InitialAmount) {
             return TileState.Drawn;
         }
         return TileState.Unused;
     }
 
-    private getTilesInHand(): TileDTO[] {
-        const playerAmount: int = GeneralManager.getPlayers.length;
-        const orderIndex: int = PlayerManager.getMe()!.orderIndex!;
-        const allTiles: TileDTO[] = GeneralManager.getTiles()!;
-        const tilesInHand: TileDTO[] = [];
+    private getTilesInHand(): Tile[] {
+        const playerCount: int = GeneralManager.getPlayers.length;
+        const me: Nullable<Player> = PlayerManager.getMe();
+        const allTiles: Nullable<Tile[]> = this.list;
+        const tilesInHand: Tile[] = [];
+        assert(me && allTiles);
 
         for (let i = 0; i < allTiles.length; i++) {
             if (
-                allTiles![i].state === TileState.Drawn &&
-                i % playerAmount === orderIndex
+                allTiles[i].state === TileState.Drawn &&
+                i % playerCount === me.orderIndex
             ) {
                 tilesInHand.push(allTiles[i]);
             }
@@ -92,7 +95,7 @@ class TileManager {
         return tilesInHand;
     }
 
-    private getStartOfGameTilesAmount(playerAmount: int): int {
+    private getInitialAmount(playerAmount: int): int {
         let amountPerPlayer: int = 4;
 
         if (playerAmount <= 5) {
