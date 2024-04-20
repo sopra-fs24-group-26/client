@@ -9,7 +9,7 @@ export type DataDTO = {
 export type SessionDTO = {
     id: UUID;
     seed: string;
-    turnPlayer: Nullable<int>;
+    turnIndex: Nullable<int>;
 };
 
 export type PlayerDTO = {
