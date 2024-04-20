@@ -51,7 +51,7 @@ class TileManager {
                     dto,
                     session.turnPlayer,
                     i,
-                    initialAmount
+                    initialAmount,
                 );
                 tile.apply(state, dto);
             }
@@ -63,38 +63,32 @@ class TileManager {
         dto: Nullable<TileDTO>,
         turnPlayer: Nullable<int>,
         index: int,
-        initialAmount: int
+        initialAmount: int,
     ): TileState {
-        
-
         if (dto !== null) {
             return TileState.Placed;
         }
-        assert(turnPlayer !== null);
+        if (turnPlayer === null) {
+            return TileState.Unused;
+        }
         if (index < turnPlayer + initialAmount) {
             return TileState.Drawn;
         }
         return TileState.Unused;
     }
 
-    private geInHand(): Tile[] {
+    private getInHand(): Tile[] {
         const players: Nullable<PlayerDTO[]> = GeneralManager.getPlayers();
         const me: Nullable<Player> = PlayerManager.getMe();
         const all: Nullable<Tile[]> = this.list;
-        const inHand: Tile[] = [];
         assert(me && all && players);
         const playerCount: number = players.length;
 
-        for (let i: int = 0; i < all.length; i++) {
-            if (
-                all[i].state === TileState.Drawn &&
-                i % playerCount === me.orderIndex
-            ) {
-                inHand.push(all[i]);
-            }
-        }
-
-        return inHand;
+        return all.filter(
+            (tile: Tile, index: int) =>
+                tile.state === TileState.Drawn &&
+                index % playerCount === me.orderIndex,
+        );
     }
 
     private getInitialAmount(): int {
