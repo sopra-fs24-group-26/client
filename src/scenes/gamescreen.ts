@@ -16,19 +16,10 @@ export class GameScreen extends Phaser.Scene {
         this.placedTilesContainer = null;
     }
 
-    /**
-     * Gamescreen continuously listens to TileManager\
-     * Whenever there is a change in tile information, this means someone has made a move\
-     * Call displayPlacedTiles() to get updated view\
-     * The event listener is freed from memory on destroy scene event
-     *
-     * Can be extended to do more things when tile info changes
-     */
     public init(): void {
         const tileUpdateListener: UUID = TileManager.onSync.on(() => {
             this.displayPlacedTiles();
         });
-        // on scene destroy free listener
         this.events.on("destroy", () => {
             TileManager.onSync.off(tileUpdateListener);
         });
@@ -44,17 +35,13 @@ export class GameScreen extends Phaser.Scene {
         this.createWorld();
         this.createCameraDrag();
         this.scene.launch("GameUiScreen");
-        this.placedTilesContainer = this.add.container();
     }
 
-    /**
-     * Temporary: Create three tiles on top of screen that represent the goal tiles\
-     * Need to add starting tile and correct positioning
-     */
     private createWorld(): void {
         for (let i: int = 0; i < 3; i++) {
             this.add.image((2 + i * 2) * 128, 0, `tile${8}`);
         }
+        this.placedTilesContainer = this.add.container();
     }
 
     private createCameraDrag(): void {
@@ -87,33 +74,18 @@ export class GameScreen extends Phaser.Scene {
         this.dragStart = activePointer.position.clone();
     }
 
-    /**
-     * All tiles are kept in a placedTilesContainer.\
-     * To update display, first remove all existing images, then create new ones using placed tiles from Tilemanager\
-     *
-     * Whenever information about tiles is updated, it calls a list of placed tiles from TileManager
-     *
-     * Add the image at coordinate * pixels
-     *
-     * @returns void
-     */
     private displayPlacedTiles(): void {
         assert(this.placedTilesContainer);
         this.placedTilesContainer.removeAll(true);
 
         const placedTiles: Nullable<Tile[]> = TileManager.getPlaced();
-        if (!placedTiles) {
-            return;
-        }
         assert(placedTiles);
-        // this arrow function is only called in for loop, so should share same scope as displayedPlacedTiles()
-        placedTiles.forEach((tile) => {
+        placedTiles.forEach((tile: Tile) => {
             assert(
                 tile.coordinateX &&
                     tile.coordinateY &&
                     this.placedTilesContainer,
             );
-            // x, y coordinate correspond to the coordinate of the center of an image
             this.placedTilesContainer.add(
                 this.add.image(
                     tile.coordinateX * GameScreen.tilePixels,
