@@ -26,7 +26,7 @@ class SessionManager {
         if (!session) {
             return null;
         }
-        return session.turnPlayer !== null;
+        return session.turnIndex !== null;
     }
 
     public async initialize(): Promise<void> {
@@ -84,8 +84,7 @@ class SessionManager {
         const session: Nullable<Session> = this.get();
         assert(session);
         const requestBody: string = session.id;
-        await api.put("/distributeOrderIndex", requestBody);
-        // here on server also begin turn?
+        await api.put("/start", requestBody);
     }
 }
 

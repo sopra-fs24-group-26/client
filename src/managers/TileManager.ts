@@ -80,7 +80,7 @@ class TileManager {
 
             const state: TileState = this.determineState(
                 dto,
-                session.turnPlayer,
+                session.turnIndex,
                 i,
                 initialAmount,
             );
@@ -105,17 +105,17 @@ class TileManager {
 
     private determineState(
         dto: Nullable<TileDTO>,
-        turnPlayer: Nullable<int>,
+        turnIndex: Nullable<int>,
         index: int,
         initialAmount: int,
     ): TileState {
         if (dto !== null) {
             return TileState.Placed;
         }
-        if (turnPlayer === null) {
+        if (turnIndex === null) {
             return TileState.Unused;
         }
-        if (index < turnPlayer + initialAmount) {
+        if (index < turnIndex + initialAmount) {
             return TileState.Drawn;
         }
         return TileState.Unused;
