@@ -10,6 +10,7 @@ import { TileState } from "definitions/enums";
 import { EventEmitter } from "utilities/EventEmitter";
 import PlayerManager from "./PlayerManager";
 import { Player } from "entities/Player";
+
 class TileManager {
     public readonly onSync: EventEmitter;
     private list: Nullable<Tile[]>;
@@ -23,6 +24,20 @@ class TileManager {
         return this.list;
     }
 
+    public getInHand(): Tile[] {
+        const players: Nullable<PlayerDTO[]> = GeneralManager.getPlayers();
+        const me: Nullable<Player> = PlayerManager.getMe();
+        const all: Nullable<Tile[]> = this.list;
+        assert(me && all && players);
+        const playerCount: number = players.length;
+
+        return all.filter(
+            (tile: Tile, index: int) =>
+                tile.state === TileState.Drawn &&
+                index % playerCount === me.orderIndex,
+        );
+    }
+
     public initialize(): void {
         this.listen();
     }
@@ -31,32 +46,61 @@ class TileManager {
         GeneralManager.onSync.on(() => {
             const session: Nullable<SessionDTO> = GeneralManager.getSession();
             const dtos: Nullable<TileDTO[]> = GeneralManager.getTiles();
-            const initialAmount: int = this.getInitialAmount();
-
             assert(session && dtos);
             const random: seedrandom.PRNG = seedrandom(session.seed);
+
             this.list = seededShuffle(
                 this.getUnfolded().map(
                     (config: TileConfig) => new Tile(random, config.type),
                 ),
                 session.seed,
             );
-
-            for (let i: int = 0; i < this.list.length; i++) {
-                const tile: Tile = this.list[i];
-                const dto: Nullable<TileDTO> =
-                    dtos.find((dto: TileDTO) => dto.id === tile.id) || null;
-
-                const state: TileState = this.determineState(
-                    dto,
-                    session.turnPlayer,
-                    i,
-                    initialAmount,
-                );
-                tile.apply(state, dto);
-            }
+            this.processStates(dtos, session);
             this.onSync.emit();
         });
+    }
+
+    private getUnfolded(): TileConfig[] {
+        const result: TileConfig[] = [];
+        for (const config of tileConfigs) {
+            for (let i: int = 0; i < config.amount; i++) {
+                result.push(config);
+            }
+        }
+        return result;
+    }
+
+    private processStates(dtos: TileDTO[], session: SessionDTO) {
+        const initialAmount: int = this.getInitialAmount();
+        assert(this.list);
+        for (let i: int = 0; i < this.list.length; i++) {
+            const tile: Tile = this.list[i];
+            const dto: Nullable<TileDTO> =
+                dtos.find((dto: TileDTO) => dto.id === tile.id) || null;
+
+            const state: TileState = this.determineState(
+                dto,
+                session.turnPlayer,
+                i,
+                initialAmount,
+            );
+            tile.apply(state, dto);
+        }
+    }
+
+    private getInitialAmount(): int {
+        const players: Nullable<PlayerDTO[]> = GeneralManager.getPlayers();
+        assert(players);
+        const playerCount: number = players.length;
+        let amountPerPlayer: int = 4;
+
+        if (playerCount <= 7) {
+            amountPerPlayer = 5;
+        }
+        if (playerCount <= 5) {
+            amountPerPlayer = 6;
+        }
+        return amountPerPlayer * playerCount;
     }
 
     private determineState(
@@ -75,46 +119,6 @@ class TileManager {
             return TileState.Drawn;
         }
         return TileState.Unused;
-    }
-
-    private getInHand(): Tile[] {
-        const players: Nullable<PlayerDTO[]> = GeneralManager.getPlayers();
-        const me: Nullable<Player> = PlayerManager.getMe();
-        const all: Nullable<Tile[]> = this.list;
-        assert(me && all && players);
-        const playerCount: number = players.length;
-
-        return all.filter(
-            (tile: Tile, index: int) =>
-                tile.state === TileState.Drawn &&
-                index % playerCount === me.orderIndex,
-        );
-    }
-
-    private getInitialAmount(): int {
-        const players: Nullable<PlayerDTO[]> = GeneralManager.getPlayers();
-        assert(players);
-        const playerCount: number = players.length;
-
-        let amountPerPlayer: int = 4;
-
-        if (playerCount <= 5) {
-            amountPerPlayer = 6;
-        }
-        if (playerCount <= 7) {
-            amountPerPlayer = 5;
-        }
-        return amountPerPlayer * playerCount;
-    }
-
-    private getUnfolded(): TileConfig[] {
-        const result: TileConfig[] = [];
-        for (const config of tileConfigs) {
-            for (let i: int = 0; i < config.amount; i++) {
-                result.push(config);
-            }
-        }
-        return result;
     }
 }
 

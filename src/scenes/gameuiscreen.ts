@@ -8,6 +8,10 @@ export class GameUiScreen extends Phaser.Scene {
         super("GameUiScreen");
     }
 
+    public preload(): void {
+        this.load.image("start", "assets/buttons/start.png");
+    }
+
     public create(): void {
         const back: Phaser.GameObjects.Rectangle = this.add.rectangle(
             ScreenWidth / 2,
