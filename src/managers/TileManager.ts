@@ -42,7 +42,6 @@ class TileManager {
         if (!this.list) {
             return null;
         }
-        assert(this.list);
         return this.list.filter(
             (tile: Tile) => tile.state === TileState.Placed,
         );
