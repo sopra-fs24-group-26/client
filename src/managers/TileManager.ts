@@ -72,7 +72,7 @@ class TileManager {
     public getTilesInHand(): Tile[] {
         const allTiles: Nullable<Tile[]> = this.getAll();
         assert(allTiles);
-        const nrTiles: int = 6;
+        const nrTiles: int = 2;
         let myTiles: Tile[] = [];
         for (let i: int = 0; i < nrTiles; i++) {
             myTiles.push(allTiles[i]);
