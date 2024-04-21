@@ -81,11 +81,8 @@ export class GameScreen extends Phaser.Scene {
         const placedTiles: Nullable<Tile[]> = TileManager.getPlaced();
         assert(placedTiles);
         placedTiles.forEach((tile: Tile) => {
-            assert(
-                tile.coordinateX &&
-                    tile.coordinateY &&
-                    this.placedTilesContainer,
-            );
+            assert(tile.coordinateX && tile.coordinateY);
+            assert(this.placedTilesContainer);
             this.placedTilesContainer.add(
                 this.add.image(
                     tile.coordinateX * GameScreen.tilePixels,
