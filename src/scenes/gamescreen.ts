@@ -1,13 +1,28 @@
 import { ScreenHeight, ScreenWidth } from "core/main";
-import { Nullable, int } from "definitions/utils";
+import { Nullable, UUID, int } from "definitions/utils";
+import { Tile } from "entities/Tile";
+import TileManager from "managers/TileManager";
 import Phaser from "phaser";
+import { assert } from "utilities/utils";
 
 export class GameScreen extends Phaser.Scene {
     private dragStart: Nullable<Phaser.Math.Vector2>;
+    private placedTilesContainer: Nullable<Phaser.GameObjects.Container>;
+    private static tilePixels: int = 128;
 
     public constructor() {
         super("GameScreen");
         this.dragStart = null;
+        this.placedTilesContainer = null;
+    }
+
+    public init(): void {
+        const tileUpdateListener: UUID = TileManager.onSync.on(() => {
+            this.displayPlacedTiles();
+        });
+        this.events.on("destroy", () => {
+            TileManager.onSync.off(tileUpdateListener);
+        });
     }
 
     public preload(): void {
@@ -23,13 +38,10 @@ export class GameScreen extends Phaser.Scene {
     }
 
     private createWorld(): void {
-        for (let i: int = 0; i < 9; i++) {
-            this.add.image(
-                Math.floor(Math.random() * 8) * 128,
-                Math.floor(Math.random() * 8) * 128,
-                `tile${i}`,
-            );
+        for (let i: int = 0; i < 3; i++) {
+            this.add.image((2 + i * 2) * 128, 0, `tile${8}`);
         }
+        this.placedTilesContainer = this.add.container();
     }
 
     private createCameraDrag(): void {
@@ -60,5 +72,24 @@ export class GameScreen extends Phaser.Scene {
             camera.scrollY += this.dragStart.y - activePointer.position.y;
         }
         this.dragStart = activePointer.position.clone();
+    }
+
+    private displayPlacedTiles(): void {
+        assert(this.placedTilesContainer);
+        this.placedTilesContainer.removeAll(true);
+
+        const placedTiles: Nullable<Tile[]> = TileManager.getPlaced();
+        assert(placedTiles);
+        placedTiles.forEach((tile: Tile) => {
+            assert(tile.coordinateX && tile.coordinateY);
+            assert(this.placedTilesContainer);
+            this.placedTilesContainer.add(
+                this.add.image(
+                    tile.coordinateX * GameScreen.tilePixels,
+                    tile.coordinateY * GameScreen.tilePixels,
+                    `tile${tile.type}`,
+                ),
+            );
+        });
     }
 }

@@ -38,6 +38,15 @@ class TileManager {
         );
     }
 
+    public getPlaced(): Nullable<Tile[]> {
+        if (!this.list) {
+            return null;
+        }
+        return this.list.filter(
+            (tile: Tile) => tile.state === TileState.Placed,
+        );
+    }
+
     public initialize(): void {
         this.listen();
     }
