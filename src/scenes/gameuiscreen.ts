@@ -14,6 +14,7 @@ export class GameUiScreen extends Phaser.Scene {
         this.uiBackground = null;
         this.drawnTilesContainer = null;
     }
+
     public init(): void {
         const tileUpdateListener: UUID = TileManager.onSync.on(() => {
             this.displayDrawnTiles();
@@ -27,10 +28,6 @@ export class GameUiScreen extends Phaser.Scene {
         for (let i: int = 0; i < 9; i++) {
             this.load.image(`tile${i}`, `assets/tiles/tile${i}.png`);
         }
-    }
-
-    public preload(): void {
-        this.load.image("start", "assets/buttons/start.png");
     }
 
     public create(): void {
@@ -48,8 +45,9 @@ export class GameUiScreen extends Phaser.Scene {
     public displayDrawnTiles(): void {
         assert(this.drawnTilesContainer);
         this.drawnTilesContainer.removeAll(true);
-        const myTiles: Nullable<Tile[]> = TileManager.getTilesInHand();
+        const myTiles: Nullable<Tile[]> = TileManager.getInHand();
         assert(myTiles && this.uiBackground);
+
         const nrTiles: int = myTiles.length;
         const tileSpacing: int =
             (this.uiBackground.width - nrTiles * 128) / (nrTiles + 1);
