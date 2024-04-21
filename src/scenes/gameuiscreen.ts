@@ -53,7 +53,6 @@ export class GameUiScreen extends Phaser.Scene {
             (this.uiBackground.width - nrTiles * 128) / (nrTiles + 1);
 
         for (let i: int = 0; i < nrTiles; i++) {
-            assert(this.drawnTilesContainer && this.uiBackground);
             this.drawnTilesContainer.add(
                 this.add.image(
                     this.uiBackground.getTopLeft().x +
