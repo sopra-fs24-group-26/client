@@ -1,7 +1,7 @@
 import { ScreenHeight, ScreenWidth } from "core/main";
 import Phaser from "phaser";
 import { assert } from "utilities/utils";
-import { float, int, Nullable, UUID } from "../definitions/utils";
+import { int, Nullable, UUID } from "../definitions/utils";
 import { Tile } from "../entities/Tile";
 import TileManager from "../managers/TileManager";
 import sessionManager from "../managers/SessionManager";
@@ -52,24 +52,34 @@ export class GameUiScreen extends Phaser.Scene {
         const myTiles: Nullable<Tile[]> = TileManager.getInHand();
         const session: Nullable<Session> = sessionManager.get();
         const me: Nullable<Player> = PlayerManager.getMe();
-        assert(myTiles && this.uiBackground && session && me);
+        const players: Nullable<Player[]> = PlayerManager.getAll();
+        assert(myTiles && this.uiBackground && session && players && me);
+        const playerCount: int = players.length;
 
         const nrTiles: int = myTiles.length;
         const tileSpacing: int =
             (this.uiBackground.width - nrTiles * 128) / (nrTiles + 1);
 
         for (let i: int = 0; i < nrTiles; i++) {
-            const image = this.add.image(
+            const image: Phaser.GameObjects.Image = this.add.image(
                 this.uiBackground.getTopLeft().x +
                     (tileSpacing + 128 / 2) +
                     i * (128 + tileSpacing),
                 ScreenHeight - 100,
                 `tile${myTiles[i].type}`,
             );
-            if (session.turnIndex % me.orderIndex === 0) {
-                this.drawnTilesContainer.add(image.setTint(0xfefeeb));
+            if (session.turnIndex % playerCount === me.orderIndex) {
+                if (session.turnIndex === 0 && me.orderIndex === 0) {
+                    this.drawnTilesContainer.add(image);
+                } else {
+                    this.drawnTilesContainer.add(
+                        image.setAlpha(0.5).setTint(0xfefeee),
+                    );
+                }
             } else {
-                this.drawnTilesContainer.add(image);
+                this.drawnTilesContainer.add(
+                    image.setAlpha(0.4).setTint(0xfefeee),
+                );
             }
         }
     }
