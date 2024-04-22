@@ -56,7 +56,7 @@ class TileManager {
         const veins: int[] = seededShuffle([9, 10, 10], session.seed); // 9 is gold, 10 are coal veins
 
         for (const item of preplacedTiles) {
-            const tile = new Tile(random, item.type || veins.pop()!);
+            const tile: Tile = new Tile(random, item.type || veins.pop()!);
 
             tile.coordinateX = item.coordinateX;
             tile.coordinateY = item.coordinateY;

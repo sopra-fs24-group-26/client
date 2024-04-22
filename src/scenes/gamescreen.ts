@@ -77,7 +77,7 @@ export class GameScreen extends Phaser.Scene {
         this.placedTilesContainer.removeAll(true);
 
         const startingTiles: Tile[] = TileManager.getStartingTiles();
-        const allTiles = [...placedTiles, ...startingTiles];
+        const allTiles: Tile[] = [...placedTiles, ...startingTiles];
         
         allTiles.forEach((tile: Tile) => {
             if (tile.coordinateX !== null && tile.coordinateY !== null) {
