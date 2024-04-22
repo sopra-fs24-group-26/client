@@ -1,6 +1,7 @@
 import { Nullable, int } from "definitions/utils";
 import GeneralManager from "./GeneralManager";
 import tileConfigs from "configs/tiles.json";
+import preplacedTiles from "configs/preplacedTiles.json";
 import { TileConfig } from "definitions/config";
 import { assert, seededShuffle } from "utilities/utils";
 import { PlayerDTO, SessionDTO, TileDTO } from "definitions/dto";
@@ -45,6 +46,25 @@ class TileManager {
         return this.list.filter(
             (tile: Tile) => tile.state === TileState.Placed,
         );
+    }
+
+    public getStartingTiles(): Tile[] {
+        const session: Nullable<SessionDTO> = GeneralManager.getSession();
+        assert(session);
+        const tiles: Tile[] = [];
+        const random: seedrandom.PRNG = seedrandom(session.seed);
+        const veins: int[] = seededShuffle([9, 10, 10], session.seed); // 9 is gold, 10 are coal veins
+
+        for (const item of preplacedTiles) {
+            const tile = new Tile(random, item.type || veins.pop()!);
+
+            tile.coordinateX = item.coordinateX;
+            tile.coordinateY = item.coordinateY;
+            tile.rotation = item.rotation;
+            tile.state = TileState.Placed;
+            tiles.push(tile);
+        }
+        return tiles;
     }
 
     public initialize(): void {
