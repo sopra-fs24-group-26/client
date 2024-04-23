@@ -32,10 +32,12 @@ export class GameUiScreen extends Phaser.Scene {
     public init(): void {
        /* const tileUpdateListener: UUID = TileManager.onSync.on(() => {
             this.displayDrawnTiles();
-        });*/
+        });
         this.events.on("destroy", () => {
             TileManager.onSync.off(tileUpdateListener);
         });
+
+        */
     }
 
     public preload(): void {
@@ -126,6 +128,7 @@ export class GameUiScreen extends Phaser.Scene {
             this.isDraging = false;
         }
     }
+
     private doDrag(): void {
         const activePointer: Phaser.Input.Pointer =
             this.game.input.activePointer
@@ -139,11 +142,13 @@ export class GameUiScreen extends Phaser.Scene {
             }
         }
     }
+
     private stopDrag():void {
         const activePointer: Phaser.Input.Pointer =
             this.game.input.activePointer
         if(this.dragObj && this.currentTile){
             if (activePointer.y > this.uiBackground.getTopLeft().y) {
+                assert(this.currentTile.id);
                 this.dragObj.x = this.originalLocations[this.currentTile.id][0];
                 this.dragObj.y = this.originalLocations[this.currentTile.id][1];
                 this.dragObj.angle = 0;
