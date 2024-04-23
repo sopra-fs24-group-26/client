@@ -67,18 +67,23 @@ export class GameScreen extends Phaser.Scene {
             const camera: Phaser.Cameras.Scene2D.Camera = this.cameras.main;
             camera.scrollX += this.dragStart.x - activePointer.position.x;
             camera.scrollY += this.dragStart.y - activePointer.position.y;
+
+            this.events.emit("cameraViewportChanged", { x: camera.scrollX, y: camera.scrollY });
         }
         this.dragStart = activePointer.position.clone();
     }
 
     private displayPlacedTiles(): void {
+        assert(this.placedTilesContainer);
+        this.placedTilesContainer.removeAll(true);
+
         const placedTiles: Nullable<Tile[]> = TileManager.getPlaced();
         assert(this.placedTilesContainer && placedTiles);
         this.placedTilesContainer.removeAll(true);
 
         const startingTiles: Tile[] = TileManager.getStartingTiles();
         const allTiles: Tile[] = [...placedTiles, ...startingTiles];
-        
+
         allTiles.forEach((tile: Tile) => {
             if (tile.coordinateX !== null && tile.coordinateY !== null) {
                 assert(this.placedTilesContainer);
@@ -87,7 +92,7 @@ export class GameScreen extends Phaser.Scene {
                         tile.coordinateX * GameScreen.tilePixels,
                         tile.coordinateY * GameScreen.tilePixels,
                         `tile${tile.type}`,
-                    ),
+                    ).setAngle(tile.rotation*90),
                 );
             }
         });

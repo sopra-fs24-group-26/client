@@ -1,7 +1,7 @@
 import { Nullable, int } from "definitions/utils";
 import GeneralManager from "./GeneralManager";
 import tileConfigs from "configs/tiles.json";
-import preplacedTiles from "configs/preplacedTiles.json";
+import { PlaceTile } from "definitions/placeTile";
 import { TileConfig } from "definitions/config";
 import { assert, seededShuffle } from "utilities/utils";
 import { PlayerDTO, SessionDTO, TileDTO } from "definitions/dto";
@@ -11,7 +11,7 @@ import { TileState } from "definitions/enums";
 import { EventEmitter } from "utilities/EventEmitter";
 import PlayerManager from "./PlayerManager";
 import { Player } from "entities/Player";
-import SessionManager from "./SessionManager";
+import { api } from "../utilities/api";
 
 class TileManager {
     public readonly onSync: EventEmitter;
@@ -153,6 +153,29 @@ class TileManager {
         }
         return TileState.Unused;
     }
+    public placeTile(tile: PlaceTile): void {
+        assert(GeneralManager.getSession());
+        if(GeneralManager.getSession()){
+            tile.sessionId = GeneralManager.getSession().id;
+            api.put(
+                "/placeTile",
+                tile,
+            );
+        }
+    }
+    //testfunction
+    //will be taken out before merging
+    public getTilesInHand(): Tile[] {
+        const allTiles: Nullable<Tile[]> = this.getAll();
+        assert(allTiles);
+        const nrTiles: int = 6;
+        let myTiles: Tile[] = [];
+        for (let i: int = 0; i < nrTiles; i++) {
+            myTiles.push(allTiles[i]);
+        }
+        return myTiles;
+    }
+
 }
 
 export default new TileManager();
