@@ -1,6 +1,7 @@
 import { Nullable, int } from "definitions/utils";
 import GeneralManager from "./GeneralManager";
 import tileConfigs from "configs/tiles.json";
+import preplacedTiles from "configs/preplacedTiles.json";
 import { TileConfig } from "definitions/config";
 import { assert, seededShuffle } from "utilities/utils";
 import { PlayerDTO, SessionDTO, TileDTO } from "definitions/dto";
@@ -10,6 +11,7 @@ import { TileState } from "definitions/enums";
 import { EventEmitter } from "utilities/EventEmitter";
 import PlayerManager from "./PlayerManager";
 import { Player } from "entities/Player";
+import SessionManager from "./SessionManager";
 
 class TileManager {
     public readonly onSync: EventEmitter;
@@ -45,6 +47,28 @@ class TileManager {
         return this.list.filter(
             (tile: Tile) => tile.state === TileState.Placed,
         );
+    }
+
+    public getStartingTiles(): Tile[] {
+        const session: Nullable<SessionDTO> = SessionManager.get();
+        assert(session);
+        const tiles: Tile[] = [];
+        const random: seedrandom.PRNG = seedrandom(session.seed);
+        const veins: int[] = seededShuffle([9, 10, 10], session.seed); // 9 is gold, 10 are coal veins
+
+        for (const item of preplacedTiles) {
+            const tile: Tile = new Tile(random, item.type || veins.pop()!);
+            const tileDTO: TileDTO = {
+                id: tile.id,
+                rotation: item.rotation,
+                coordinateX: item.coordinateX,
+                coordinateY: item.coordinateY,
+            } as TileDTO;
+
+            tile.apply(TileState.Placed, tileDTO);
+            tiles.push(tile);
+        }
+        return tiles;
     }
 
     public initialize(): void {

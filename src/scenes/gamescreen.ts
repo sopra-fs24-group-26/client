@@ -26,7 +26,7 @@ export class GameScreen extends Phaser.Scene {
     }
 
     public preload(): void {
-        for (let i: int = 0; i < 9; i++) {
+        for (let i: int = 0; i < 12; i++) {
             this.load.image(`tile${i}`, `assets/tiles/tile${i}.png`);
         }
     }
@@ -38,9 +38,6 @@ export class GameScreen extends Phaser.Scene {
     }
 
     private createWorld(): void {
-        for (let i: int = 0; i < 3; i++) {
-            this.add.image((2 + i * 2) * 128, 0, `tile${8}`);
-        }
         this.placedTilesContainer = this.add.container();
     }
 
@@ -75,21 +72,24 @@ export class GameScreen extends Phaser.Scene {
     }
 
     private displayPlacedTiles(): void {
-        assert(this.placedTilesContainer);
+        const placedTiles: Nullable<Tile[]> = TileManager.getPlaced();
+        assert(this.placedTilesContainer && placedTiles);
         this.placedTilesContainer.removeAll(true);
 
-        const placedTiles: Nullable<Tile[]> = TileManager.getPlaced();
-        assert(placedTiles);
-        placedTiles.forEach((tile: Tile) => {
-            assert(tile.coordinateX && tile.coordinateY);
-            assert(this.placedTilesContainer);
-            this.placedTilesContainer.add(
-                this.add.image(
-                    tile.coordinateX * GameScreen.tilePixels,
-                    tile.coordinateY * GameScreen.tilePixels,
-                    `tile${tile.type}`,
-                ),
-            );
+        const startingTiles: Tile[] = TileManager.getStartingTiles();
+        const allTiles: Tile[] = [...placedTiles, ...startingTiles];
+        
+        allTiles.forEach((tile: Tile) => {
+            if (tile.coordinateX !== null && tile.coordinateY !== null) {
+                assert(this.placedTilesContainer);
+                this.placedTilesContainer.add(
+                    this.add.image(
+                        tile.coordinateX * GameScreen.tilePixels,
+                        tile.coordinateY * GameScreen.tilePixels,
+                        `tile${tile.type}`,
+                    ),
+                );
+            }
         });
     }
 }

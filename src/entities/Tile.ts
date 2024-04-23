@@ -23,8 +23,8 @@ export class Tile {
 
     public apply(state: TileState, dto: Nullable<TileDTO>): void {
         this.state = state;
-        this.rotation = dto?.rotation || null;
-        this.coordinateX = dto?.coordinateX || null;
-        this.coordinateY = dto?.coordinateY || null;
+        this.rotation = dto?.rotation ?? null;
+        this.coordinateX = dto?.coordinateX ?? null;
+        this.coordinateY = dto?.coordinateY ?? null;
     }
 }
