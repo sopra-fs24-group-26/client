@@ -63,7 +63,7 @@ class TileManager {
                 rotation: item.rotation,
                 coordinateX: item.coordinateX,
                 coordinateY: item.coordinateY,
-            };
+            } as TileDTO;
 
             tile.apply(TileState.Placed, tileDTO);
             tiles.push(tile);
