@@ -11,6 +11,7 @@ import { TileState } from "definitions/enums";
 import { EventEmitter } from "utilities/EventEmitter";
 import PlayerManager from "./PlayerManager";
 import { Player } from "entities/Player";
+import SessionManager from "./SessionManager";
 
 class TileManager {
     public readonly onSync: EventEmitter;
@@ -49,7 +50,7 @@ class TileManager {
     }
 
     public getStartingTiles(): Tile[] {
-        const session: Nullable<SessionDTO> = GeneralManager.getSession();
+        const session: Nullable<SessionDTO> = SessionManager.get();
         assert(session);
         const tiles: Tile[] = [];
         const random: seedrandom.PRNG = seedrandom(session.seed);
@@ -57,11 +58,14 @@ class TileManager {
 
         for (const item of preplacedTiles) {
             const tile: Tile = new Tile(random, item.type || veins.pop()!);
+            const tileDTO: TileDTO = {
+                id: tile.id,
+                rotation: item.rotation,
+                coordinateX: item.coordinateX,
+                coordinateY: item.coordinateY,
+            };
 
-            tile.coordinateX = item.coordinateX;
-            tile.coordinateY = item.coordinateY;
-            tile.rotation = item.rotation;
-            tile.state = TileState.Placed;
+            tile.apply(TileState.Placed, tileDTO);
             tiles.push(tile);
         }
         return tiles;
