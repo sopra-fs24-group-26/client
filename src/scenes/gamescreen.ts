@@ -4,16 +4,19 @@ import { Tile } from "entities/Tile";
 import TileManager from "managers/TileManager";
 import Phaser from "phaser";
 import { assert } from "utilities/utils";
+import { AdjacencyMap} from "utilities/AdjacencyMap"
 
 export class GameScreen extends Phaser.Scene {
     private dragStart: Nullable<Phaser.Math.Vector2>;
     private placedTilesContainer: Nullable<Phaser.GameObjects.Container>;
     private static tilePixels: int = 128;
+    public adjacencyMap: Nullable<AdjacencyMap>;
 
     public constructor() {
         super("GameScreen");
         this.dragStart = null;
         this.placedTilesContainer = null;
+        this.adjacencyMap = null;
     }
 
     public init(): void {
@@ -74,6 +77,7 @@ export class GameScreen extends Phaser.Scene {
     }
 
     private displayPlacedTiles(): void {
+        TileManager.updateAdjacencyMap();
         assert(this.placedTilesContainer);
         this.placedTilesContainer.removeAll(true);
 

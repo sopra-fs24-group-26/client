@@ -1,10 +1,12 @@
 import { ScreenHeight, ScreenWidth } from "core/main";
 import Phaser from "phaser";
 import { assert } from "utilities/utils";
+import { PlaceTile } from "../definitions/placeTile";
 import { int, Nullable, UUID } from "../definitions/utils";
 import { Tile } from "../entities/Tile";
 import TileManager from "../managers/TileManager";
 import SessionManager from "../managers/SessionManager";
+import  { GameScreen }  from "./gamescreen";
 
 export class GameUiScreen extends Phaser.Scene {
     private uiBackground: Nullable<Phaser.GameObjects.Rectangle>;
@@ -16,6 +18,7 @@ export class GameUiScreen extends Phaser.Scene {
     private topLeftY: int;
     private isDraging: boolean;
     private static tilePixels: int = 128;
+    private wrongText: Phaser.GameObjects.Text;
 
     public constructor() {
         super("GameUiScreen");
@@ -57,13 +60,13 @@ export class GameUiScreen extends Phaser.Scene {
         this.uiBackground.setInteractive();
         this.drawnTilesContainer = this.add.container();
         this.scene.get("GameScreen").events.on("cameraViewportChanged", this.handleViewportChange, this);
-        this.input.keyboard.on('keydown-LEFT', () => {
+        this.input.keyboard.on("keydown-LEFT", () => {
             if (this.dragObj) {
                 this.dragObj.angle += -90;
                 this.currentTile.rotation = (this.currentTile.rotation - 1) % 4;
             }
         });
-        this.input.keyboard.on('keydown-RIGHT', () => {
+        this.input.keyboard.on("keydown-RIGHT", () => {
             if (this.dragObj) {
                 this.dragObj.angle += 90;
                 this.currentTile.rotation = (this.currentTile.rotation + 1) % 4;
@@ -87,17 +90,18 @@ export class GameUiScreen extends Phaser.Scene {
             (this.uiBackground.width - nrTiles * 128) / (nrTiles + 1);
         const myTurn: boolean = SessionManager.isMyTurn();
 
-        for (let i: int = 0; i < nrTiles; i++) {            const tile: Phaser.GameObjects.Image = this.add.image(
+        for (let i: int = 0; i < nrTiles; i++) { const tile: Phaser.GameObjects.Image = this.add.image(
             this.uiBackground.getTopLeft().x +
             (tileSpacing + GameUiScreen.tilePixels / 2) +
             i * (GameUiScreen.tilePixels + tileSpacing), ScreenHeight - 100, `tile${myTiles[i].type}`,
         );
             tile.setInteractive();
             this.originalLocations[myTiles[i].id.toString()] = [tile.x, tile.y];
-            tile.on('pointerdown', (() => {
+            tile.on("pointerdown", (() => {
                 this.dragObj = tile;
                 this.dragObj.setDepth(Number.MAX_SAFE_INTEGER);
                 this.currentTile.id = myTiles[i].id.toString();
+                this.currentTile.type = myTiles[i].type;
                 this.toggleDrag();
             }), this);
             if (!myTurn) {
@@ -108,6 +112,7 @@ export class GameUiScreen extends Phaser.Scene {
                     this.dragObj = tile;
                     this.dragObj.setDepth(Number.MAX_SAFE_INTEGER);
                     this.currentTile.id = myTiles[i].id.toString();
+                    this.currentTile.type = myTiles[i].type;
                     this.toggleDrag();
                 }), this);
             }
@@ -117,14 +122,15 @@ export class GameUiScreen extends Phaser.Scene {
 
     private toggleDrag(): void {
         if(!this.isDraging && this.dragObj){
-            this.dragObj.on('pointermove', this.doDrag, this);
-            this.dragObj.on('pointerdown', this.stopDrag, this);
-            this.dragObj.on('pointerout', this.doDrag, this);
+            if(this.wrongText) this.wrongText.destroy();
+            this.dragObj.on("pointermove", this.doDrag, this);
+            this.dragObj.on("pointerdown", this.stopDrag, this);
+            this.dragObj.on("pointerout", this.doDrag, this);
             this.isDraging = true;
         }else if (this.dragObj) {
-            this.dragObj.off('pointermove', this.doDrag, this);
-            this.dragObj.off('pointerdown', this.stopDrag, this);
-            this.dragObj.off('pointerout', this.doDrag, this);
+            this.dragObj.off("pointermove", this.doDrag, this);
+            this.dragObj.off("pointerdown", this.stopDrag, this);
+            this.dragObj.off("pointerout", this.doDrag, this);
             this.isDraging = false;
         }
     }
@@ -133,7 +139,7 @@ export class GameUiScreen extends Phaser.Scene {
         const activePointer: Phaser.Input.Pointer =
             this.game.input.activePointer
         if (this.dragObj) {
-            if (activePointer.y < this.uiBackground.getTopLeft().y) {
+            if (activePointer.y < this.uiBackground.getTopLeft().y && this.checkAdjacency([activePointer.x, activePointer.y])) {
                 this.dragObj.x = Phaser.Math.Snap.To(activePointer.x, GameUiScreen.tilePixels,  - this.topLeftX);
                 this.dragObj.y = Phaser.Math.Snap.To(activePointer.y, GameUiScreen.tilePixels,  - this.topLeftY);
             } else {
@@ -147,13 +153,18 @@ export class GameUiScreen extends Phaser.Scene {
         const activePointer: Phaser.Input.Pointer =
             this.game.input.activePointer
         if(this.dragObj && this.currentTile){
-            if (activePointer.y > this.uiBackground.getTopLeft().y) {
+            if (!(this.checkAdjacency([activePointer.x, activePointer.y])) || activePointer.y > this.uiBackground.getTopLeft().y) {
                 assert(this.currentTile.id);
                 this.dragObj.x = this.originalLocations[this.currentTile.id][0];
                 this.dragObj.y = this.originalLocations[this.currentTile.id][1];
                 this.dragObj.angle = 0;
                 this.dragObj.setDepth(10);
-            }else {
+            }else if (!this.checkConnections([activePointer.x, activePointer.y])) {
+                this.doDrag();
+                this.displayErrorMEssage();
+                return;
+            }
+            else {
                 this.currentTile.coordinateX = (this.dragObj.x + this.topLeftX)/GameUiScreen.tilePixels;
                 this.currentTile.coordinateY = (this.dragObj.y + this.topLeftY)/GameUiScreen.tilePixels;
                 TileManager.placeTile(this.currentTile);
@@ -166,5 +177,27 @@ export class GameUiScreen extends Phaser.Scene {
     private handleViewportChange(viewport: {x: int, y: int}): void {
         this.topLeftX = viewport.x;
         this.topLeftY = viewport.y;
+    }
+
+    private checkAdjacency(uiCoordinates: int[]): boolean {
+        const gameWorldCoordinates: int[] = this.translateCoordinates(uiCoordinates)
+        return TileManager.getAdjacencyMap().isAdjacent(gameWorldCoordinates[0], gameWorldCoordinates[1]);
+    }
+
+    private checkConnections(uiCoordinates: int[]): boolean {
+        const gameWorldCoordinates : int[] = this.translateCoordinates(uiCoordinates);
+        return TileManager.getAdjacencyMap().isConnectionsAlign(gameWorldCoordinates[0], gameWorldCoordinates[1], this.currentTile);
+    }
+
+    private translateCoordinates(uiCoordinates: int[]): int[] {
+        return[(Phaser.Math.Snap.To(uiCoordinates[0], GameUiScreen.tilePixels,  - this.topLeftX) + this.topLeftX)/128, (Phaser.Math.Snap.To(uiCoordinates[1], GameUiScreen.tilePixels,  - this.topLeftY) + this.topLeftY)/128]
+    }
+
+    private displayErrorMEssage(): void {
+        this.wrongText = this.add.text(100, 100, "Oops! You are gay.", {
+            fontFamily: "Arial",
+            fontSize: "24px",
+            color: "#ff0000",
+        });
     }
 }

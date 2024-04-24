@@ -3,7 +3,7 @@ import GeneralManager from "./GeneralManager";
 import tileConfigs from "configs/tiles.json";
 import { PlaceTile } from "definitions/placeTile";
 import preplacedTiles from "configs/preplacedTiles.json";
-import { TileConfig } from "definitions/config";
+import { TileConfig, TileConnectionConfig } from "definitions/config";
 import { assert, seededShuffle } from "utilities/utils";
 import { PlayerDTO, SessionDTO, TileDTO } from "definitions/dto";
 import { Tile } from "entities/Tile";
@@ -14,18 +14,43 @@ import PlayerManager from "./PlayerManager";
 import { Player } from "entities/Player";
 import { api } from "../utilities/api";
 import SessionManager from "./SessionManager"
+import { log } from "utilities/logger";
+import { all } from "axios";
+import { AdjacencyMap} from "utilities/AdjacencyMap"
 
 class TileManager {
     public readonly onSync: EventEmitter;
     private list: Nullable<Tile[]>;
+    private adjacencyMap: Nullable<AdjacencyMap>;
+    private connectionsMap: Map<int,int[]>;
 
     public constructor() {
         this.onSync = new EventEmitter();
         this.list = null;
+        this.adjacencyMap = null;
+        this.connectionsMap = this.createConnectionsMap();
+    }
+
+    public getConnectionsMap(): Map<int,int[]> {
+        return this.connectionsMap;
     }
 
     public getAll(): Nullable<Tile[]> {
         return this.list;
+    }
+    public getAdjacencyMap(): AdjacencyMap | null {
+        return this.adjacencyMap;
+    }
+
+    public updateAdjacencyMap(): void {
+        this.adjacencyMap = new AdjacencyMap(this.getRelevantTilesInWorld());
+    }
+
+    public getRelevantTilesInWorld(): Tile[] {
+        const placedTiles: Nullable<Tile[]> = this.getPlaced();
+        assert(placedTiles);
+        const startingTile: Tile[] = this.getStartingTile();
+        return [...placedTiles, ...startingTile];
     }
 
     public getInHand(): Tile[] {
@@ -73,9 +98,25 @@ class TileManager {
         return tiles;
     }
 
+    public getStartingTile(): Tile[] {
+        return this.getStartingTiles().filter((tile: Tile)=> tile.coordinateX === 0 && tile.coordinateY === 0);
+    }
+
     public initialize(): void {
         this.listen();
     }
+
+    private createConnectionsMap(): Map<int,int[]> {
+        const connectionsMap:Map<int,int[]> = new Map();
+        for (const config of tileConfigs) {
+            connectionsMap.set(config.type, config.connections);
+        }
+        connectionsMap.forEach((value, key) => {
+            console.log(key + ' => ' + value);
+        });
+        return connectionsMap;
+    }
+
 
     private listen(): void {
         GeneralManager.onSync.on(() => {
@@ -105,7 +146,7 @@ class TileManager {
         return result;
     }
 
-    private processStates(dtos: TileDTO[], session: SessionDTO) {
+    private processStates(dtos: TileDTO[], session: SessionDTO): void {
         const initialAmount: int = this.getInitialAmount();
         assert(this.list);
         for (let i: int = 0; i < this.list.length; i++) {
