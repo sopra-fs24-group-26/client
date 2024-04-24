@@ -1,4 +1,4 @@
-import { Nullable, UUID } from "definitions/utils";
+import { int, Nullable, UUID } from "definitions/utils";
 import PlayerManager from "../managers/PlayerManager";
 import axios from "axios";
 import { api } from "../utilities/api";
@@ -7,6 +7,7 @@ import GeneralManager from "./GeneralManager";
 import { assert } from "utilities/utils";
 import { Session } from "entities/Session";
 import { EventEmitter } from "utilities/EventEmitter";
+import { Player } from "../entities/Player";
 
 class SessionManager {
     public readonly onSync: EventEmitter;
@@ -27,6 +28,18 @@ class SessionManager {
             return null;
         }
         return session.turnIndex !== null;
+    }
+
+    public isMyTurn(): boolean {
+        const session: Nullable<Session> = this.get();
+        const players: Nullable<Player[]> = PlayerManager.getAll();
+        const me: Nullable<Player> = PlayerManager.getMe();
+        assert(session && players && me);
+        const playerCount: int = players.length;
+        if (session.turnIndex === null) {
+            return false;
+        }
+        return session.turnIndex % playerCount === me.orderIndex;
     }
 
     public async initialize(): Promise<void> {
