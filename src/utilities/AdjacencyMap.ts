@@ -25,7 +25,6 @@ export class AdjacencyMap {
         var count: int = 0;
         var isAligned: boolean = true;
         assert(this.cells.has(k));
-        assert(this.cells.has(k));
         const connectionsTile: int[] = this.shiftByRotation(TileManager.getConnectionsMap().get(tile.type).slice(), tile.rotation);
         const connectionsRequired: Nullable<int[]> | undefined = this.cells.get(k)[1]
         assert(connectionsRequired);

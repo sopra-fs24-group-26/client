@@ -194,7 +194,7 @@ export class GameUiScreen extends Phaser.Scene {
     }
 
     private displayErrorMEssage(): void {
-        this.wrongText = this.add.text(100, 100, "Oops! You are gay.", {
+        this.wrongText = this.add.text(100, 100, "Oops! Path doesn't fit", {
             fontFamily: "Arial",
             fontSize: "24px",
             color: "#ff0000",
