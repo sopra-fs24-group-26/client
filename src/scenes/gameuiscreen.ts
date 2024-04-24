@@ -4,7 +4,7 @@ import { assert } from "utilities/utils";
 import { int, Nullable, UUID } from "../definitions/utils";
 import { Tile } from "../entities/Tile";
 import TileManager from "../managers/TileManager";
-import PlayerManager from "../managers/PlayerManager";
+import SessionManager from "../managers/SessionManager";
 
 export class GameUiScreen extends Phaser.Scene {
     private uiBackground: Nullable<Phaser.GameObjects.Rectangle>;
@@ -53,7 +53,7 @@ export class GameUiScreen extends Phaser.Scene {
         const nrTiles: int = myTiles.length;
         const tileSpacing: int =
             (this.uiBackground.width - nrTiles * 128) / (nrTiles + 1);
-        const myTurn: boolean = PlayerManager.checkMyTurn();
+        const myTurn: boolean = SessionManager.isMyTurn();
 
         for (let i: int = 0; i < nrTiles; i++) {
             const image: Phaser.GameObjects.Image = this.add.image(
@@ -63,13 +63,12 @@ export class GameUiScreen extends Phaser.Scene {
                 ScreenHeight - 100,
                 `tile${myTiles[i].type}`,
             );
-            if (myTurn) {
-                this.drawnTilesContainer.add(image);
-            } else {
-                this.drawnTilesContainer.add(
-                    image.setAlpha(0.5).setTint(0xfefeee),
-                );
+            if (!myTurn) {
+                image.setAlpha(0.5);
+                image.setTint(0xfefeee);
+                image.disableInteractive();
             }
+            this.drawnTilesContainer.add(image);
         }
     }
 }

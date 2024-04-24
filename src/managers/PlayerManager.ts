@@ -6,8 +6,6 @@ import { Player } from "entities/Player";
 import { api } from "utilities/api";
 import axios from "axios";
 import { EventEmitter } from "utilities/EventEmitter";
-import SessionManager from "./SessionManager";
-import { Session } from "../entities/Session";
 
 class PlayerManager {
     public readonly onSync: EventEmitter;
@@ -92,18 +90,6 @@ class PlayerManager {
         this.removeId();
         const requestBody: string = id;
         await api.post("/deletePlayer", requestBody);
-    }
-
-    public checkMyTurn(): boolean {
-        const session: Nullable<Session> = SessionManager.get();
-        const players: Nullable<Player[]> = this.getAll();
-        const me: Nullable<Player> = this.getMe();
-        assert(session && players && me);
-        const playerCount: int = players.length;
-        if (session.turnIndex === null) {
-            return false;
-        }
-        return session.turnIndex % playerCount === me.orderIndex;
     }
 
     public generateName(): string {
