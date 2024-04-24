@@ -29,6 +29,7 @@ class SessionManager {
         }
         return session.turnIndex !== null;
     }
+
     public isMyTurn(): boolean {
         const session: Nullable<Session> = this.get();
         const players: Nullable<Player[]> = PlayerManager.getAll();
