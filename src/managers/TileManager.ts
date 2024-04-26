@@ -80,9 +80,13 @@ class TileManager {
         const tiles: Tile[] = [];
         const random: seedrandom.PRNG = seedrandom(session.seed);
         const veins: int[] = seededShuffle([9, 10, 10], session.seed); // 9 is gold, 10 are coal veins
+        const startingCard: int[] = [11];
 
         for (const item of preplacedTiles) {
-            const tile: Tile = new Tile(random, item.type || veins.pop()!);
+            const tile: Tile = new Tile(
+                random,
+                startingCard.pop()! || veins.pop()!,
+            );
             const tileDTO: TileDTO = {
                 id: tile.id,
                 rotation: item.rotation,
