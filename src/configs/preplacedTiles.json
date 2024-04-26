@@ -1,41 +1,25 @@
 [
     {
         "type": 2,
-        "connections": [
-            [0, 1, 0],
-            [1, 1, 1],
-            [0, 1, 0]
-        ],
+        "connections": [1,1,1,1,1],
         "rotation": 0,
         "coordinateX": 0,
         "coordinateY": 0
     },
     {
-        "connections": [
-            [0, 1, 0],
-            [1, 1, 1],
-            [0, 1, 0]
-        ],
+        "connections": [1,1,1,1,1],
         "rotation": 0,
         "coordinateX": 8,
         "coordinateY": -2
     },
     {
-        "connections": [
-            [0, 1, 0],
-            [1, 1, 1],
-            [0, 1, 0]
-        ],
+        "connections": [1,1,1,1,1],
         "rotation": 0,
         "coordinateX": 8,
         "coordinateY": 0
     },
     {
-        "connections": [
-            [0, 1, 0],
-            [1, 1, 1],
-            [0, 1, 0]
-        ],
+        "connections": [1,1,1,1,1],
         "rotation": 0,
         "coordinateX": 8,
         "coordinateY": 2

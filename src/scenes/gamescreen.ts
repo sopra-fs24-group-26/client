@@ -4,7 +4,7 @@ import { Tile } from "entities/Tile";
 import TileManager from "managers/TileManager";
 import Phaser from "phaser";
 import { assert } from "utilities/utils";
-import { AdjacencyMap} from "utilities/AdjacencyMap"
+import { AdjacencyMap } from "utilities/AdjacencyMap";
 
 export class GameScreen extends Phaser.Scene {
     private dragStart: Nullable<Phaser.Math.Vector2>;
@@ -96,7 +96,7 @@ export class GameScreen extends Phaser.Scene {
                         tile.coordinateX * GameScreen.tilePixels,
                         tile.coordinateY * GameScreen.tilePixels,
                         `tile${tile.type}`,
-                    ).setAngle(tile.rotation*90),
+                    ).setAngle(tile.rotation * 90),
                 );
             }
         });

@@ -3,7 +3,7 @@ import GeneralManager from "./GeneralManager";
 import tileConfigs from "configs/tiles.json";
 import { PlaceTile } from "definitions/placeTile";
 import preplacedTiles from "configs/preplacedTiles.json";
-import { TileConfig, TileConnectionConfig } from "definitions/config";
+import { TileConfig } from "definitions/config";
 import { assert, seededShuffle } from "utilities/utils";
 import { PlayerDTO, SessionDTO, TileDTO } from "definitions/dto";
 import { Tile } from "entities/Tile";
@@ -14,8 +14,6 @@ import PlayerManager from "./PlayerManager";
 import { Player } from "entities/Player";
 import { api } from "../utilities/api";
 import SessionManager from "./SessionManager"
-import { log } from "utilities/logger";
-import { all } from "axios";
 import { AdjacencyMap} from "utilities/AdjacencyMap"
 
 class TileManager {
@@ -121,9 +119,6 @@ class TileManager {
         for (const config of tileConfigs) {
             connectionsMap.set(config.type, config.connections);
         }
-        connectionsMap.forEach((value, key) => {
-            console.log(key + ' => ' + value);
-        });
         return connectionsMap;
     }
 
