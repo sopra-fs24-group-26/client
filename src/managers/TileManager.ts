@@ -200,19 +200,6 @@ class TileManager {
         }
         return TileState.Unused;
     }
-
-    //testfunction
-    //will be taken out before merging
-    public getTilesInHand(): Tile[] {
-        const allTiles: Nullable<Tile[]> = this.getAll();
-        assert(allTiles);
-        const nrTiles: int = 6;
-        let myTiles: Tile[] = [];
-        for (let i: int = 0; i < nrTiles; i++) {
-            myTiles.push(allTiles[i]);
-        }
-        return myTiles;
-    }
 }
 
 export default new TileManager();

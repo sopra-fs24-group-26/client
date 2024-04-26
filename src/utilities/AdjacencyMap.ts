@@ -22,12 +22,12 @@ export class AdjacencyMap {
 
     public isAligned(x: int, y: int, tile: PlaceTile): boolean {
         const k: string = this.key(x, y);
-        var amountOfConnections: int = 0;
-        var isAligned: boolean = true;
+        let amountOfConnections: int = 0;
+        let isAligned: boolean = true;
         assert(tile.type !== null);
-        const connectionsType: Nullable<int[]> = TileManager.getConnectionsMap().get(tile.type) ?? null;
+        let connectionsType: Nullable<int[]> = TileManager.getConnectionsMap().get(tile.type) ?? null;
         assert(connectionsType);
-        const connectionsTile: int[] = this.shiftByRotation(connectionsType.slice(), tile.rotation);
+        const connectionsTile: int[] = this.shiftByRotation(connectionsType, tile.rotation);
         const cellAtK: Nullable<[boolean, Nullable<int[]>]> = this.cells.get(k) ?? null;
         assert(cellAtK);
         const connectionsRequired: Nullable<int[]> = cellAtK[1];
@@ -87,7 +87,7 @@ export class AdjacencyMap {
     }
 
     private initialiseConnection(otherTile: int, connectionsOfTile: int[]): int[] {
-        var connections: int[] = [];
+        let connections: int[] = [];
         for (let i: int = 0; i < 5; i++) {
             connections.push(2);
         }
@@ -99,12 +99,12 @@ export class AdjacencyMap {
     private shiftByRotation(connections: int[], rotation: int): int[] {
         assert(connections);
         rotation = (rotation % 4 + 4) % 4;
-        var shiftedConnections: int[] = connections.slice();
+        let shiftedConnections: int[] = connections.slice();
         const lastElement: Nullable<int> = shiftedConnections.pop() ?? null;
-        assert(lastElement);
+        assert(lastElement !== null);
         for (let i: int = 0; i < rotation; i++) {
             var elementToShift: Nullable<int> = shiftedConnections.pop() ?? null;
-            assert(elementToShift);
+            assert(elementToShift !== null);
             shiftedConnections.unshift(elementToShift);
         }
         shiftedConnections.push(lastElement);

@@ -84,9 +84,7 @@ export class GameUiScreen extends Phaser.Scene {
     public displayDrawnTiles(): void {
         assert(this.drawnTilesContainer);
         this.drawnTilesContainer.removeAll(true);
-        const myTiles: Nullable<Tile[]> = TileManager.getTilesInHand();
-        //commentet out for testing purposees
-        //const myTiles: Nullable<Tile[]> = TileManager.getInHand();
+        const myTiles: Nullable<Tile[]> = TileManager.getInHand();
         assert(myTiles && this.uiBackground);
         const nrTiles: int = myTiles.length;
         const tileSpacing: int =
