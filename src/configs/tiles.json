@@ -43,5 +43,21 @@
         "type": 8,
         "amount": 2,
         "connections": [0, 1, 1, 0, 0]
+    },
+
+    {
+        "type": 9,
+        "amount": 0,
+        "connections": [1, 1, 1, 1, 1]
+    },
+    {
+        "type": 10,
+        "amount": 0,
+        "connections": [1, 1, 1, 1, 1]
+    },
+    {
+        "type": 11,
+        "amount": 0,
+        "connections": [1, 1, 1, 1, 1]
     }
 ]
