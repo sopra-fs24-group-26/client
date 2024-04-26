@@ -45,7 +45,7 @@ class TileManager {
     public updateAdjacencyMap(): void {
         this.adjacencyMap = new AdjacencyMap(this.getRelevantTilesInWorld());
     }
-
+    
     public getRelevantTilesInWorld(): Tile[] {
         const placedTiles: Nullable<Tile[]> = this.getPlaced();
         assert(placedTiles);
@@ -76,7 +76,7 @@ class TileManager {
         );
     }
 
-    public getStartingTiles(): Tile[] {
+    public getPreplacedTiles(): Tile[] {
         const session: Nullable<SessionDTO> = SessionManager.get();
         assert(session);
         const tiles: Tile[] = [];
@@ -99,7 +99,17 @@ class TileManager {
     }
 
     public getStartingTile(): Tile[] {
-        return this.getStartingTiles().filter((tile: Tile)=> tile.coordinateX === 0 && tile.coordinateY === 0);
+        return this.getPreplacedTiles().filter((tile: Tile)=> tile.coordinateX === 0 && tile.coordinateY === 0);
+    }
+
+    public placeTile(tile: PlaceTile): void {
+        const session: Nullable<SessionDTO> = SessionManager.get();
+        assert(session);
+        tile.sessionId = session.id;
+        api.put(
+            "/placeTile",
+            tile,
+        );
     }
 
     public initialize(): void {
@@ -116,7 +126,6 @@ class TileManager {
         });
         return connectionsMap;
     }
-
 
     private listen(): void {
         GeneralManager.onSync.on(() => {
@@ -196,15 +205,7 @@ class TileManager {
         }
         return TileState.Unused;
     }
-    public placeTile(tile: PlaceTile): void {
-        const session: Nullable<SessionDTO> = SessionManager.get();
-        assert(session);
-        tile.sessionId = session.id;
-        api.put(
-            "/placeTile",
-            tile,
-        );
-    }
+
     //testfunction
     //will be taken out before merging
     public getTilesInHand(): Tile[] {

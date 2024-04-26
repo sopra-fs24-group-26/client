@@ -85,7 +85,7 @@ export class GameScreen extends Phaser.Scene {
         assert(this.placedTilesContainer && placedTiles);
         this.placedTilesContainer.removeAll(true);
 
-        const startingTiles: Tile[] = TileManager.getStartingTiles();
+        const startingTiles: Tile[] = TileManager.getPreplacedTiles();
         const allTiles: Tile[] = [...placedTiles, ...startingTiles];
 
         allTiles.forEach((tile: Tile) => {

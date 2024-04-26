@@ -3,7 +3,6 @@ import { int, Nullable } from "definitions/utils";
 import TileManager from "../managers/TileManager";
 import { assert } from "./utils";
 import { PlaceTile } from "definitions/placeTile";
-import { log } from "./logger";
 
 export class AdjacencyMap {
     private cells: Map<string,[boolean, Nullable<int[]>]>;
@@ -20,20 +19,23 @@ export class AdjacencyMap {
         return false
     }
 
-    public isConnectionsAlign(x: int, y: int, tile: PlaceTile): boolean {
+    public isAligned(x: int, y: int, tile: PlaceTile): boolean {
         const k: string = this.key(x,y);
-        var count: int = 0;
+        var amountOfConnections: int = 0;
         var isAligned: boolean = true;
-        assert(this.cells.has(k));
-        const connectionsTile: int[] = this.shiftByRotation(TileManager.getConnectionsMap().get(tile.type).slice(), tile.rotation);
+        assert(tile.type !== null);
+        const connectionsType : int[] | undefined= TileManager.getConnectionsMap().get(tile.type);
+        assert(connectionsType);
+        const connectionsTile: int[] = this.shiftByRotation(connectionsType.slice(), tile.rotation);
         const connectionsRequired: Nullable<int[]> | undefined = this.cells.get(k)[1]
         assert(connectionsRequired);
         for (let i: int = 0; i < 4; i++) {
             if(connectionsRequired[i] === 2) continue;
             if(!(connectionsRequired[i] === connectionsTile[i])) isAligned = false;
-            if(connectionsRequired[i] === connectionsTile[i]) count = count + connectionsTile[i];
+            if(connectionsRequired[i] === connectionsTile[i]) amountOfConnections = amountOfConnections + connectionsTile[i];
         }
-        if(count < 1) isAligned = false;
+        if(amountOfConnections < 1) isAligned = false;
+        if(connectionsRequired[4] === 0) isAligned = false;
         return isAligned;
     }
 
@@ -65,12 +67,14 @@ export class AdjacencyMap {
         }
         if (!(this.cells.has(k))) {
             const connections: int[] = this.initialiseConnection(locationRelativeToTile, connectionsOfTile);
-            this.cells.set(k, [true,connections])
+            this.cells.set(k, [true,connections]);
         } else if (this.cells.get(k)[0]) {
             const connections: Nullable<int> = this.cells.get(k)[1];
-            assert(connections !== undefined);
-            assert(connections);
+            assert(connections !== undefined && connections !== null);
             connections[(locationRelativeToTile+2)%4] = connectionsOfTile[locationRelativeToTile];
+            if (connections[4] !== 1) {
+                connections[4] = connectionsOfTile[4];
+            }
         }
     }
 
@@ -80,6 +84,7 @@ export class AdjacencyMap {
             connections.push(2);
         }
         connections[(otherTile+2)%4] = connectionsOfTile[otherTile];
+        connections[4] = connectionsOfTile[4];
         return connections;
     }
 
