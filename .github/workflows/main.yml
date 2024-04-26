@@ -1,12 +1,13 @@
 name: Deploy Project to App Engine
 
 on:
-  push:
-    branches:
-      - master
+    push:
+        branches:
+            - master
+            - deploy-assets-hotfix
 
-    # run the workflow manually from the Actions tab
-    workflow_dispatch:
+        # run the workflow manually from the Actions tab
+        workflow_dispatch:
 
 jobs:
     sonarcloud:

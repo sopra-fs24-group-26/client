@@ -3,6 +3,7 @@ import SessionManager from "managers/SessionManager";
 import Phaser from "phaser";
 import { interactify } from "../utilities/utils";
 import { ScreenHeight, ScreenWidth } from "../core/main";
+import { log } from "utilities/logger";
 
 export class TitleScreen extends Phaser.Scene {
     public constructor() {
@@ -11,8 +12,13 @@ export class TitleScreen extends Phaser.Scene {
 
     public preload(): void {
         const root: string = process.env["PUBLIC_URL"] ?? "";
-        this.load.image("create", `${root}/assets/buttons/create.png`);
-        this.load.image("backdrop", `${root}/assets/sabo.png`);
+        log(process.env["PUBLIC_URL"]);
+        log(root);
+        log(this);
+        log(window);
+        log(process);
+        this.load.image("create", "./assets/buttons/create.png");
+        this.load.image("backdrop", "./assets/sabo.png");
     }
 
     public create(): void {
