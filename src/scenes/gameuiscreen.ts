@@ -125,7 +125,6 @@ export class GameUiScreen extends Phaser.Scene {
                     this.dragObj.setDepth(Number.MAX_SAFE_INTEGER);
                     this.currentTile.id = myTiles[i].id;
                     this.currentTile.type = myTiles[i].type;
-                    this.setBackToOriginalPosition(false);
                     this.toggleDrag();
                 },
                 this,
@@ -188,11 +187,11 @@ export class GameUiScreen extends Phaser.Scene {
                 !this.checkAdjacency([activePointer.x, activePointer.y]) ||
                 activePointer.y > this.uiBackground.getTopLeft().y
             ) {
-                this.setBackToOriginalPosition(true);
+                this.setBackToOriginalPosition();
             } else if (
                 !this.checkConnections([activePointer.x, activePointer.y])
             ) {
-                this.setBackToOriginalPosition(true);
+                this.setBackToOriginalPosition();
                 this.displayErrorMessage();
                 return;
             } else {
@@ -203,22 +202,17 @@ export class GameUiScreen extends Phaser.Scene {
         this.currentTile = new PlaceTile();
     }
 
-    private setBackToOriginalPosition(onlyDragObj: Boolean): void {
+    private setBackToOriginalPosition(): void {
         assert(this.drawnTilesContainer);
-        for (const tile of this.drawnTilesContainer.list) {
-            if (!(tile instanceof Phaser.GameObjects.Image)) {
-                continue;
-            }
-            if ((tile === this.dragObj) === onlyDragObj) {
-                const original: Nullable<Phaser.Math.Vector2> =
-                    this.originalLocations.get(tile) ?? null;
-                assert(original);
-                tile.x = original.x;
-                tile.y = original.y;
-                tile.angle = 0;
-                tile.setDepth(1);
-            }
-        }
+        if(!this.dragObj){return;}
+        const original: Nullable<Phaser.Math.Vector2> =
+            this.originalLocations.get(this.dragObj) ?? null;
+        assert(original);
+        this.dragObj.x = original.x;
+        this.dragObj.y = original.y;
+        this.dragObj.angle = 0;
+        this.dragObj.setDepth(1);
+        this.currentTile.rotation = 0;
     }
 
     private setAllTileNotInteractive(): void {
