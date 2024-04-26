@@ -2,7 +2,7 @@ import { ScreenHeight, ScreenWidth } from "core/main";
 import Phaser from "phaser";
 import { assert } from "utilities/utils";
 import { PlaceTile } from "../definitions/placeTile";
-import { int, Nullable } from "../definitions/utils";
+import { int, Nullable, UUID } from "../definitions/utils";
 import { Tile } from "../entities/Tile";
 import TileManager from "../managers/TileManager";
 import SessionManager from "../managers/SessionManager";
@@ -36,13 +36,18 @@ export class GameUiScreen extends Phaser.Scene {
     }
 
     public init(): void {
-        /* const tileUpdateListener: UUID = TileManager.onSync.on(() => {
-             this.displayDrawnTiles();
-         });
-         this.events.on("destroy", () => {
-             TileManager.onSync.off(tileUpdateListener);
-         });
-         */
+        const tileUpdateListener: UUID = TileManager.onSync.on(() => {
+            if (!this.isDraging) {
+                const isMyTurn: boolean = SessionManager.isMyTurn();
+                this.displayDrawnTiles();
+                isMyTurn
+                    ? this.setAllTilesInteractive()
+                    : this.setAllTileNotInteractive();
+            }
+        });
+        this.events.on("destroy", () => {
+            TileManager.onSync.off(tileUpdateListener);
+        });
     }
 
     public preload(): void {
@@ -52,7 +57,6 @@ export class GameUiScreen extends Phaser.Scene {
     }
 
     public create(): void {
-        const isMyTurn: boolean = SessionManager.isMyTurn();
         this.uiBackground = this.add.rectangle(
             ScreenWidth / 2,
             ScreenHeight - 100,
@@ -87,10 +91,6 @@ export class GameUiScreen extends Phaser.Scene {
             this.handleViewportChange,
             this,
         );
-        this.displayDrawnTiles();
-        isMyTurn
-            ? this.setAllTilesInteractive()
-            : this.setAllTileNotInteractive();
     }
 
     public displayDrawnTiles(): void {
