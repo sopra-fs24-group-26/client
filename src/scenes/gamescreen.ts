@@ -71,7 +71,10 @@ export class GameScreen extends Phaser.Scene {
             camera.scrollX += this.dragStart.x - activePointer.position.x;
             camera.scrollY += this.dragStart.y - activePointer.position.y;
 
-            this.events.emit("cameraViewportChanged", { x: camera.scrollX, y: camera.scrollY });
+            this.events.emit("cameraViewportChanged", {
+                x: camera.scrollX,
+                y: camera.scrollY,
+            });
         }
         this.dragStart = activePointer.position.clone();
     }
@@ -92,11 +95,13 @@ export class GameScreen extends Phaser.Scene {
             if (tile.coordinateX !== null && tile.coordinateY !== null) {
                 assert(this.placedTilesContainer);
                 this.placedTilesContainer.add(
-                    this.add.image(
-                        tile.coordinateX * GameScreen.tilePixels,
-                        tile.coordinateY * GameScreen.tilePixels,
-                        `tile${tile.type}`,
-                    ).setAngle(tile.rotation * 90),
+                    this.add
+                        .image(
+                            tile.coordinateX * GameScreen.tilePixels,
+                            tile.coordinateY * GameScreen.tilePixels,
+                            `tile${tile.type}`,
+                        )
+                        .setAngle(tile.rotation * 90),
                 );
             }
         });

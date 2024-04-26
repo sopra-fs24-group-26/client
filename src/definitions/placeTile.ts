@@ -1,6 +1,6 @@
 import { int, Nullable, UUID } from "./utils";
 
-export class PlaceTile{
+export class PlaceTile {
     public id: Nullable<UUID>;
     public type: Nullable<int>;
     public sessionId: Nullable<UUID>;

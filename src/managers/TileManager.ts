@@ -13,14 +13,14 @@ import { EventEmitter } from "utilities/EventEmitter";
 import PlayerManager from "./PlayerManager";
 import { Player } from "entities/Player";
 import { api } from "../utilities/api";
-import SessionManager from "./SessionManager"
-import { AdjacencyMap} from "utilities/AdjacencyMap"
+import SessionManager from "./SessionManager";
+import { AdjacencyMap } from "utilities/AdjacencyMap";
 
 class TileManager {
     public readonly onSync: EventEmitter;
     private list: Nullable<Tile[]>;
     private adjacencyMap: Nullable<AdjacencyMap>;
-    private connectionsMap: Map<int,int[]>;
+    private connectionsMap: Map<int, int[]>;
 
     public constructor() {
         this.onSync = new EventEmitter();
@@ -29,7 +29,7 @@ class TileManager {
         this.connectionsMap = this.createConnectionsMap();
     }
 
-    public getConnectionsMap(): Map<int,int[]> {
+    public getConnectionsMap(): Map<int, int[]> {
         return this.connectionsMap;
     }
 
@@ -43,7 +43,7 @@ class TileManager {
     public updateAdjacencyMap(): void {
         this.adjacencyMap = new AdjacencyMap(this.getRelevantTilesInWorld());
     }
-    
+
     public getRelevantTilesInWorld(): Tile[] {
         const placedTiles: Nullable<Tile[]> = this.getPlaced();
         assert(placedTiles);
@@ -97,25 +97,24 @@ class TileManager {
     }
 
     public getStartingTile(): Tile[] {
-        return this.getPreplacedTiles().filter((tile: Tile)=> tile.coordinateX === 0 && tile.coordinateY === 0);
+        return this.getPreplacedTiles().filter(
+            (tile: Tile) => tile.coordinateX === 0 && tile.coordinateY === 0,
+        );
     }
 
     public placeTile(tile: PlaceTile): void {
         const session: Nullable<SessionDTO> = SessionManager.get();
         assert(session);
         tile.sessionId = session.id;
-        api.put(
-            "/placeTile",
-            tile,
-        );
+        api.put("/placeTile", tile);
     }
 
     public initialize(): void {
         this.listen();
     }
 
-    private createConnectionsMap(): Map<int,int[]> {
-        const connectionsMap:Map<int,int[]> = new Map();
+    private createConnectionsMap(): Map<int, int[]> {
+        const connectionsMap: Map<int, int[]> = new Map();
         for (const config of tileConfigs) {
             connectionsMap.set(config.type, config.connections);
         }
