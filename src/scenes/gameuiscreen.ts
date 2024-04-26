@@ -16,8 +16,10 @@ export class GameUiScreen extends Phaser.Scene {
     private topLeftY: int;
     private dragObj: Nullable<Phaser.GameObjects.Image>;
     private currentTile: PlaceTile;
-    private originalLocations: { [key: string]: [int, int] };
-    private displayedTiles: [Phaser.GameObjects.Image, string, int][];
+    private originalLocations: Map<
+        Phaser.GameObjects.Image,
+        Phaser.Math.Vector2
+    >;
     private wrongText: Nullable<Phaser.GameObjects.Text>;
     private isDraging: boolean;
 
@@ -29,20 +31,23 @@ export class GameUiScreen extends Phaser.Scene {
         this.topLeftY = 0;
         this.dragObj = null;
         this.currentTile = new PlaceTile();
-        this.originalLocations = {};
-        this.displayedTiles = [];
+        this.originalLocations = new Map<
+            Phaser.GameObjects.Image,
+            Phaser.Math.Vector2
+        >();
         this.wrongText = null;
         this.isDraging = false;
     }
 
     public init(): void {
         const tileUpdateListener: UUID = TileManager.onSync.on(() => {
-            if (!this.isDraging) {
-                const isMyTurn: boolean = SessionManager.isMyTurn();
-                this.displayDrawnTiles();
-                isMyTurn
-                    ? this.setAllTilesInteractive()
-                    : this.setAllTileNotInteractive();
+            if (this.isDraging) {
+                return;
+            }
+            const isMyTurn: boolean = SessionManager.isMyTurn();
+            this.displayDrawnTiles();
+            if (!isMyTurn) {
+                this.setAllTileNotInteractive();
             }
         });
         this.events.on("destroy", () => {
@@ -113,12 +118,22 @@ export class GameUiScreen extends Phaser.Scene {
                 `tile${myTiles[i].type}`,
             );
             tile.setInteractive();
-            this.displayedTiles.push([
+            tile.on(
+                "pointerdown",
+                () => {
+                    this.dragObj = tile;
+                    this.dragObj.setDepth(Number.MAX_SAFE_INTEGER);
+                    this.currentTile.id = myTiles[i].id;
+                    this.currentTile.type = myTiles[i].type;
+                    this.setBackToOriginalPosition(false);
+                    this.toggleDrag();
+                },
+                this,
+            );
+            this.originalLocations.set(
                 tile,
-                myTiles[i].id.toString(),
-                myTiles[i].type,
-            ]);
-            this.originalLocations[myTiles[i].id.toString()] = [tile.x, tile.y];
+                new Phaser.Math.Vector2(tile.x, tile.y),
+            );
             this.drawnTilesContainer.add(tile);
         }
     }
@@ -126,14 +141,12 @@ export class GameUiScreen extends Phaser.Scene {
     private toggleDrag(): void {
         if (!this.isDraging && this.dragObj) {
             if (this.wrongText) this.wrongText.destroy();
-            this.dragObj.on("pointermove", this.doDrag, this);
+            this.input.on("pointermove", this.doDrag, this);
             this.dragObj.on("pointerdown", this.stopDrag, this);
-            this.dragObj.on("pointerout", this.doDrag, this);
             this.isDraging = true;
         } else if (this.dragObj) {
-            this.dragObj.off("pointermove", this.doDrag, this);
+            this.input.off("pointermove", this.doDrag, this);
             this.dragObj.off("pointerdown", this.stopDrag, this);
-            this.dragObj.off("pointerout", this.doDrag, this);
             this.isDraging = false;
         }
     }
@@ -142,26 +155,27 @@ export class GameUiScreen extends Phaser.Scene {
         const activePointer: Phaser.Input.Pointer =
             this.game.input.activePointer;
         assert(this.uiBackground);
-        if (this.dragObj) {
-            this.dragObj.setDepth(6);
-            if (
-                activePointer.y < this.uiBackground.getTopLeft().y &&
-                this.checkAdjacency([activePointer.x, activePointer.y])
-            ) {
-                this.dragObj.x = Phaser.Math.Snap.To(
-                    activePointer.x,
-                    GameUiScreen.tilePixels,
-                    -this.topLeftX,
-                );
-                this.dragObj.y = Phaser.Math.Snap.To(
-                    activePointer.y,
-                    GameUiScreen.tilePixels,
-                    -this.topLeftY,
-                );
-            } else {
-                this.dragObj.x = activePointer.x;
-                this.dragObj.y = activePointer.y;
-            }
+        if (!this.dragObj) {
+            return;
+        }
+        this.dragObj.setDepth(6);
+        if (
+            activePointer.y < this.uiBackground.getTopLeft().y &&
+            this.checkAdjacency([activePointer.x, activePointer.y])
+        ) {
+            this.dragObj.x = Phaser.Math.Snap.To(
+                activePointer.x,
+                GameUiScreen.tilePixels,
+                -this.topLeftX,
+            );
+            this.dragObj.y = Phaser.Math.Snap.To(
+                activePointer.y,
+                GameUiScreen.tilePixels,
+                -this.topLeftY,
+            );
+        } else {
+            this.dragObj.x = activePointer.x;
+            this.dragObj.y = activePointer.y;
         }
     }
 
@@ -189,28 +203,18 @@ export class GameUiScreen extends Phaser.Scene {
         this.currentTile = new PlaceTile();
     }
 
-    private setAllTilesInteractive(): void {
-        for (const [tile, id, type] of this.displayedTiles) {
-            tile.on(
-                "pointerdown",
-                () => {
-                    this.dragObj = tile;
-                    this.dragObj.setDepth(Number.MAX_SAFE_INTEGER);
-                    this.currentTile.id = id;
-                    this.currentTile.type = type;
-                    this.setBackToOriginalPosition(false);
-                    this.toggleDrag();
-                },
-                this,
-            );
-        }
-    }
-
     private setBackToOriginalPosition(onlyDragObj: Boolean): void {
-        for (const [tile, id, _] of this.displayedTiles) {
+        assert(this.drawnTilesContainer);
+        for (const tile of this.drawnTilesContainer.list) {
+            if (!(tile instanceof Phaser.GameObjects.Image)) {
+                continue;
+            }
             if ((tile === this.dragObj) === onlyDragObj) {
-                tile.x = this.originalLocations[id][0];
-                tile.y = this.originalLocations[id][1];
+                const original: Nullable<Phaser.Math.Vector2> =
+                    this.originalLocations.get(tile) ?? null;
+                assert(original);
+                tile.x = original.x;
+                tile.y = original.y;
                 tile.angle = 0;
                 tile.setDepth(1);
             }
@@ -218,18 +222,12 @@ export class GameUiScreen extends Phaser.Scene {
     }
 
     private setAllTileNotInteractive(): void {
-        for (const [tile, id, type] of this.displayedTiles) {
-            tile.off(
-                "pointerdown",
-                () => {
-                    this.dragObj = tile;
-                    this.dragObj.setDepth(Number.MAX_SAFE_INTEGER);
-                    this.currentTile.id = id;
-                    this.currentTile.type = type;
-                    this.toggleDrag();
-                },
-                this,
-            );
+        assert(this.drawnTilesContainer);
+        for (const tile of this.drawnTilesContainer.list) {
+            if (!(tile instanceof Phaser.GameObjects.Image)) {
+                continue;
+            }
+            tile.disableInteractive();
             tile.setAlpha(0.5);
             tile.setTint(0xfefeee);
         }
@@ -292,8 +290,9 @@ export class GameUiScreen extends Phaser.Scene {
             (this.dragObj.x + this.topLeftX) / GameUiScreen.tilePixels;
         this.currentTile.coordinateY =
             (this.dragObj.y + this.topLeftY) / GameUiScreen.tilePixels;
-        TileManager.placeTile(this.currentTile);
+        TileManager.place(this.currentTile);
         this.dragObj.destroy();
+        this.setAllTileNotInteractive();
     }
 
     private displayErrorMessage(): void {

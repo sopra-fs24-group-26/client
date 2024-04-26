@@ -36,18 +36,18 @@ class TileManager {
     public getAll(): Nullable<Tile[]> {
         return this.list;
     }
-    public getAdjacencyMap(): AdjacencyMap | null {
+    public getAdjacencyMap(): Nullable<AdjacencyMap> {
         return this.adjacencyMap;
     }
 
     public updateAdjacencyMap(): void {
-        this.adjacencyMap = new AdjacencyMap(this.getRelevantTilesInWorld());
+        this.adjacencyMap = new AdjacencyMap(this.getRelevantInWorld());
     }
 
-    public getRelevantTilesInWorld(): Tile[] {
+    private getRelevantInWorld(): Tile[] {
         const placedTiles: Nullable<Tile[]> = this.getPlaced();
         assert(placedTiles);
-        const startingTile: Tile[] = this.getStartingTile();
+        const startingTile: Tile[] = this.getStarting();
         return [...placedTiles, ...startingTile];
     }
 
@@ -74,7 +74,7 @@ class TileManager {
         );
     }
 
-    public getPreplacedTiles(): Tile[] {
+    public getPreplaced(): Tile[] {
         const session: Nullable<SessionDTO> = SessionManager.get();
         assert(session);
         const tiles: Tile[] = [];
@@ -96,13 +96,13 @@ class TileManager {
         return tiles;
     }
 
-    public getStartingTile(): Tile[] {
-        return this.getPreplacedTiles().filter(
+    private getStarting(): Tile[] {
+        return this.getPreplaced().filter(
             (tile: Tile) => tile.coordinateX === 0 && tile.coordinateY === 0,
         );
     }
 
-    public placeTile(tile: PlaceTile): void {
+    public place(tile: PlaceTile): void {
         const session: Nullable<SessionDTO> = SessionManager.get();
         assert(session);
         tile.sessionId = session.id;
