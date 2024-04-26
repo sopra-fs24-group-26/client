@@ -31,7 +31,7 @@ class SessionManager {
     }
 
     public isMyTurn(): boolean {
-        const session: Nullable<Session> = this.get();
+        const session: Nullable<SessionDTO> = GeneralManager.getSession();
         const players: Nullable<Player[]> = PlayerManager.getAll();
         const me: Nullable<Player> = PlayerManager.getMe();
         assert(session && players && me);

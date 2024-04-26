@@ -4,8 +4,8 @@ import { StartGame, EventBus } from "./main";
 import { Nullable } from "definitions/utils";
 
 export interface IRefPhaserGame {
-    game: Phaser.Game | null;
-    scene: Phaser.Scene | null;
+    game: Nullable<Phaser.Game>;
+    scene: Nullable<Phaser.Scene>;
 }
 
 interface IProps {}

@@ -8,7 +8,7 @@ export class Tile {
     public readonly id: UUID;
     public readonly type: int;
     public state: Nullable<TileState>;
-    public rotation: Nullable<int>;
+    public rotation: int;
     public coordinateX: Nullable<int>;
     public coordinateY: Nullable<int>;
 
@@ -16,14 +16,14 @@ export class Tile {
         this.id = seededUUIDv4(random);
         this.type = type;
         this.state = null;
-        this.rotation = null;
+        this.rotation = 0;
         this.coordinateX = null;
         this.coordinateY = null;
     }
 
     public apply(state: TileState, dto: Nullable<TileDTO>): void {
         this.state = state;
-        this.rotation = dto?.rotation ?? null;
+        this.rotation = dto?.rotation ?? 0;
         this.coordinateX = dto?.coordinateX ?? null;
         this.coordinateY = dto?.coordinateY ?? null;
     }
