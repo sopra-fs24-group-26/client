@@ -26,9 +26,8 @@ export class GameScreen extends Phaser.Scene {
     }
 
     public preload(): void {
-        const root: string = process.env["PUBLIC_URL"] ?? "";
         for (let i: int = 0; i < 12; i++) {
-            this.load.image(`tile${i}`, `${root}/assets/tiles/tile${i}.png`);
+            this.load.image(`tile${i}`, `assets/tiles/tile${i}.png`);
         }
     }
 
@@ -88,7 +87,7 @@ export class GameScreen extends Phaser.Scene {
 
         const preplacedTiles: Tile[] = TileManager.getPreplaced();
         const allTiles: Tile[] = [...placedTiles, ...preplacedTiles];
-        
+
         allTiles.forEach((tile: Tile) => {
             if (tile.coordinateX !== null && tile.coordinateY !== null) {
                 assert(this.placedTilesContainer);
