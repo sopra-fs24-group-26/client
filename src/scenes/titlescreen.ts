@@ -10,9 +10,8 @@ export class TitleScreen extends Phaser.Scene {
     }
 
     public preload(): void {
-        const root: string = process.env["PUBLIC_URL"] ?? "";
-        this.load.image("create", `${root}/assets/buttons/create.png`);
-        this.load.image("backdrop", `${root}/assets/sabo.png`);
+        this.load.image("create", "assets/buttons/create.png");
+        this.load.image("backdrop", "assets/sabo.png");
     }
 
     public create(): void {
