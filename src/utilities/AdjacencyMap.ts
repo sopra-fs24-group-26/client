@@ -1,11 +1,12 @@
 import { Tile } from "entities/Tile";
 import { int, Nullable } from "definitions/utils";
-import TileManager from "../managers/TileManager";
 import { assert } from "./utils";
 import { PlaceTile } from "definitions/placeTile";
+import { adjacencyCell } from "../definitions/adjacencyCell";
+import PlaceManager from "managers/AdjacencyManager";
 
 export class AdjacencyMap {
-    private cells: Map<string, [boolean, Nullable<int[]>]>;
+    private cells: Map<string, adjacencyCell>;
 
     public constructor(tiles: Tile[]) {
         this.cells = new Map();
@@ -13,12 +14,12 @@ export class AdjacencyMap {
     }
 
     public isAdjacent(x: int, y: int): boolean {
-        const isAdjacent: Nullable<[boolean, Nullable<int[]>]> =
-            this.cells.get(this.key(x, y)) ?? null;
-        if (isAdjacent !== null) {
-            return isAdjacent[0];
+        const k: string = this.key(x, y);
+        const cellAtK: Nullable<adjacencyCell> = this.cells.get(k) ?? null;
+        if (cellAtK === null || cellAtK.orientation === null) {
+            return false;
         }
-        return false;
+        return true;
     }
 
     public isAligned(x: int, y: int, tile: PlaceTile): boolean {
@@ -27,16 +28,15 @@ export class AdjacencyMap {
         let isAligned: boolean = true;
         assert(tile.type !== null);
         let connectionsType: Nullable<int[]> =
-            TileManager.getConnectionsMap().get(tile.type) ?? null;
+            PlaceManager.getConnectionsMap().get(tile.type) ?? null;
         assert(connectionsType);
         const connectionsTile: int[] = this.shiftByRotation(
             connectionsType,
             tile.rotation,
         );
-        const cellAtK: Nullable<[boolean, Nullable<int[]>]> =
-            this.cells.get(k) ?? null;
+        const cellAtK: Nullable<adjacencyCell> = this.cells.get(k) ?? null;
         assert(cellAtK);
-        const connectionsRequired: Nullable<int[]> = cellAtK[1];
+        const connectionsRequired: Nullable<int[]> = cellAtK.orientation;
         assert(connectionsRequired);
         for (let i: int = 0; i < 4; i++) {
             if (connectionsRequired[i] === 2) {
@@ -61,7 +61,7 @@ export class AdjacencyMap {
     private populateMap(tiles: Tile[]): void {
         const nrTiles: int = tiles.length;
         const connectionsMap: Nullable<Map<int, int[]>> =
-            TileManager.getConnectionsMap();
+            PlaceManager.getConnectionsMap();
         assert(connectionsMap);
         for (let i: int = 0; i < nrTiles; i++) {
             const preConnecitons: Nullable<int[]> =
@@ -93,26 +93,26 @@ export class AdjacencyMap {
         locationRelativeToTile: int,
         connectionsOfTile: int[],
     ): void {
+        let newCell: adjacencyCell = {
+            orientation: null,
+        };
         const k: string = this.key(x, y);
+        const cellAtK: Nullable<adjacencyCell> = this.cells.get(k) ?? null;
         if (locationRelativeToTile === -1) {
-            this.cells.set(k, [false, null]);
+            this.cells.set(k, newCell);
             return;
         }
-        const cellAtK: Nullable<[boolean, Nullable<int[]>]> =
-            this.cells.get(k) ?? null;
         if (cellAtK === null) {
-            const connections: int[] = this.initialiseConnection(
+            newCell.orientation = this.initialiseConnection(
                 locationRelativeToTile,
                 connectionsOfTile,
             );
-            this.cells.set(k, [true, connections]);
-        } else if (cellAtK[0]) {
-            const connections: Nullable<int[]> = cellAtK[1];
-            assert(connections);
-            connections[(locationRelativeToTile + 2) % 4] =
+            this.cells.set(k, newCell);
+        } else if (cellAtK.orientation !== null) {
+            cellAtK.orientation[(locationRelativeToTile + 2) % 4] =
                 connectionsOfTile[locationRelativeToTile];
-            if (connections[4] !== 1) {
-                connections[4] = connectionsOfTile[4];
+            if (cellAtK.orientation[4] !== 1) {
+                cellAtK.orientation[4] = connectionsOfTile[4];
             }
         }
     }

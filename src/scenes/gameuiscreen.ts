@@ -6,7 +6,7 @@ import { int, Nullable, UUID } from "../definitions/utils";
 import { Tile } from "../entities/Tile";
 import TileManager from "../managers/TileManager";
 import SessionManager from "../managers/SessionManager";
-import { AdjacencyMap } from "../utilities/AdjacencyMap";
+import PlaceManager from "../managers/AdjacencyManager";
 
 export class GameUiScreen extends Phaser.Scene {
     private static tilePixels: int = 128;
@@ -157,10 +157,12 @@ export class GameUiScreen extends Phaser.Scene {
         if (!this.dragObj) {
             return;
         }
-        this.dragObj.setDepth(6);
         if (
             activePointer.y < this.uiBackground.getTopLeft().y &&
-            this.checkAdjacency([activePointer.x, activePointer.y])
+            PlaceManager.checkAdjacency(
+                this.translateX(activePointer.x),
+                this.translateY(activePointer.y),
+            )
         ) {
             this.dragObj.x = Phaser.Math.Snap.To(
                 activePointer.x,
@@ -184,12 +186,19 @@ export class GameUiScreen extends Phaser.Scene {
         assert(this.uiBackground);
         if (this.dragObj && this.currentTile) {
             if (
-                !this.checkAdjacency([activePointer.x, activePointer.y]) ||
+                !PlaceManager.checkAdjacency(
+                    this.translateX(activePointer.x),
+                    this.translateY(activePointer.y),
+                ) ||
                 activePointer.y > this.uiBackground.getTopLeft().y
             ) {
                 this.setBackToOriginalPosition();
             } else if (
-                !this.checkConnections([activePointer.x, activePointer.y])
+                !PlaceManager.checkConnections(
+                    this.translateX(activePointer.x),
+                    this.translateY(activePointer.y),
+                    this.currentTile,
+                )
             ) {
                 this.setBackToOriginalPosition();
                 this.displayErrorMessage();
@@ -234,48 +243,20 @@ export class GameUiScreen extends Phaser.Scene {
         this.topLeftY = viewport.y;
     }
 
-    private checkAdjacency(uiCoordinates: int[]): boolean {
-        const gameWorldCoordinates: int[] =
-            this.translateCoordinates(uiCoordinates);
-        const adjacencyMap: Nullable<AdjacencyMap> =
-            TileManager.getAdjacencyMap();
-        assert(adjacencyMap);
-        return adjacencyMap.isAdjacent(
-            gameWorldCoordinates[0],
-            gameWorldCoordinates[1],
-        );
-    }
-
-    private checkConnections(uiCoordinates: int[]): boolean {
-        const gameWorldCoordinates: int[] =
-            this.translateCoordinates(uiCoordinates);
-        const adjacencyMap: Nullable<AdjacencyMap> =
-            TileManager.getAdjacencyMap();
-        assert(adjacencyMap);
-        return adjacencyMap.isAligned(
-            gameWorldCoordinates[0],
-            gameWorldCoordinates[1],
-            this.currentTile,
-        );
-    }
-
-    private translateCoordinates(uiCoordinates: int[]): int[] {
-        return [
-            (Phaser.Math.Snap.To(
-                uiCoordinates[0],
-                GameUiScreen.tilePixels,
-                -this.topLeftX,
-            ) +
+    private translateX(x: int): int {
+        return (
+            (Phaser.Math.Snap.To(x, GameUiScreen.tilePixels, -this.topLeftX) +
                 this.topLeftX) /
-                128,
-            (Phaser.Math.Snap.To(
-                uiCoordinates[1],
-                GameUiScreen.tilePixels,
-                -this.topLeftY,
-            ) +
+            128
+        );
+    }
+
+    private translateY(y: int): int {
+        return (
+            (Phaser.Math.Snap.To(y, GameUiScreen.tilePixels, -this.topLeftY) +
                 this.topLeftY) /
-                128,
-        ];
+            128
+        );
     }
 
     private placeTile(): void {
@@ -286,7 +267,7 @@ export class GameUiScreen extends Phaser.Scene {
             (this.dragObj.x + this.topLeftX) / GameUiScreen.tilePixels;
         this.currentTile.coordinateY =
             (this.dragObj.y + this.topLeftY) / GameUiScreen.tilePixels;
-        TileManager.place(this.currentTile);
+        PlaceManager.tile(this.currentTile);
         this.dragObj.destroy();
         this.setAllTileNotInteractive();
     }
