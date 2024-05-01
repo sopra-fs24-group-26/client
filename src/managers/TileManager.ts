@@ -1,4 +1,4 @@
-import { Nullable, UUID, int } from "definitions/utils";
+import { Nullable, int } from "definitions/utils";
 import GeneralManager from "./GeneralManager";
 import tileConfigs from "configs/tiles.json";
 import { PlaceTile } from "definitions/placeTile";
