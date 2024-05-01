@@ -27,4 +27,8 @@ export class Tile {
         this.coordinateX = dto?.coordinateX ?? null;
         this.coordinateY = dto?.coordinateY ?? null;
     }
+
+    public applyState(state: TileState): void {
+        this.state = state;
+    }
 }

@@ -59,6 +59,7 @@ export class GameUiScreen extends Phaser.Scene {
         for (let i: int = 0; i < 9; i++) {
             this.load.image(`tile${i}`, `assets/tiles/tile${i}.png`);
         }
+        this.load.image("trashCan", "assets/buttons/trashcan.jpg");
     }
 
     public create(): void {
@@ -107,7 +108,6 @@ export class GameUiScreen extends Phaser.Scene {
         const tileSpacing: int =
             (this.uiBackground.width - nrTiles * GameUiScreen.tilePixels) /
             (nrTiles + 1);
-        (this.uiBackground.width - nrTiles * 128) / (nrTiles + 1);
 
         for (let i: int = 0; i < nrTiles; i++) {
             const tile: Phaser.GameObjects.Image = this.add.image(
@@ -134,6 +134,28 @@ export class GameUiScreen extends Phaser.Scene {
                 new Phaser.Math.Vector2(tile.x, tile.y),
             );
             this.drawnTilesContainer.add(tile);
+
+            //Add trash can icon over every drawn tile
+            const trashCan: Phaser.GameObjects.Image = this.add.image(
+                this.uiBackground.getTopLeft().x +
+                    (tileSpacing + GameUiScreen.tilePixels / 2) +
+                    i * (GameUiScreen.tilePixels + tileSpacing),
+                ScreenHeight - 180,
+                "trashCan",
+            );
+            trashCan.setInteractive();
+            trashCan.on(
+                "pointerdown",
+                () => {
+                    this.dragObj = tile;
+                    this.currentTile.id = myTiles[i].id;
+                    this.currentTile.type = myTiles[i].type;
+                    this.discardTile();
+                },
+                this,
+            );
+
+            this.drawnTilesContainer.add(trashCan);
         }
     }
 
@@ -288,6 +310,15 @@ export class GameUiScreen extends Phaser.Scene {
             (this.dragObj.y + this.topLeftY) / GameUiScreen.tilePixels;
         TileManager.place(this.currentTile);
         this.dragObj.destroy();
+        this.setAllTileNotInteractive();
+    }
+
+    private discardTile(): void {
+        //Didn't use apply here because state change doesn't come from ping
+        assert(this.dragObj);
+        this.dragObj.destroy();
+
+        TileManager.discard(this.currentTile);
         this.setAllTileNotInteractive();
     }
 

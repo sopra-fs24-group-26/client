@@ -1,4 +1,4 @@
-import { Nullable, int } from "definitions/utils";
+import { Nullable, UUID, int } from "definitions/utils";
 import GeneralManager from "./GeneralManager";
 import tileConfigs from "configs/tiles.json";
 import { PlaceTile } from "definitions/placeTile";
@@ -15,18 +15,21 @@ import { Player } from "entities/Player";
 import { api } from "../utilities/api";
 import SessionManager from "./SessionManager";
 import { AdjacencyMap } from "utilities/AdjacencyMap";
+import { log } from "utilities/logger";
 
 class TileManager {
     public readonly onSync: EventEmitter;
     private list: Nullable<Tile[]>;
     private adjacencyMap: Nullable<AdjacencyMap>;
     private connectionsMap: Map<int, int[]>;
+    private listOfDiscardedTilesIndex: int[];
 
     public constructor() {
         this.onSync = new EventEmitter();
         this.list = null;
         this.adjacencyMap = null;
         this.connectionsMap = this.createConnectionsMap();
+        this.listOfDiscardedTilesIndex = [];
     }
 
     public getConnectionsMap(): Map<int, int[]> {
@@ -74,6 +77,27 @@ class TileManager {
         );
     }
 
+    private indexInListOfDiscardedTiles(index: int): boolean {
+        log("indexInListOfDiscardedTiles");
+        for (let i = 0; i < this.listOfDiscardedTilesIndex.length; i++) {
+            if (index === this.listOfDiscardedTilesIndex[i]) {
+                log("index is discarded");
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private findIndexByTileID(tileID: UUID): Nullable<int> {
+        assert(this.list);
+        for (let i: int = 0; i < this.list.length; i++) {
+            if (tileID === this.list[i].id) {
+                return i;
+            }
+        }
+        return null;
+    }
+
     public getPreplaced(): Tile[] {
         const session: Nullable<SessionDTO> = SessionManager.get();
         assert(session);
@@ -107,6 +131,20 @@ class TileManager {
         assert(session);
         tile.sessionId = session.id;
         api.put("/placeTile", tile);
+    }
+
+    public discard(tile: PlaceTile): void {
+        log("discard");
+        const session: Nullable<SessionDTO> = SessionManager.get();
+        assert(session);
+        tile.sessionId = session.id;
+        api.put("/discardTile", tile);
+        assert(tile.id);
+        const index: Nullable<int> = this.findIndexByTileID(tile.id);
+        log(index);
+        assert(index !== null);
+        this.listOfDiscardedTilesIndex.push(index);
+        log(this.listOfDiscardedTilesIndex);
     }
 
     public initialize(): void {
@@ -194,7 +232,13 @@ class TileManager {
         if (turnIndex === null) {
             return TileState.Unused;
         }
+        // if dto === null and turnIndex !== null (if the game started but tile not in database)
         if (index < turnIndex + initialAmount) {
+            if (this.indexInListOfDiscardedTiles(index)) {
+                log("Discarded");
+                return TileState.Discarded;
+            }
+            log("Drawn");
             return TileState.Drawn;
         }
         return TileState.Unused;
