@@ -22,14 +22,12 @@ class TileManager {
     private list: Nullable<Tile[]>;
     private adjacencyMap: Nullable<AdjacencyMap>;
     private connectionsMap: Map<int, int[]>;
-    private listOfDiscardedTilesIndex: int[];
 
     public constructor() {
         this.onSync = new EventEmitter();
         this.list = null;
         this.adjacencyMap = null;
         this.connectionsMap = this.createConnectionsMap();
-        this.listOfDiscardedTilesIndex = [];
     }
 
     public getConnectionsMap(): Map<int, int[]> {
@@ -77,27 +75,6 @@ class TileManager {
         );
     }
 
-    private indexInListOfDiscardedTiles(index: int): boolean {
-        log("indexInListOfDiscardedTiles");
-        for (let i = 0; i < this.listOfDiscardedTilesIndex.length; i++) {
-            if (index === this.listOfDiscardedTilesIndex[i]) {
-                log("index is discarded");
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private findIndexByTileID(tileID: UUID): Nullable<int> {
-        assert(this.list);
-        for (let i: int = 0; i < this.list.length; i++) {
-            if (tileID === this.list[i].id) {
-                return i;
-            }
-        }
-        return null;
-    }
-
     public getPreplaced(): Tile[] {
         const session: Nullable<SessionDTO> = SessionManager.get();
         assert(session);
@@ -112,6 +89,7 @@ class TileManager {
                 rotation: item.rotation,
                 coordinateX: item.coordinateX,
                 coordinateY: item.coordinateY,
+                discarded: false,
             } as TileDTO;
 
             tile.apply(TileState.Placed, tileDTO);
@@ -134,17 +112,10 @@ class TileManager {
     }
 
     public discard(tile: PlaceTile): void {
-        log("discard");
         const session: Nullable<SessionDTO> = SessionManager.get();
         assert(session);
         tile.sessionId = session.id;
         api.put("/discardTile", tile);
-        assert(tile.id);
-        const index: Nullable<int> = this.findIndexByTileID(tile.id);
-        log(index);
-        assert(index !== null);
-        this.listOfDiscardedTilesIndex.push(index);
-        log(this.listOfDiscardedTilesIndex);
     }
 
     public initialize(): void {
@@ -194,7 +165,8 @@ class TileManager {
             const tile: Tile = this.list[i];
             const dto: Nullable<TileDTO> =
                 dtos.find((dto: TileDTO) => dto.id === tile.id) || null;
-
+            log("dto.discarded in processStates: ");
+            log(dto?.discarded);
             const state: TileState = this.determineState(
                 dto,
                 session.turnIndex,
@@ -227,18 +199,19 @@ class TileManager {
         initialAmount: int,
     ): TileState {
         if (dto !== null) {
+            log("dto.discarded:");
+            log(dto.discarded);
+            if (dto.discarded === true) {
+                log("DIscarded");
+                return TileState.Discarded;
+            }
+            log("Placed");
             return TileState.Placed;
         }
         if (turnIndex === null) {
             return TileState.Unused;
         }
-        // if dto === null and turnIndex !== null (if the game started but tile not in database)
         if (index < turnIndex + initialAmount) {
-            if (this.indexInListOfDiscardedTiles(index)) {
-                log("Discarded");
-                return TileState.Discarded;
-            }
-            log("Drawn");
             return TileState.Drawn;
         }
         return TileState.Unused;

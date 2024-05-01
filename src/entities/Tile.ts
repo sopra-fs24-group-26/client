@@ -11,6 +11,7 @@ export class Tile {
     public rotation: int;
     public coordinateX: Nullable<int>;
     public coordinateY: Nullable<int>;
+    public discarded: Nullable<boolean>;
 
     public constructor(random: seedrandom.PRNG, type: int) {
         this.id = seededUUIDv4(random);
@@ -19,6 +20,7 @@ export class Tile {
         this.rotation = 0;
         this.coordinateX = null;
         this.coordinateY = null;
+        this.discarded = null;
     }
 
     public apply(state: TileState, dto: Nullable<TileDTO>): void {
@@ -26,6 +28,7 @@ export class Tile {
         this.rotation = dto?.rotation ?? 0;
         this.coordinateX = dto?.coordinateX ?? null;
         this.coordinateY = dto?.coordinateY ?? null;
+        this.discarded = dto?.discarded ?? null;
     }
 
     public applyState(state: TileState): void {
