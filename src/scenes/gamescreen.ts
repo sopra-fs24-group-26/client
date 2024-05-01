@@ -4,8 +4,7 @@ import { Tile } from "entities/Tile";
 import TileManager from "managers/TileManager";
 import Phaser from "phaser";
 import { assert } from "utilities/utils";
-import { log } from "../utilities/logger";
-import PlaceManager from "../managers/AdjacencyManager";
+import AdjacencyManager from "../managers/AdjacencyManager";
 
 export class GameScreen extends Phaser.Scene {
     private dragStart: Nullable<Phaser.Math.Vector2>;
@@ -79,7 +78,7 @@ export class GameScreen extends Phaser.Scene {
     }
 
     private displayPlacedTiles(): void {
-        PlaceManager.createAdjacencyMap();
+        AdjacencyManager.createAdjacencyMap();
         assert(this.placedTilesContainer);
         this.placedTilesContainer.removeAll(true);
 

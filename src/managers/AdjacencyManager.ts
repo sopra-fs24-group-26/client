@@ -7,18 +7,28 @@ import SessionManager from "./SessionManager";
 import { assert } from "../utilities/utils";
 import { api } from "../utilities/api";
 import TileManager from "./TileManager";
+import { pathRepresentation } from "../definitions/pathRepresentation";
 
 class AdjacencyManager {
     private adjacencyMap: Nullable<AdjacencyMap>;
-    private connectionsMap: Map<int, int[]>;
+    private pathMap: Map<int, pathRepresentation>;
+    private hasWon: boolean;
 
     public constructor() {
         this.adjacencyMap = null;
-        this.connectionsMap = this.createConnectionsMap();
+        this.pathMap = this.createConnectionsMap();
+        this.hasWon = false;
     }
 
-    public getConnectionsMap(): Map<int, int[]> {
-        return this.connectionsMap;
+    public setHasWon(hasWon: boolean): void {
+        this.hasWon = hasWon;
+    }
+
+    public getHasWon(): boolean {
+        return this.hasWon;
+    }
+    public getPathMap(): Map<int, pathRepresentation> {
+        return this.pathMap;
     }
 
     public tile(tile: PlaceTile): void {
@@ -39,14 +49,26 @@ class AdjacencyManager {
     }
 
     public createAdjacencyMap(): void {
-        this.adjacencyMap = new AdjacencyMap(TileManager.getAllInWorld());
+        this.adjacencyMap = new AdjacencyMap(
+            TileManager.getAllExceptGoal(),
+            TileManager.getVeins(),
+        );
     }
 
-    private createConnectionsMap(): Map<int, int[]> {
-        const connectionsMap: Map<int, int[]> = new Map();
+    private createConnectionsMap(): Map<int, pathRepresentation> {
+        const connectionsMap: Map<int, pathRepresentation> = new Map();
         for (const config of tileConfigs) {
-            connectionsMap.set(config.type, config.connections);
+            connectionsMap.set(config.type, {
+                top: config.connections[0],
+                right: config.connections[1],
+                bottom: config.connections[2],
+                left: config.connections[3],
+                center: config.connections[4],
+                connectionToStart: 2,
+                occupied: null,
+            });
         }
+
         return connectionsMap;
     }
 }

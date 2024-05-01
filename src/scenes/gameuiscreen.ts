@@ -6,7 +6,7 @@ import { int, Nullable, UUID } from "../definitions/utils";
 import { Tile } from "../entities/Tile";
 import TileManager from "../managers/TileManager";
 import SessionManager from "../managers/SessionManager";
-import PlaceManager from "../managers/AdjacencyManager";
+import AdjacencyManager from "../managers/AdjacencyManager";
 
 export class GameUiScreen extends Phaser.Scene {
     private static tilePixels: int = 128;
@@ -21,6 +21,7 @@ export class GameUiScreen extends Phaser.Scene {
         Phaser.Math.Vector2
     >;
     private wrongText: Nullable<Phaser.GameObjects.Text>;
+    private winText: Nullable<Phaser.GameObjects.Text>;
     private isDraging: boolean;
 
     public constructor() {
@@ -36,6 +37,7 @@ export class GameUiScreen extends Phaser.Scene {
             Phaser.Math.Vector2
         >();
         this.wrongText = null;
+        this.winText = null;
         this.isDraging = false;
     }
 
@@ -44,10 +46,14 @@ export class GameUiScreen extends Phaser.Scene {
             if (this.isDraging) {
                 return;
             }
-            const isMyTurn: boolean = SessionManager.isMyTurn();
+            let isMyTurn: boolean = SessionManager.isMyTurn();
             this.displayDrawnTiles();
             if (!isMyTurn) {
                 this.setAllTileNotInteractive();
+            }
+            if (AdjacencyManager.getHasWon()) {
+                this.displayWinMessage();
+                isMyTurn = false;
             }
         });
         this.events.on("destroy", () => {
@@ -159,7 +165,7 @@ export class GameUiScreen extends Phaser.Scene {
         }
         if (
             activePointer.y < this.uiBackground.getTopLeft().y &&
-            PlaceManager.checkAdjacency(
+            AdjacencyManager.checkAdjacency(
                 this.translateX(activePointer.x),
                 this.translateY(activePointer.y),
             )
@@ -186,7 +192,7 @@ export class GameUiScreen extends Phaser.Scene {
         assert(this.uiBackground);
         if (this.dragObj && this.currentTile) {
             if (
-                !PlaceManager.checkAdjacency(
+                !AdjacencyManager.checkAdjacency(
                     this.translateX(activePointer.x),
                     this.translateY(activePointer.y),
                 ) ||
@@ -194,7 +200,7 @@ export class GameUiScreen extends Phaser.Scene {
             ) {
                 this.setBackToOriginalPosition();
             } else if (
-                !PlaceManager.checkConnections(
+                !AdjacencyManager.checkConnections(
                     this.translateX(activePointer.x),
                     this.translateY(activePointer.y),
                     this.currentTile,
@@ -267,7 +273,7 @@ export class GameUiScreen extends Phaser.Scene {
             (this.dragObj.x + this.topLeftX) / GameUiScreen.tilePixels;
         this.currentTile.coordinateY =
             (this.dragObj.y + this.topLeftY) / GameUiScreen.tilePixels;
-        PlaceManager.tile(this.currentTile);
+        AdjacencyManager.tile(this.currentTile);
         this.dragObj.destroy();
         this.setAllTileNotInteractive();
     }
@@ -277,6 +283,15 @@ export class GameUiScreen extends Phaser.Scene {
             fontFamily: "Arial",
             fontSize: "24px",
             color: "#ff0000",
+        });
+    }
+
+    private displayWinMessage(): void {
+        this.winText = this.add.text(100, 200, "Congrats, You Win!", {
+            fontFamily: "Arial",
+            fontSize: "100px",
+            color: "#ffd700",
+            fontStyle: "bold",
         });
     }
 }
