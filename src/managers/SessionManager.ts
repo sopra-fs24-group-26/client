@@ -71,8 +71,11 @@ class SessionManager {
             "/join",
             requestBody,
         );
-        PlayerManager.saveId(response.data);
-        location.pathname = "";
+        if (response !== null) {
+            PlayerManager.saveId(response.data);
+            location.pathname = "";
+        }
+        return;
     }
 
     private listen(): void {
