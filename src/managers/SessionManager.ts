@@ -71,11 +71,11 @@ class SessionManager {
             "/join",
             requestBody,
         );
-        if (response !== null) {
-            PlayerManager.saveId(response.data);
-            location.pathname = "";
+        if (!response.data) {
+            return;
         }
-        return;
+        PlayerManager.saveId(response.data);
+        location.pathname = "";
     }
 
     private listen(): void {
