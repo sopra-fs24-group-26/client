@@ -159,6 +159,7 @@ export class GameUiScreen extends Phaser.Scene {
             trashCan.on(
                 "pointerdown",
                 () => {
+                    trashCan.destroy();
                     this.dragObj = tile;
                     this.currentTile.id = myTiles[i].id;
                     this.currentTile.type = myTiles[i].type;
