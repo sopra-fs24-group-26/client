@@ -30,8 +30,4 @@ export class Tile {
         this.coordinateY = dto?.coordinateY ?? null;
         this.discarded = dto?.discarded ?? null;
     }
-
-    public applyState(state: TileState): void {
-        this.state = state;
-    }
 }
