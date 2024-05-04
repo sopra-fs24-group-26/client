@@ -15,7 +15,6 @@ import { Player } from "entities/Player";
 import { api } from "../utilities/api";
 import SessionManager from "./SessionManager";
 import { AdjacencyMap } from "utilities/AdjacencyMap";
-import { log } from "utilities/logger";
 
 class TileManager {
     public readonly onSync: EventEmitter;
@@ -165,8 +164,6 @@ class TileManager {
             const tile: Tile = this.list[i];
             const dto: Nullable<TileDTO> =
                 dtos.find((dto: TileDTO) => dto.id === tile.id) || null;
-            log("dto.discarded in processStates: ");
-            log(dto?.discarded);
             const state: TileState = this.determineState(
                 dto,
                 session.turnIndex,
@@ -199,13 +196,9 @@ class TileManager {
         initialAmount: int,
     ): TileState {
         if (dto !== null) {
-            log("dto.discarded:");
-            log(dto.discarded);
             if (dto.discarded === true) {
-                log("DIscarded");
                 return TileState.Discarded;
             }
-            log("Placed");
             return TileState.Placed;
         }
         if (turnIndex === null) {

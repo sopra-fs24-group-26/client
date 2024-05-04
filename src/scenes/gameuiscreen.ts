@@ -327,7 +327,6 @@ export class GameUiScreen extends Phaser.Scene {
     }
 
     private discardTile(): void {
-        //Didn't use apply here because state change doesn't come from ping
         assert(this.dragObj);
         this.dragObj.destroy();
 
