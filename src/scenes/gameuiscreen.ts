@@ -10,6 +10,7 @@ import { AdjacencyMap } from "../utilities/AdjacencyMap";
 
 export class GameUiScreen extends Phaser.Scene {
     private static tilePixels: int = 128;
+    private static trashcanPixels: int = 30;
     private uiBackground: Nullable<Phaser.GameObjects.Rectangle>;
     private drawnTilesContainer: Nullable<Phaser.GameObjects.Container>;
     private topLeftX: int;
@@ -59,7 +60,7 @@ export class GameUiScreen extends Phaser.Scene {
         for (let i: int = 0; i < 9; i++) {
             this.load.image(`tile${i}`, `assets/tiles/tile${i}.png`);
         }
-        this.load.image("trashCan", "assets/buttons/trashcan.jpg");
+        this.load.image("trashCan", "assets/buttons/trashcan.png");
     }
 
     public create(): void {
@@ -136,14 +137,25 @@ export class GameUiScreen extends Phaser.Scene {
             this.drawnTilesContainer.add(tile);
 
             //Add trash can icon over every drawn tile
+            //x = tileCoordinateX + tilePixels/2 - trashcanPixels/2
+            //y = tileCoordinateY + tilePixels/2 - trashcanPixels/2
             const trashCan: Phaser.GameObjects.Image = this.add.image(
                 this.uiBackground.getTopLeft().x +
                     (tileSpacing + GameUiScreen.tilePixels / 2) +
-                    i * (GameUiScreen.tilePixels + tileSpacing),
-                ScreenHeight - 180,
+                    i * (GameUiScreen.tilePixels + tileSpacing) +
+                    (GameUiScreen.tilePixels - GameUiScreen.trashcanPixels) / 2,
+                ScreenHeight -
+                    100 +
+                    (GameUiScreen.tilePixels - GameUiScreen.trashcanPixels) / 2,
                 "trashCan",
             );
             trashCan.setInteractive();
+            trashCan.on("pointerover", () => {
+                document.body.style.cursor = "pointer";
+            });
+            trashCan.on("pointerout", () => {
+                document.body.style.cursor = "default";
+            });
             trashCan.on(
                 "pointerdown",
                 () => {
