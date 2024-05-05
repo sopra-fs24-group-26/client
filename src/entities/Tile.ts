@@ -6,7 +6,7 @@ import { seededUUIDv4 } from "utilities/utils";
 
 export class Tile {
     public readonly id: UUID;
-    public readonly type: int;
+    public type: int;
     public state: Nullable<TileState>;
     public rotation: int;
     public coordinateX: Nullable<int>;

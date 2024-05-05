@@ -22,7 +22,6 @@ export class GameUiScreen extends Phaser.Scene {
         Phaser.Math.Vector2
     >;
     private wrongText: Nullable<Phaser.GameObjects.Text>;
-    private winText: Nullable<Phaser.GameObjects.Text>;
     private isDraging: boolean;
 
     public constructor() {
@@ -45,7 +44,6 @@ export class GameUiScreen extends Phaser.Scene {
             Phaser.Math.Vector2
         >();
         this.wrongText = null;
-        this.winText = null;
         this.isDraging = false;
     }
 
@@ -58,10 +56,6 @@ export class GameUiScreen extends Phaser.Scene {
             this.displayDrawnTiles();
             if (!isMyTurn) {
                 this.setAllTileNotInteractive();
-            }
-            if (AdjacencyManager.getHasWon()) {
-                this.displayWinMessage();
-                isMyTurn = false;
             }
         });
         this.events.on("destroy", () => {
@@ -335,14 +329,5 @@ export class GameUiScreen extends Phaser.Scene {
     private cleanUp(): void {
         this.dragObj = null;
         this.currentTile.rotation = 0;
-    }
-
-    private displayWinMessage(): void {
-        this.winText = this.add.text(100, 200, "Congrats, You Win!", {
-            fontFamily: "Arial",
-            fontSize: "100px",
-            color: "#ffd700",
-            fontStyle: "bold",
-        });
     }
 }

@@ -8,21 +8,12 @@ import TileManager from "./TileManager";
 class AdjacencyManager {
     private adjacencyMap: Nullable<AdjacencyMap>;
     private pathMap: Map<int, Path>;
-    private hasWon: boolean;
 
     public constructor() {
         this.adjacencyMap = null;
         this.pathMap = this.createConnectionsMap();
-        this.hasWon = false;
     }
 
-    public setHasWon(hasWon: boolean): void {
-        this.hasWon = hasWon;
-    }
-
-    public getHasWon(): boolean {
-        return this.hasWon;
-    }
     public getPathMap(): Map<int, Path> {
         return this.pathMap;
     }
