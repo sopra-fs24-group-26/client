@@ -148,6 +148,9 @@ export class GameUiScreen extends Phaser.Scene {
                 "trashCan",
             );
             interactify(trashCan, 1, () => {
+                if (this.dragObj !== null) {
+                    return;
+                }
                 trashCan.destroy();
                 this.dragObj = tile;
                 this.currentTile.id = myTiles[i].id;
@@ -301,6 +304,7 @@ export class GameUiScreen extends Phaser.Scene {
         this.dragObj.destroy();
 
         TileManager.discard(this.currentTile);
+        this.cleanUp();
         this.setAllTileNotInteractive();
     }
 

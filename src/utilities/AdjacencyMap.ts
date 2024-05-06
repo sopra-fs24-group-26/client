@@ -3,15 +3,20 @@ import { int, Nullable } from "definitions/utils";
 import { assert } from "./utils";
 import { Placeable, Path } from "definitions/adjacency";
 import AdjacencyManager from "managers/AdjacencyManager";
-import SessionManager from "managers/SessionManager";
-import TileManager from "managers/TileManager";
+import SessionManager from "../managers/SessionManager";
+import Phaser from "phaser";
+import TileManager from "../managers/TileManager";
 
 export class AdjacencyMap {
     private cells: Map<string, Path>;
+    private goldKey: Phaser.Math.Vector2;
+    private coalKeys: Phaser.Math.Vector2[] = [];
 
-    public constructor(allPlacedTilesExceptGoal: Tile[], goalTiles: Tile[]) {
+    public constructor(placedTiles: Tile[]) {
         this.cells = new Map();
-        this.populateMap(allPlacedTilesExceptGoal, goalTiles);
+        this.goldKey = new Phaser.Math.Vector2(0, 0);
+        this.coalKeys = [];
+        this.populateMap(placedTiles);
     }
 
     public isAdjacent(x: int, y: int): boolean {
@@ -57,7 +62,7 @@ export class AdjacencyMap {
         return false;
     }
 
-    private populateMap(tiles: Tile[], goalTiles: Tile[]): void {
+    private populateMap(tiles: Tile[]): void {
         const nrTiles: int = tiles.length;
         for (let i: int = 0; i < nrTiles; i++) {
             const pathType: Nullable<Path> =
@@ -72,8 +77,14 @@ export class AdjacencyMap {
             assert(x !== null);
             assert(y !== null);
             this.updateCellAndAdjacent(x, y, pathTile);
+            if (tiles[i].type === 9) {
+                this.goldKey.set(x, y);
+            }
+            if (tiles[i].type === 10) {
+                this.coalKeys.push(new Phaser.Math.Vector2(x, y));
+            }
         }
-        this.updateGoalTiles(goalTiles);
+        this.updateConnectionToStart(0, 0);
     }
 
     private updateCellAndAdjacent(x: int, y: int, pathTile: Path): void {
@@ -130,19 +141,12 @@ export class AdjacencyMap {
             bottom: 2,
             left: 2,
             center: 2,
-            connectionToStart: 1,
+            connectionToStart: 0,
             occupied: 0,
         } as Path;
         // @ts-ignore
         newCell[locationFromThisCell] =
             pathAdjacentCell[locationRelativeToAdjacent];
-        if (
-            pathAdjacentCell.center === 0 ||
-            pathAdjacentCell.connectionToStart === 0 ||
-            pathAdjacentCell[locationRelativeToAdjacent] === 0
-        ) {
-            newCell.connectionToStart = 0;
-        }
         return newCell;
     }
 
@@ -157,16 +161,6 @@ export class AdjacencyMap {
         // @ts-ignore
         cellAtK[locationFromToThisCell] =
             pathAdjacentCell[locationRelativeToAdjacent];
-        if (
-            cellAtK.connectionToStart !== 1 &&
-            pathAdjacentCell[locationRelativeToAdjacent] === 1
-        ) {
-            cellAtK.connectionToStart = Math.min(
-                pathAdjacentCell.connectionToStart,
-                pathAdjacentCell.center,
-            );
-        }
-
         return cellAtK;
     }
 
@@ -196,43 +190,42 @@ export class AdjacencyMap {
         return newConnections;
     }
 
-    private updateGoalTiles(goalTiles: Tile[]): void {
-        const nrTiles: int = goalTiles.length;
-        for (let i: int = 0; i < nrTiles; i++) {
-            const x: Nullable<int> = goalTiles[i].coordinateX;
-            const y: Nullable<int> = goalTiles[i].coordinateY;
-            assert(x !== null);
-            assert(y !== null);
-            let goalPathRepresentation: Nullable<Path> =
-                AdjacencyManager.getPathMap().get(goalTiles[i].type) ?? null;
-            assert(goalPathRepresentation);
-            if (
-                (this.cells.get(this.key(x, y - 1))?.occupied === 1 &&
-                    this.cells.get(this.key(x, y - 1))?.center === 1) ||
-                (this.cells.get(this.key(x + 1, y))?.occupied === 1 &&
-                    this.cells.get(this.key(x + 1, y))?.center === 1) ||
-                (this.cells.get(this.key(x, y + 1))?.occupied === 1 &&
-                    this.cells.get(this.key(x, y + 1))?.center === 1) ||
-                (this.cells.get(this.key(x - 1, y))?.occupied === 1 &&
-                    this.cells.get(this.key(x - 1, y))?.center === 1)
-            ) {
-                goalPathRepresentation.connectionToStart = 1;
-                if (
-                    goalTiles[i].type === 10 &&
-                    !TileManager.reachedCoal.some(
-                        (coordinate) =>
-                            coordinate.x === x && coordinate.y === y,
-                    )
-                ) {
-                    TileManager.reachedCoal.push(new Phaser.Math.Vector2(x, y));
-                }
-                if (goalTiles[i].type === 9) {
-                    SessionManager.setReachedGold();
-                }
-            } else {
-                goalPathRepresentation.connectionToStart = 0;
-            }
-            this.updateCellAndAdjacent(x, y, goalPathRepresentation);
+    private updateConnectionToStart(x: int, y: int): void {
+        const k: string = this.key(x, y);
+        let path: Nullable<Path> = this.cells.get(k) ?? null;
+        assert(path);
+        if (path.connectionToStart) {
+            return;
+        }
+        if (this.goldKey.x === x && this.goldKey.y === y) {
+            SessionManager.setReachedGold();
+        }
+        if (
+            this.coalKeys.some(
+                (coordinate) => coordinate.x === x && coordinate.y === y,
+            ) &&
+            !TileManager.reachedCoal.some(
+                (coordniate) => coordniate.x === x && coordniate.y === y,
+            )
+        ) {
+            TileManager.reachedCoal.push(new Phaser.Math.Vector2(x, y));
+        }
+        path.connectionToStart = 1;
+        this.cells.set(k, path);
+        if (!path.occupied || !path.center) {
+            return;
+        }
+        if (path.top) {
+            this.updateConnectionToStart(x, y - 1);
+        }
+        if (path.right) {
+            this.updateConnectionToStart(x + 1, y);
+        }
+        if (path.bottom) {
+            this.updateConnectionToStart(x, y + 1);
+        }
+        if (path.left) {
+            this.updateConnectionToStart(x - 1, y);
         }
     }
 }

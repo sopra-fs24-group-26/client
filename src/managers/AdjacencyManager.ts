@@ -1,7 +1,7 @@
 import { int, Nullable } from "../definitions/utils";
 import { AdjacencyMap } from "../utilities/AdjacencyMap";
 import tileConfigs from "../configs/tiles.json";
-import { Placeable, Path } from "../definitions/placeable";
+import { Placeable, Path } from "../definitions/adjacency";
 import { assert } from "../utilities/utils";
 import TileManager from "./TileManager";
 
@@ -29,10 +29,7 @@ class AdjacencyManager {
     }
 
     public createAdjacencyMap(): void {
-        this.adjacencyMap = new AdjacencyMap(
-            TileManager.getAllExceptVeins(),
-            TileManager.getVeins(),
-        );
+        this.adjacencyMap = new AdjacencyMap(TileManager.getAllInWorld());
     }
 
     private createConnectionsMap(): Map<int, Path> {
@@ -44,7 +41,7 @@ class AdjacencyManager {
                 bottom: config.connections[2],
                 left: config.connections[3],
                 center: config.connections[4],
-                connectionToStart: 2,
+                connectionToStart: 0,
                 occupied: null,
             } as Path);
         }
