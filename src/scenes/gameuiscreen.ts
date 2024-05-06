@@ -1,6 +1,6 @@
 import { ScreenHeight, ScreenWidth } from "core/main";
 import Phaser from "phaser";
-import { assert } from "utilities/utils";
+import { assert, interactify } from "utilities/utils";
 import { PlaceTile } from "../definitions/placeTile";
 import { int, Nullable, UUID } from "../definitions/utils";
 import { Tile } from "../entities/Tile";
@@ -10,6 +10,7 @@ import { AdjacencyMap } from "../utilities/AdjacencyMap";
 
 export class GameUiScreen extends Phaser.Scene {
     private static tilePixels: int = 128;
+    private static trashcanPixels: int = 30;
     private uiBackground: Nullable<Phaser.GameObjects.Rectangle>;
     private drawnTilesContainer: Nullable<Phaser.GameObjects.Container>;
     private topLeftX: int;
@@ -59,6 +60,7 @@ export class GameUiScreen extends Phaser.Scene {
         for (let i: int = 0; i < 9; i++) {
             this.load.image(`tile${i}`, `assets/tiles/tile${i}.png`);
         }
+        this.load.image("trashCan", "assets/buttons/trashcan.png");
     }
 
     public create(): void {
@@ -107,7 +109,6 @@ export class GameUiScreen extends Phaser.Scene {
         const tileSpacing: int =
             (this.uiBackground.width - nrTiles * GameUiScreen.tilePixels) /
             (nrTiles + 1);
-        (this.uiBackground.width - nrTiles * 128) / (nrTiles + 1);
 
         for (let i: int = 0; i < nrTiles; i++) {
             const tile: Phaser.GameObjects.Image = this.add.image(
@@ -134,6 +135,25 @@ export class GameUiScreen extends Phaser.Scene {
                 new Phaser.Math.Vector2(tile.x, tile.y),
             );
             this.drawnTilesContainer.add(tile);
+
+            const trashCan: Phaser.GameObjects.Image = this.add.image(
+                this.uiBackground.getTopLeft().x +
+                    (tileSpacing + GameUiScreen.tilePixels / 2) +
+                    i * (GameUiScreen.tilePixels + tileSpacing) +
+                    (GameUiScreen.tilePixels - GameUiScreen.trashcanPixels) / 2,
+                ScreenHeight -
+                    100 +
+                    (GameUiScreen.tilePixels - GameUiScreen.trashcanPixels) / 2,
+                "trashCan",
+            );
+            interactify(trashCan, 1, () => {
+                trashCan.destroy();
+                this.dragObj = tile;
+                this.currentTile.id = myTiles[i].id;
+                this.currentTile.type = myTiles[i].type;
+                this.discardTile();
+            });
+            this.drawnTilesContainer.add(trashCan);
         }
     }
 
@@ -288,6 +308,14 @@ export class GameUiScreen extends Phaser.Scene {
             (this.dragObj.y + this.topLeftY) / GameUiScreen.tilePixels;
         TileManager.place(this.currentTile);
         this.dragObj.destroy();
+        this.setAllTileNotInteractive();
+    }
+
+    private discardTile(): void {
+        assert(this.dragObj);
+        this.dragObj.destroy();
+
+        TileManager.discard(this.currentTile);
         this.setAllTileNotInteractive();
     }
 
