@@ -88,7 +88,6 @@ export class GameUiScreen extends Phaser.Scene {
                 this,
             );
         assert(this.input.keyboard);
-
         this.input.keyboard.on("keydown-LEFT", () => this.turnTileLeft());
         this.input.keyboard.on("keydown-A", () => this.turnTileLeft());
         this.input.keyboard.on("keydown-RIGHT", () => this.turnTileRight());
@@ -164,6 +163,7 @@ export class GameUiScreen extends Phaser.Scene {
     private toggleDrag(): void {
         if (!this.isDraging && this.dragObj) {
             if (this.wrongText) this.wrongText.destroy();
+            this.toggleTrashcansVisibility(false);
             this.input.on("pointermove", this.doDrag, this);
             this.dragObj.on("pointerdown", this.stopDrag, this);
             this.isDraging = true;
@@ -330,7 +330,22 @@ export class GameUiScreen extends Phaser.Scene {
         }
     }
 
+    private toggleTrashcansVisibility(isVisable: boolean): void {
+        assert(this.drawnTilesContainer);
+        this.drawnTilesContainer.iterate(
+            (image: {
+                texture: { key: string };
+                setVisible: (arg0: boolean) => void;
+            }): void => {
+                if (image.texture.key === "trashCan") {
+                    image.setVisible(isVisable);
+                }
+            },
+        );
+    }
+
     private cleanUp(): void {
+        this.toggleTrashcansVisibility(true);
         this.dragObj = null;
         this.currentTile.rotation = 0;
     }
