@@ -89,6 +89,7 @@ class TileManager {
                 rotation: item.rotation,
                 coordinateX: item.coordinateX,
                 coordinateY: item.coordinateY,
+                discarded: false,
             } as TileDTO;
 
             tile.apply(TileState.Placed, tileDTO);
@@ -102,6 +103,13 @@ class TileManager {
         assert(session);
         tile.sessionId = session.id;
         api.put("/placeTile", tile);
+    }
+
+    public discard(tile: PlaceTile): void {
+        const session: Nullable<SessionDTO> = SessionManager.get();
+        assert(session);
+        tile.sessionId = session.id;
+        api.put("/discardTile", tile);
     }
 
     public initialize(): void {
@@ -143,7 +151,6 @@ class TileManager {
             const tile: Tile = this.list[i];
             const dto: Nullable<TileDTO> =
                 dtos.find((dto: TileDTO) => dto.id === tile.id) || null;
-
             const state: TileState = this.determineState(
                 dto,
                 session.turnIndex,
@@ -176,6 +183,9 @@ class TileManager {
         initialAmount: int,
     ): TileState {
         if (dto !== null) {
+            if (dto.discarded === true) {
+                return TileState.Discarded;
+            }
             return TileState.Placed;
         }
         if (turnIndex === null) {

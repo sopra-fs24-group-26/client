@@ -71,6 +71,9 @@ class SessionManager {
             "/join",
             requestBody,
         );
+        if (!response.data) {
+            return;
+        }
         PlayerManager.saveId(response.data);
         location.pathname = "";
     }

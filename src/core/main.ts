@@ -17,10 +17,9 @@ const config: Phaser.Types.Core.GameConfig = {
     width: ScreenWidth,
     height: ScreenHeight,
     parent: "game-container",
-    backgroundColor: "#693745",
+    backgroundColor: "#463a40",
     scene: [TitleScreen, LobbyScreen, GameScreen, GameUiScreen],
 };
-
 export const EventBus: Phaser.Events.EventEmitter =
     new Phaser.Events.EventEmitter();
 
