@@ -1,6 +1,6 @@
 import { ScreenHeight, ScreenWidth } from "core/main";
 import Phaser from "phaser";
-import { assert } from "utilities/utils";
+import { assert, interactify } from "utilities/utils";
 import { PlaceTile } from "../definitions/placeTile";
 import { int, Nullable, UUID } from "../definitions/utils";
 import { Tile } from "../entities/Tile";
@@ -136,9 +136,6 @@ export class GameUiScreen extends Phaser.Scene {
             );
             this.drawnTilesContainer.add(tile);
 
-            //Add trash can icon over every drawn tile
-            //x = tileCoordinateX + tilePixels/2 - trashcanPixels/2
-            //y = tileCoordinateY + tilePixels/2 - trashcanPixels/2
             const trashCan: Phaser.GameObjects.Image = this.add.image(
                 this.uiBackground.getTopLeft().x +
                     (tileSpacing + GameUiScreen.tilePixels / 2) +
@@ -149,25 +146,13 @@ export class GameUiScreen extends Phaser.Scene {
                     (GameUiScreen.tilePixels - GameUiScreen.trashcanPixels) / 2,
                 "trashCan",
             );
-            trashCan.setInteractive();
-            trashCan.on("pointerover", () => {
-                document.body.style.cursor = "pointer";
+            interactify(trashCan, 1, () => {
+                trashCan.destroy();
+                this.dragObj = tile;
+                this.currentTile.id = myTiles[i].id;
+                this.currentTile.type = myTiles[i].type;
+                this.discardTile();
             });
-            trashCan.on("pointerout", () => {
-                document.body.style.cursor = "default";
-            });
-            trashCan.on(
-                "pointerdown",
-                () => {
-                    trashCan.destroy();
-                    this.dragObj = tile;
-                    this.currentTile.id = myTiles[i].id;
-                    this.currentTile.type = myTiles[i].type;
-                    this.discardTile();
-                },
-                this,
-            );
-
             this.drawnTilesContainer.add(trashCan);
         }
     }
