@@ -1,17 +1,13 @@
 import { int, Nullable } from "../definitions/utils";
 import { AdjacencyMap } from "../utilities/AdjacencyMap";
 import tileConfigs from "../configs/tiles.json";
-import { PlaceTile } from "../definitions/placeTile";
-import { SessionDTO } from "../definitions/dto";
-import SessionManager from "./SessionManager";
+import { Placeable, Path } from "../definitions/placeable";
 import { assert } from "../utilities/utils";
-import { api } from "../utilities/api";
 import TileManager from "./TileManager";
-import { pathRepresentation } from "../definitions/pathRepresentation";
 
 class AdjacencyManager {
     private adjacencyMap: Nullable<AdjacencyMap>;
-    private pathMap: Map<int, pathRepresentation>;
+    private pathMap: Map<int, Path>;
     private hasWon: boolean;
 
     public constructor() {
@@ -27,15 +23,8 @@ class AdjacencyManager {
     public getHasWon(): boolean {
         return this.hasWon;
     }
-    public getPathMap(): Map<int, pathRepresentation> {
+    public getPathMap(): Map<int, Path> {
         return this.pathMap;
-    }
-
-    public tile(tile: PlaceTile): void {
-        const session: Nullable<SessionDTO> = SessionManager.get();
-        assert(session);
-        tile.sessionId = session.id;
-        api.put("/placeTile", tile);
     }
 
     public checkAdjacency(x: int, y: int): boolean {
@@ -43,20 +32,20 @@ class AdjacencyManager {
         return this.adjacencyMap.isAdjacent(x, y);
     }
 
-    public checkConnections(x: int, y: int, tile: PlaceTile): boolean {
+    public checkConnections(x: int, y: int, tile: Placeable): boolean {
         assert(this.adjacencyMap);
         return this.adjacencyMap.isAligned(x, y, tile);
     }
 
     public createAdjacencyMap(): void {
         this.adjacencyMap = new AdjacencyMap(
-            TileManager.getAllExceptGoal(),
+            TileManager.getAllExceptVeins(),
             TileManager.getVeins(),
         );
     }
 
-    private createConnectionsMap(): Map<int, pathRepresentation> {
-        const connectionsMap: Map<int, pathRepresentation> = new Map();
+    private createConnectionsMap(): Map<int, Path> {
+        const connectionsMap: Map<int, Path> = new Map();
         for (const config of tileConfigs) {
             connectionsMap.set(config.type, {
                 top: config.connections[0],
@@ -66,7 +55,7 @@ class AdjacencyManager {
                 center: config.connections[4],
                 connectionToStart: 2,
                 occupied: null,
-            });
+            } as Path);
         }
 
         return connectionsMap;

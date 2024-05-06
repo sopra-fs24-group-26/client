@@ -1,12 +1,11 @@
 import { Tile } from "entities/Tile";
 import { int, Nullable } from "definitions/utils";
 import { assert } from "./utils";
-import { PlaceTile } from "definitions/placeTile";
-import { pathRepresentation } from "../definitions/pathRepresentation";
+import { Placeable, Path } from "definitions/adjacency";
 import AdjacencyManager from "managers/AdjacencyManager";
 
 export class AdjacencyMap {
-    private cells: Map<string, pathRepresentation>;
+    private cells: Map<string, Path>;
 
     public constructor(allPlacedTilesExceptGoal: Tile[], goalTiles: Tile[]) {
         this.cells = new Map();
@@ -15,25 +14,21 @@ export class AdjacencyMap {
 
     public isAdjacent(x: int, y: int): boolean {
         const k: string = this.key(x, y);
-        const cellAtK: Nullable<pathRepresentation> = this.cells.get(k) ?? null;
+        const cellAtK: Nullable<Path> = this.cells.get(k) ?? null;
         if (cellAtK === null || cellAtK.occupied === 1) {
             return false;
         }
         return true;
     }
 
-    public isAligned(x: int, y: int, tile: PlaceTile): boolean {
+    public isAligned(x: int, y: int, tile: Placeable): boolean {
         const k: string = this.key(x, y);
         assert(tile.type !== null);
-        let pathType: Nullable<pathRepresentation> =
+        let pathType: Nullable<Path> =
             AdjacencyManager.getPathMap().get(tile.type) ?? null;
         assert(pathType);
-        const pathTile: pathRepresentation = this.shiftByRotation(
-            pathType,
-            tile.rotation,
-        );
-        const pathRequired: Nullable<pathRepresentation> =
-            this.cells.get(k) ?? null;
+        const pathTile: Path = this.shiftByRotation(pathType, tile.rotation);
+        const pathRequired: Nullable<Path> = this.cells.get(k) ?? null;
         assert(pathRequired);
         if (pathRequired.connectionToStart === 0) {
             return false;
@@ -47,9 +42,9 @@ export class AdjacencyMap {
     }
 
     private checkDirections(
-        key: keyof pathRepresentation,
-        pathRequired: pathRepresentation,
-        pathTile: pathRepresentation,
+        key: keyof Path,
+        pathRequired: Path,
+        pathTile: Path,
     ): boolean {
         if (pathRequired[key] === 2) {
             return true;
@@ -63,10 +58,10 @@ export class AdjacencyMap {
     private populateMap(tiles: Tile[], goalTiles: Tile[]): void {
         const nrTiles: int = tiles.length;
         for (let i: int = 0; i < nrTiles; i++) {
-            const pathType: Nullable<pathRepresentation> =
+            const pathType: Nullable<Path> =
                 AdjacencyManager.getPathMap().get(tiles[i].type) ?? null;
             assert(pathType);
-            const pathTile: pathRepresentation = this.shiftByRotation(
+            const pathTile: Path = this.shiftByRotation(
                 pathType,
                 tiles[i].rotation,
             );
@@ -79,11 +74,7 @@ export class AdjacencyMap {
         this.updateGoalTiles(goalTiles);
     }
 
-    private updateCellAndAdjacent(
-        x: int,
-        y: int,
-        pathTile: pathRepresentation,
-    ): void {
+    private updateCellAndAdjacent(x: int, y: int, pathTile: Path): void {
         this.updateCell(x, y, null, pathTile);
         this.updateCell(x, y - 1, "top", pathTile);
         this.updateCell(x + 1, y, "right", pathTile);
@@ -98,24 +89,24 @@ export class AdjacencyMap {
     private updateCell(
         x: int,
         y: int,
-        locationRelativeToAdjacent: Nullable<keyof pathRepresentation>,
-        pathAdjacentTile: pathRepresentation,
+        locationRelativeToAdjacent: Nullable<keyof Path>,
+        pathAdjacentTile: Path,
     ): void {
         const k: string = this.key(x, y);
-        const cellAtK: Nullable<pathRepresentation> = this.cells.get(k) ?? null;
+        const cellAtK: Nullable<Path> = this.cells.get(k) ?? null;
         if (locationRelativeToAdjacent === null) {
             pathAdjacentTile.occupied = 1;
             this.cells.set(k, pathAdjacentTile);
             return;
         }
         if (cellAtK === null) {
-            let newCell: pathRepresentation = this.initializeRequiredPath(
+            let newCell: Path = this.initializeRequiredPath(
                 locationRelativeToAdjacent,
                 pathAdjacentTile,
             );
             this.cells.set(k, newCell);
         } else {
-            let updatedCell: pathRepresentation = this.updateRequiredPath(
+            let updatedCell: Path = this.updateRequiredPath(
                 cellAtK,
                 locationRelativeToAdjacent,
                 pathAdjacentTile,
@@ -125,12 +116,13 @@ export class AdjacencyMap {
     }
 
     private initializeRequiredPath(
-        locationRelativeToAdjacent: keyof pathRepresentation,
-        pathAdjacentCell: pathRepresentation,
-    ): pathRepresentation {
-        const locationFromThisCell: keyof pathRepresentation =
-            this.reverseDirection(locationRelativeToAdjacent);
-        let newCell: pathRepresentation = {
+        locationRelativeToAdjacent: keyof Path,
+        pathAdjacentCell: Path,
+    ): Path {
+        const locationFromThisCell: keyof Path = this.reverseDirection(
+            locationRelativeToAdjacent,
+        );
+        let newCell: Path = {
             top: 2,
             right: 2,
             bottom: 2,
@@ -138,7 +130,8 @@ export class AdjacencyMap {
             center: 2,
             connectionToStart: 1,
             occupied: 0,
-        };
+        } as Path;
+        // @ts-ignore
         newCell[locationFromThisCell] =
             pathAdjacentCell[locationRelativeToAdjacent];
         if (
@@ -152,12 +145,14 @@ export class AdjacencyMap {
     }
 
     private updateRequiredPath(
-        cellAtK: pathRepresentation,
-        locationRelativeToAdjacent: keyof pathRepresentation,
-        pathAdjacentCell: pathRepresentation,
-    ): pathRepresentation {
-        const locationFromToThisCell: keyof pathRepresentation =
-            this.reverseDirection(locationRelativeToAdjacent);
+        cellAtK: Path,
+        locationRelativeToAdjacent: keyof Path,
+        pathAdjacentCell: Path,
+    ): Path {
+        const locationFromToThisCell: keyof Path = this.reverseDirection(
+            locationRelativeToAdjacent,
+        );
+        // @ts-ignore
         cellAtK[locationFromToThisCell] =
             pathAdjacentCell[locationRelativeToAdjacent];
         if (
@@ -173,9 +168,7 @@ export class AdjacencyMap {
         return cellAtK;
     }
 
-    private reverseDirection(
-        attribute: keyof pathRepresentation,
-    ): keyof pathRepresentation {
+    private reverseDirection(attribute: keyof Path): keyof Path {
         if (attribute === "top") {
             return "bottom";
         }
@@ -188,11 +181,8 @@ export class AdjacencyMap {
         return "left";
     }
 
-    private shiftByRotation(
-        connections: pathRepresentation,
-        rotation: int,
-    ): pathRepresentation {
-        let newConnections: pathRepresentation = { ...connections };
+    private shiftByRotation(connections: Path, rotation: int): Path {
+        let newConnections: Path = { ...connections };
         rotation = ((rotation % 4) + 4) % 4;
         for (let i: int = 0; i < rotation; i++) {
             let temp: int = newConnections.top;
@@ -211,7 +201,7 @@ export class AdjacencyMap {
             const y: Nullable<int> = goalTiles[i].coordinateY;
             assert(x !== null);
             assert(y !== null);
-            let goalPathRepresentation: Nullable<pathRepresentation> =
+            let goalPathRepresentation: Nullable<Path> =
                 AdjacencyManager.getPathMap().get(goalTiles[i].type) ?? null;
             assert(goalPathRepresentation);
             if (

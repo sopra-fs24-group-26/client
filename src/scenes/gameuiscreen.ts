@@ -1,7 +1,7 @@
 import { ScreenHeight, ScreenWidth } from "core/main";
 import Phaser from "phaser";
-import { assert } from "utilities/utils";
-import { PlaceTile } from "../definitions/placeTile";
+import { assert, interactify } from "utilities/utils";
+import { Placeable } from "../definitions/adjacency";
 import { int, Nullable, UUID } from "../definitions/utils";
 import { Tile } from "../entities/Tile";
 import TileManager from "../managers/TileManager";
@@ -15,7 +15,7 @@ export class GameUiScreen extends Phaser.Scene {
     private topLeftX: int;
     private topLeftY: int;
     private dragObj: Nullable<Phaser.GameObjects.Image>;
-    private currentTile: PlaceTile;
+    private currentTile: Placeable;
     private originalLocations: Map<
         Phaser.GameObjects.Image,
         Phaser.Math.Vector2
@@ -31,7 +31,14 @@ export class GameUiScreen extends Phaser.Scene {
         this.topLeftX = 0;
         this.topLeftY = 0;
         this.dragObj = null;
-        this.currentTile = new PlaceTile();
+        this.currentTile = {
+            id: null,
+            type: null,
+            sessionId: null,
+            rotation: 0,
+            coordinateX: null,
+            coordinateY: null,
+        } as Placeable;
         this.originalLocations = new Map<
             Phaser.GameObjects.Image,
             Phaser.Math.Vector2
@@ -85,18 +92,12 @@ export class GameUiScreen extends Phaser.Scene {
                 this,
             );
         assert(this.input.keyboard);
-        this.input.keyboard.on("keydown-LEFT", () => {
-            if (this.dragObj) {
-                this.dragObj.angle += -90;
-                this.currentTile.rotation = (this.currentTile.rotation - 1) % 4;
-            }
-        });
-        this.input.keyboard.on("keydown-RIGHT", () => {
-            if (this.dragObj) {
-                this.dragObj.angle += 90;
-                this.currentTile.rotation = (this.currentTile.rotation + 1) % 4;
-            }
-        });
+
+        this.input.keyboard.on("keydown-LEFT", () => this.turnTileLeft());
+        this.input.keyboard.on("keydown-A", () => this.turnTileLeft());
+        this.input.keyboard.on("keydown-RIGHT", () => this.turnTileRight());
+        this.input.keyboard.on("keydown-D", () => this.turnTileRight());
+
         this.events.on(
             "cameraViewportChanged",
             this.handleViewportChange,
@@ -190,31 +191,32 @@ export class GameUiScreen extends Phaser.Scene {
         const activePointer: Phaser.Input.Pointer =
             this.game.input.activePointer;
         assert(this.uiBackground);
-        if (this.dragObj && this.currentTile) {
-            if (
-                !AdjacencyManager.checkAdjacency(
-                    this.translateX(activePointer.x),
-                    this.translateY(activePointer.y),
-                ) ||
-                activePointer.y > this.uiBackground.getTopLeft().y
-            ) {
-                this.setBackToOriginalPosition();
-            } else if (
-                !AdjacencyManager.checkConnections(
-                    this.translateX(activePointer.x),
-                    this.translateY(activePointer.y),
-                    this.currentTile,
-                )
-            ) {
-                this.setBackToOriginalPosition();
-                this.displayErrorMessage();
-                return;
-            } else {
-                this.placeTile();
-            }
+        if (!this.dragObj || !this.currentTile) {
+            this.cleanUp();
+            return;
         }
-        this.dragObj = null;
-        this.currentTile = new PlaceTile();
+        if (
+            !AdjacencyManager.checkAdjacency(
+                this.translateX(activePointer.x),
+                this.translateY(activePointer.y),
+            ) ||
+            activePointer.y > this.uiBackground.getTopLeft().y
+        ) {
+            this.setBackToOriginalPosition();
+            return;
+        }
+        if (
+            !AdjacencyManager.checkConnections(
+                this.translateX(activePointer.x),
+                this.translateY(activePointer.y),
+                this.currentTile,
+            )
+        ) {
+            this.setBackToOriginalPosition();
+            this.displayErrorMessage();
+            return;
+        }
+        this.placeTile();
     }
 
     private setBackToOriginalPosition(): void {
@@ -230,6 +232,7 @@ export class GameUiScreen extends Phaser.Scene {
         this.dragObj.angle = 0;
         this.dragObj.setDepth(1);
         this.currentTile.rotation = 0;
+        this.cleanUp();
     }
 
     private setAllTileNotInteractive(): void {
@@ -273,9 +276,10 @@ export class GameUiScreen extends Phaser.Scene {
             (this.dragObj.x + this.topLeftX) / GameUiScreen.tilePixels;
         this.currentTile.coordinateY =
             (this.dragObj.y + this.topLeftY) / GameUiScreen.tilePixels;
-        AdjacencyManager.tile(this.currentTile);
+        TileManager.place(this.currentTile);
         this.dragObj.destroy();
         this.setAllTileNotInteractive();
+        this.cleanUp();
     }
 
     private displayErrorMessage(): void {
@@ -284,6 +288,25 @@ export class GameUiScreen extends Phaser.Scene {
             fontSize: "24px",
             color: "#ff0000",
         });
+    }
+
+    private turnTileLeft(): void {
+        if (this.dragObj) {
+            this.dragObj.angle += -90;
+            this.currentTile.rotation = (this.currentTile.rotation - 1) % 4;
+        }
+    }
+
+    private turnTileRight(): void {
+        if (this.dragObj) {
+            this.dragObj.angle += 90;
+            this.currentTile.rotation = (this.currentTile.rotation + 1) % 4;
+        }
+    }
+
+    private cleanUp(): void {
+        this.dragObj = null;
+        this.currentTile.rotation = 0;
     }
 
     private displayWinMessage(): void {

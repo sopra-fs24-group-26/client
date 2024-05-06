@@ -12,6 +12,8 @@ import { EventEmitter } from "utilities/EventEmitter";
 import PlayerManager from "./PlayerManager";
 import { Player } from "entities/Player";
 import SessionManager from "./SessionManager";
+import { api } from "../utilities/api";
+import { Placeable } from "definitions/adjacency";
 
 class TileManager {
     public readonly onSync: EventEmitter;
@@ -26,7 +28,7 @@ class TileManager {
         return this.list;
     }
 
-    public getAllExceptGoal(): Tile[] {
+    public getAllExceptVeins(): Tile[] {
         const placedTiles: Nullable<Tile[]> = this.getPlaced();
         assert(placedTiles);
         const preplacedTiles: Tile[] = this.getPreplaced();
@@ -93,6 +95,13 @@ class TileManager {
             tiles.push(tile);
         }
         return tiles;
+    }
+
+    public place(tile: Placeable): void {
+        const session: Nullable<SessionDTO> = SessionManager.get();
+        assert(session);
+        tile.sessionId = session.id;
+        api.put("/placeTile", tile);
     }
 
     public initialize(): void {
