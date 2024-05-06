@@ -4,6 +4,7 @@ import { Tile } from "entities/Tile";
 import TileManager from "managers/TileManager";
 import Phaser from "phaser";
 import { assert } from "utilities/utils";
+import AdjacencyManager from "../managers/AdjacencyManager";
 
 export class GameScreen extends Phaser.Scene {
     private dragStart: Nullable<Phaser.Math.Vector2>;
@@ -77,16 +78,14 @@ export class GameScreen extends Phaser.Scene {
     }
 
     private displayPlacedTiles(): void {
-        TileManager.updateAdjacencyMap();
+        AdjacencyManager.createAdjacencyMap();
         assert(this.placedTilesContainer);
         this.placedTilesContainer.removeAll(true);
 
         const placedTiles: Nullable<Tile[]> = TileManager.getPlaced();
         assert(this.placedTilesContainer && placedTiles);
         this.placedTilesContainer.removeAll(true);
-
-        const preplacedTiles: Tile[] = TileManager.getPreplaced();
-        const allTiles: Tile[] = [...placedTiles, ...preplacedTiles];
+        const allTiles: Tile[] = TileManager.getAllInWorld();
 
         allTiles.forEach((tile: Tile) => {
             if (tile.coordinateX !== null && tile.coordinateY !== null) {
