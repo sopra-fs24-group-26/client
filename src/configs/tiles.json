@@ -59,5 +59,10 @@
         "type": 11,
         "amount": 0,
         "connections": [1, 1, 1, 1, 1]
+    },
+    {
+        "type": 12,
+        "amount": 0,
+        "connections": [1, 1, 1, 1, 1]
     }
 ]

@@ -3,6 +3,8 @@ import { int, Nullable } from "definitions/utils";
 import { assert } from "./utils";
 import { Placeable, Path } from "definitions/adjacency";
 import AdjacencyManager from "managers/AdjacencyManager";
+import SessionManager from "managers/SessionManager";
+import TileManager from "managers/TileManager";
 
 export class AdjacencyMap {
     private cells: Map<string, Path>;
@@ -215,8 +217,17 @@ export class AdjacencyMap {
                     this.cells.get(this.key(x - 1, y))?.center === 1)
             ) {
                 goalPathRepresentation.connectionToStart = 1;
+                if (
+                    goalTiles[i].type === 10 &&
+                    !TileManager.reachedCoal.some(
+                        (coordinate) =>
+                            coordinate.x === x && coordinate.y === y,
+                    )
+                ) {
+                    TileManager.reachedCoal.push(new Phaser.Math.Vector2(x, y));
+                }
                 if (goalTiles[i].type === 9) {
-                    AdjacencyManager.setHasWon(true);
+                    SessionManager.setReachedGold();
                 }
             } else {
                 goalPathRepresentation.connectionToStart = 0;

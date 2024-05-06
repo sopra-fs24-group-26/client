@@ -17,6 +17,7 @@ import { Placeable } from "definitions/adjacency";
 
 class TileManager {
     public readonly onSync: EventEmitter;
+    public reachedCoal: Phaser.Math.Vector2[] = [];
     private list: Nullable<Tile[]>;
 
     public constructor() {
@@ -83,6 +84,17 @@ class TileManager {
         const veins: int[] = seededShuffle([9, 10, 10], session.seed); // 9 is gold, 10 are coal veins
 
         for (const item of preplacedTiles) {
+            // this is to turn coal veins into real coal paths
+            if (
+                this.reachedCoal.some(
+                    (coordinate) =>
+                        coordinate.x === item.coordinateX &&
+                        coordinate.y === item.coordinateY,
+                )
+            ) {
+                veins[veins.length - 1] = 12;
+            }
+
             const tile: Tile = new Tile(random, item.type || veins.pop()!);
             const tileDTO: TileDTO = {
                 id: tile.id,
@@ -105,7 +117,7 @@ class TileManager {
         api.put("/placeTile", tile);
     }
 
-    public discard(tile: PlaceTile): void {
+    public discard(tile: Placeable): void {
         const session: Nullable<SessionDTO> = SessionManager.get();
         assert(session);
         tile.sessionId = session.id;

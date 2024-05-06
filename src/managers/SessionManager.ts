@@ -12,10 +12,12 @@ import { Player } from "../entities/Player";
 class SessionManager {
     public readonly onSync: EventEmitter;
     private session: Nullable<Session>;
+    private reachedGold: boolean;
 
     public constructor() {
         this.onSync = new EventEmitter();
         this.session = null;
+        this.reachedGold = false;
     }
 
     public get(): Nullable<Session> {
@@ -38,6 +40,8 @@ class SessionManager {
         const playerCount: int = players.length;
         if (session.turnIndex === null) {
             return false;
+        }
+        if (session.turnIndex === 40) {
         }
         return session.turnIndex % playerCount === me.orderIndex;
     }
@@ -101,6 +105,23 @@ class SessionManager {
         assert(session);
         const requestBody: string = session.id;
         await api.put("/start", requestBody);
+    }
+    /* 
+    public async delete(): Promise<void> {
+        const session: Nullable<Session> = this.get();
+        assert(session);
+        const requestBody: string = session.id;
+        await api.put("/start", requestBody);
+    }
+
+    } */
+
+    public setReachedGold(): void {
+        this.reachedGold = true;
+    }
+
+    public getReachedGold(): boolean {
+        return this.reachedGold;
     }
 }
 

@@ -5,6 +5,9 @@ import TileManager from "managers/TileManager";
 import Phaser from "phaser";
 import { assert } from "utilities/utils";
 import AdjacencyManager from "../managers/AdjacencyManager";
+import SessionManager from "managers/SessionManager";
+import { Session } from "entities/Session";
+import { TileState } from "definitions/enums";
 
 export class GameScreen extends Phaser.Scene {
     private dragStart: Nullable<Phaser.Math.Vector2>;
@@ -20,6 +23,7 @@ export class GameScreen extends Phaser.Scene {
     public init(): void {
         const tileUpdateListener: UUID = TileManager.onSync.on(() => {
             this.displayPlacedTiles();
+            this.checkGameEnd();
         });
         this.events.on("destroy", () => {
             TileManager.onSync.off(tileUpdateListener);
@@ -27,7 +31,7 @@ export class GameScreen extends Phaser.Scene {
     }
 
     public preload(): void {
-        for (let i: int = 0; i < 12; i++) {
+        for (let i: int = 0; i < 13; i++) {
             this.load.image(`tile${i}`, `assets/tiles/tile${i}.png`);
         }
     }
@@ -101,5 +105,28 @@ export class GameScreen extends Phaser.Scene {
                 );
             }
         });
+    }
+
+    private checkGameEnd() {
+        const session: Nullable<Session> = SessionManager.get();
+        const tiles: Nullable<Tile[]> = TileManager.getAll();
+        assert(session && tiles);
+        if (!session.turnIndex) {
+            return;
+        }
+
+        const state: Nullable<TileState> = tiles[tiles.length - 1].state;
+        if (state === null) {
+            return;
+        }
+        if (
+            SessionManager.getReachedGold() ||
+            state === TileState.Placed ||
+            state === TileState.Discarded
+        ) {
+            this.scene.start("EndScreen");
+            this.scene.remove("GameUiScreen");
+            this.scene.remove("GameScreen");
+        }
     }
 }
