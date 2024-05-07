@@ -41,8 +41,6 @@ class SessionManager {
         if (session.turnIndex === null) {
             return false;
         }
-        if (session.turnIndex === 40) {
-        }
         return session.turnIndex % playerCount === me.orderIndex;
     }
 
@@ -106,16 +104,7 @@ class SessionManager {
         const requestBody: string = session.id;
         await api.put("/start", requestBody);
     }
-    /* 
-    public async delete(): Promise<void> {
-        const session: Nullable<Session> = this.get();
-        assert(session);
-        const requestBody: string = session.id;
-        await api.put("/start", requestBody);
-    }
-
-    } */
-
+    
     public setReachedGold(): void {
         this.reachedGold = true;
     }
