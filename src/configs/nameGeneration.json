@@ -1,0 +1,33 @@
+{
+    "prefixes": [
+        "Sir",
+        "Dr.",
+        "Madam",
+        "My",
+        "General",
+        "Crazy",
+        "Blue",
+        "Red",
+        "Lady"
+    ],
+    "titles": [
+        "Lord",
+        "med.",
+        "Knight",
+        "Beautiful",
+        "Ugly",
+        "King",
+        "Queen",
+        "Baron"
+    ],
+    "names": [
+        "Nightingale",
+        "Einstein",
+        "of Rivia",
+        "Lancelot",
+        "Targaryen",
+        "Peasant",
+        "Shrek",
+        "of the Migros"
+    ]
+}

@@ -6,6 +6,7 @@ import { Player } from "entities/Player";
 import { api } from "utilities/api";
 import axios from "axios";
 import { EventEmitter } from "utilities/EventEmitter";
+import nameGeneration from "configs/nameGeneration.json";
 
 class PlayerManager {
     public readonly onSync: EventEmitter;
@@ -93,47 +94,13 @@ class PlayerManager {
     }
 
     public generateName(): string {
-        const prefix: string[] = [
-            "Sir ",
-            "Dr. ",
-            "Madam ",
-            "My ",
-            "General ",
-            "Crazy ",
-            "Blue ",
-            "Lady ",
-        ];
-        const title: string[] = [
-            "Lord ",
-            "med. ",
-            "Knight ",
-            "Horny ",
-            "Ugly ",
-            "King ",
-            "Queen ",
-        ];
-        const names: string[] = [
-            "Nightingale",
-            "Einstein",
-            "of Rivia",
-            "Lancelot",
-            "Targaryen",
-            "Karen",
-            "Poopybutthole",
-            "of the Migros",
-        ];
-        const maxPrefix: int = prefix.length;
-        const maxTitle: int = title.length;
-        const maxName: int = names.length;
-
-        const randomPrefix: int = Math.floor(Math.random() * maxPrefix);
-        const randomTitle: int = Math.floor(Math.random() * maxTitle);
-        const randomName: int = Math.floor(Math.random() * maxName);
-
-        const username: string =
-            prefix[randomPrefix] + title[randomTitle] + names[randomName];
-
-        return username;
+        const prefixes: string[] = nameGeneration.prefixes;
+        const titles: string[] = nameGeneration.titles;
+        const names: string[] = nameGeneration.names;
+        const prefix: int = Math.floor(Math.random() * prefixes.length);
+        const title: int = Math.floor(Math.random() * titles.length);
+        const name: int = Math.floor(Math.random() * names.length);
+        return `${prefixes[prefix]} ${titles[title]} ${names[name]}`;
     }
 }
 
