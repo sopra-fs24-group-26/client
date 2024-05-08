@@ -7,7 +7,6 @@ import { assert } from "utilities/utils";
 import AdjacencyManager from "../managers/AdjacencyManager";
 import SessionManager from "managers/SessionManager";
 import { Session } from "entities/Session";
-import { TileState } from "definitions/enums";
 
 export class GameScreen extends Phaser.Scene {
     private dragStart: Nullable<Phaser.Math.Vector2>;
@@ -111,18 +110,10 @@ export class GameScreen extends Phaser.Scene {
         const session: Nullable<Session> = SessionManager.get();
         const tiles: Nullable<Tile[]> = TileManager.getAll();
         assert(session && tiles);
-        if (!session.turnIndex) {
-            return;
-        }
 
-        const state: Nullable<TileState> = tiles[tiles.length - 1].state;
-        if (state === null) {
-            return;
-        }
         if (
             SessionManager.getReachedGold() ||
-            state === TileState.Placed ||
-            state === TileState.Discarded
+            session.turnIndex === tiles.length
         ) {
             this.scene.start("EndScreen");
             this.scene.remove("GameUiScreen");

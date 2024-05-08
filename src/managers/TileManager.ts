@@ -29,29 +29,11 @@ class TileManager {
         return this.list;
     }
 
-    public getAllExceptVeins(): Tile[] {
-        const placedTiles: Nullable<Tile[]> = this.getPlaced();
-        assert(placedTiles);
-        const preplacedTiles: Tile[] = this.getPreplaced();
-        const startingTile: Tile[] = preplacedTiles.filter(
-            (tile: Tile) => tile.coordinateX === 0,
-        );
-        return [...startingTile, ...placedTiles];
-    }
-
     public getAllInWorld(): Tile[] {
         const prePlaced: Tile[] = this.getPreplaced();
         const placed: Nullable<Tile[]> = this.getPlaced();
         assert(placed);
         return [...prePlaced, ...placed];
-    }
-
-    public getVeins(): Tile[] {
-        const preplacedTiles: Tile[] = this.getPreplaced();
-        const goalTiles: Tile[] = preplacedTiles.filter(
-            (tile: Tile) => tile.coordinateX !== 0,
-        );
-        return goalTiles;
     }
 
     public getInHand(): Tile[] {

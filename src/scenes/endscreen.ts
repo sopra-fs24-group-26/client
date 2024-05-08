@@ -18,12 +18,12 @@ export class EndScreen extends Phaser.Scene {
 
     public create(): void {
         this.displayMessage();
+        PlayerManager.removeId();
 
         const button: Phaser.GameObjects.Image = this.add
             .image(ScreenWidth / 2, ScreenHeight / 1.5, "quit")
             .setOrigin(0.5, 0.5);
         interactify(button, 0.5, () => this.onButton());
-        PlayerManager.delete();
     }
 
     private async onButton(): Promise<void> {
