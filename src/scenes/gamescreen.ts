@@ -30,7 +30,7 @@ export class GameScreen extends Phaser.Scene {
     }
 
     public preload(): void {
-        for (let i: int = 0; i < 13; i++) {
+        for (let i: int = 0; i < 15; i++) {
             this.load.image(`tile${i}`, `assets/tiles/tile${i}.png`);
         }
     }

@@ -181,6 +181,11 @@ export class GameUiScreen extends Phaser.Scene {
         if (!this.dragObj) {
             return;
         }
+        if (this.dragObj.texture.key.includes("13")){
+            this.doDragAction();
+            return;
+        }
+        do
         if (
             activePointer.y < this.uiBackground.getTopLeft().y &&
             AdjacencyManager.checkAdjacency(
