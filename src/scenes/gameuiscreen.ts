@@ -2,17 +2,23 @@ import { ScreenHeight, ScreenWidth } from "core/main";
 import Phaser from "phaser";
 import { assert, interactify } from "utilities/utils";
 import { Placeable } from "../definitions/adjacency";
-import { int, Nullable, UUID } from "../definitions/utils";
+import { float, int, Nullable, UUID } from "../definitions/utils";
 import { Tile } from "../entities/Tile";
 import TileManager from "../managers/TileManager";
 import SessionManager from "../managers/SessionManager";
 import AdjacencyManager from "../managers/AdjacencyManager";
+import { Player } from "../entities/Player";
+import PlayerManager from "../managers/PlayerManager";
+import { Role } from "../definitions/enums";
+import { Session } from "../entities/Session";
 
 export class GameUiScreen extends Phaser.Scene {
     private static tilePixels: int = 128;
     private static trashcanPixels: int = 30;
+    private static profilePixels: int = 50;
     private uiBackground: Nullable<Phaser.GameObjects.Rectangle>;
     private drawnTilesContainer: Nullable<Phaser.GameObjects.Container>;
+    private profilesContainer: Nullable<Phaser.GameObjects.Container>;
     private topLeftX: int;
     private topLeftY: int;
     private dragObj: Nullable<Phaser.GameObjects.Image>;
@@ -28,6 +34,7 @@ export class GameUiScreen extends Phaser.Scene {
         super("GameUiScreen");
         this.uiBackground = null;
         this.drawnTilesContainer = null;
+        this.profilesContainer = null;
         this.topLeftX = 0;
         this.topLeftY = 0;
         this.dragObj = null;
@@ -54,6 +61,7 @@ export class GameUiScreen extends Phaser.Scene {
             }
             let isMyTurn: boolean = SessionManager.isMyTurn();
             this.displayDrawnTiles();
+            this.displayProfiles();
             if (!isMyTurn) {
                 this.setAllTileNotInteractive();
             }
@@ -67,7 +75,11 @@ export class GameUiScreen extends Phaser.Scene {
         for (let i: int = 0; i < 9; i++) {
             this.load.image(`tile${i}`, `assets/tiles/tile${i}.png`);
         }
+        for (let i: int = 0; i < 5; i++) {
+            this.load.image(`profile${i}`, `assets/profiles/profile${i}.png`);
+        }
         this.load.image("trashCan", "assets/buttons/trashcan.png");
+        this.load.image("ring", "assets/profiles/ring.png");
     }
 
     public create(): void {
@@ -80,6 +92,7 @@ export class GameUiScreen extends Phaser.Scene {
         );
         this.uiBackground.setInteractive();
         this.drawnTilesContainer = this.add.container();
+        this.profilesContainer = this.add.container();
         assert(this.input.keyboard);
         this.input.keyboard.on("keydown-LEFT", () => this.turnTileLeft());
         this.input.keyboard.on("keydown-A", () => this.turnTileLeft());
@@ -96,6 +109,77 @@ export class GameUiScreen extends Phaser.Scene {
             this.handleViewportChange,
             this,
         );
+    }
+
+    public displayProfiles(): void {
+        const allPlayers: Nullable<Player[]> = PlayerManager.getAll();
+        const me: Nullable<Player> = PlayerManager.getMe();
+        const session: Nullable<Session> = SessionManager.get();
+        assert(me && allPlayers && session && this.profilesContainer);
+        this.profilesContainer.removeAll(true);
+        const playerCount: int = allPlayers.length;
+
+        const profileSpacing: int =
+            (ScreenWidth - playerCount * GameUiScreen.profilePixels) /
+            (playerCount + 1);
+        const y: float = ScreenHeight / 10;
+
+        for (let i: int = 0; i < playerCount; i++) {
+            let name: string = allPlayers[i].name;
+            const x: float =
+                profileSpacing +
+                GameUiScreen.profilePixels / 2 +
+                i * (GameUiScreen.profilePixels + profileSpacing);
+
+            const profile = this.add.image(
+                x,
+                y,
+                `profile${allPlayers[i].profile}`,
+            );
+            if (SessionManager.isPlayersTurn(allPlayers[i], playerCount)) {
+                this.profilesContainer.add(this.add.image(x, y, "ring"));
+            }
+            if (allPlayers[i].orderIndex === me.orderIndex) {
+                this.addRole(x, y, me);
+                name += " (Me)";
+            }
+            this.addName(x, y, name);
+            this.profilesContainer.add(profile);
+        }
+    }
+
+    public addRole(x: float, y: float, me: Player): void {
+        let roleString: string = "Miner";
+        if (me.role === Role.Saboteur) {
+            roleString = "Saboteur";
+        }
+        const roleText = this.add.text(
+            x - (roleString.length * 6.5) / 2,
+            y - GameUiScreen.profilePixels,
+            roleString,
+            {
+                fontFamily: "Verdana",
+                fontSize: "11px",
+                color: "#ffd700",
+                fontStyle: "bold",
+            },
+        );
+        this.profilesContainer.add(roleText);
+    }
+
+    public addName(x: float, y: float, name: string): void {
+        const nameText = this.add.text(
+            x - (name.length * 6) / 2,
+            y + GameUiScreen.profilePixels / 1.5,
+            name,
+            {
+                fontFamily: "Verdana",
+                fontSize: "11px",
+                color: "#549b3d",
+                fontStyle: "bold",
+            },
+        );
+        this.profilesContainer.add(nameText);
     }
 
     public displayDrawnTiles(): void {
