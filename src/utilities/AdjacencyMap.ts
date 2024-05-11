@@ -200,14 +200,13 @@ export class AdjacencyMap {
         if (this.goldKey.x === x && this.goldKey.y === y) {
             SessionManager.setReachedGold();
         }
-        if (
-            this.coalKeys.some(
-                (coordinate) => coordinate.x === x && coordinate.y === y,
-            ) &&
-            !TileManager.reachedCoal.some(
-                (coordniate) => coordniate.x === x && coordniate.y === y,
-            )
-        ) {
+        const coal: boolean = this.coalKeys.some(
+            (coordinate) => coordinate.x === x && coordinate.y === y,
+        );
+        const reachedCoal: boolean = TileManager.reachedCoal.some(
+            (coordniate) => coordniate.x === x && coordniate.y === y,
+        );
+        if (coal && !reachedCoal) {
             TileManager.reachedCoal.push(new Phaser.Math.Vector2(x, y));
         }
         path.connectionToStart = 1;

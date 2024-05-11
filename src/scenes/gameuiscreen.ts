@@ -7,6 +7,7 @@ import { Tile } from "../entities/Tile";
 import TileManager from "../managers/TileManager";
 import SessionManager from "../managers/SessionManager";
 import AdjacencyManager from "../managers/AdjacencyManager";
+import { log } from "utilities/logger";
 
 export class GameUiScreen extends Phaser.Scene {
     private static tilePixels: int = 128;
@@ -181,28 +182,37 @@ export class GameUiScreen extends Phaser.Scene {
         if (!this.dragObj) {
             return;
         }
-        if (this.dragObj.texture.key.includes("13")){
-            this.doDragAction();
-            return;
+        if (activePointer.y < this.uiBackground.getTopLeft().y) {
+            if (this.dragObj.texture.key.includes("14")) {
+                this.doDragAction();
+                return;
+            }
+            this.doDragTile();
+        } else {
+            this.dragObj.x = activePointer.x;
+            this.dragObj.y = activePointer.y;
         }
-        do
-        if (
-            activePointer.y < this.uiBackground.getTopLeft().y &&
-            AdjacencyManager.checkAdjacency(
-                this.translateX(activePointer.x),
-                this.translateY(activePointer.y),
-            )
-        ) {
-            this.dragObj.x = Phaser.Math.Snap.To(
-                activePointer.x,
-                GameUiScreen.tilePixels,
-                -this.topLeftX,
-            );
-            this.dragObj.y = Phaser.Math.Snap.To(
-                activePointer.y,
-                GameUiScreen.tilePixels,
-                -this.topLeftY,
-            );
+    }
+
+    private doDragAction(): void {
+        const activePointer: Phaser.Input.Pointer =
+            this.game.input.activePointer;
+        assert(this.dragObj);
+        this.dragObj.x = this.snapX(activePointer.x);
+        this.dragObj.y = this.snapY(activePointer.y);
+    }
+
+    private doDragTile(): void {
+        const activePointer: Phaser.Input.Pointer =
+            this.game.input.activePointer;
+        const adjacency: boolean = AdjacencyManager.checkAdjacency(
+            this.translateX(activePointer.x),
+            this.translateY(activePointer.y),
+        );
+        assert(this.dragObj);
+        if (adjacency) {
+            this.dragObj.x = this.snapX(activePointer.x);
+            this.dragObj.y = this.snapY(activePointer.y);
         } else {
             this.dragObj.x = activePointer.x;
             this.dragObj.y = activePointer.y;
@@ -210,30 +220,46 @@ export class GameUiScreen extends Phaser.Scene {
     }
 
     private stopDrag(): void {
-        const activePointer: Phaser.Input.Pointer =
-            this.game.input.activePointer;
-        assert(this.uiBackground);
         if (!this.dragObj || !this.currentTile) {
             this.cleanUp();
             return;
         }
-        if (
-            !AdjacencyManager.checkAdjacency(
-                this.translateX(activePointer.x),
-                this.translateY(activePointer.y),
-            ) ||
-            activePointer.y > this.uiBackground.getTopLeft().y
-        ) {
+        if (this.dragObj.texture.key.includes("14")) {
+            this.stopDragAction();
+            return;
+        }
+        this.stopDragTile();
+    }
+
+    private stopDragAction(): void {
+        const overVein: boolean = true;
+        if (overVein) {
+            log("show ore");
+            this.discardTile();
+            //timer with display ore
+            return;
+        }
+        this.setBackToOriginalPosition();
+    }
+
+    private stopDragTile(): void {
+        const activePointer: Phaser.Input.Pointer =
+            this.game.input.activePointer;
+        assert(this.uiBackground);
+        const adjacency: boolean = AdjacencyManager.checkAdjacency(
+            this.translateX(activePointer.x),
+            this.translateY(activePointer.y),
+        );
+        if (!adjacency || activePointer.y > this.uiBackground.getTopLeft().y) {
             this.setBackToOriginalPosition();
             return;
         }
-        if (
-            !AdjacencyManager.checkConnections(
-                this.translateX(activePointer.x),
-                this.translateY(activePointer.y),
-                this.currentTile,
-            )
-        ) {
+        const conncetions: boolean = AdjacencyManager.checkConnections(
+            this.translateX(activePointer.x),
+            this.translateY(activePointer.y),
+            this.currentTile,
+        );
+        if (!conncetions) {
             this.setBackToOriginalPosition();
             this.displayErrorMessage();
             return;
@@ -275,19 +301,19 @@ export class GameUiScreen extends Phaser.Scene {
     }
 
     private translateX(x: int): int {
-        return (
-            (Phaser.Math.Snap.To(x, GameUiScreen.tilePixels, -this.topLeftX) +
-                this.topLeftX) /
-            128
-        );
+        return (this.snapX(x) + this.topLeftX) / 128;
     }
 
     private translateY(y: int): int {
-        return (
-            (Phaser.Math.Snap.To(y, GameUiScreen.tilePixels, -this.topLeftY) +
-                this.topLeftY) /
-            128
-        );
+        return (this.snapY(y) + this.topLeftY) / 128;
+    }
+
+    private snapX(x: int): int {
+        return Phaser.Math.Snap.To(x, GameUiScreen.tilePixels, -this.topLeftX);
+    }
+
+    private snapY(y: int): int {
+        return Phaser.Math.Snap.To(y, GameUiScreen.tilePixels, -this.topLeftY);
     }
 
     private placeTile(): void {
@@ -306,9 +332,8 @@ export class GameUiScreen extends Phaser.Scene {
 
     private discardTile(): void {
         assert(this.dragObj);
-        this.dragObj.destroy();
-
         TileManager.discard(this.currentTile);
+        this.dragObj.destroy();
         this.cleanUp();
         this.setAllTileNotInteractive();
     }

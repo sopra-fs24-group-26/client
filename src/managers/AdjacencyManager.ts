@@ -35,18 +35,24 @@ class AdjacencyManager {
     private createConnectionsMap(): Map<int, Path> {
         const connectionsMap: Map<int, Path> = new Map();
         for (const config of tileConfigs) {
-            connectionsMap.set(config.type, {
-                top: config.connections[0],
-                right: config.connections[1],
-                bottom: config.connections[2],
-                left: config.connections[3],
-                center: config.connections[4],
-                connectionToStart: 0,
-                occupied: null,
-            } as Path);
+            connectionsMap.set(
+                config.type,
+                this.createPath(config.connections),
+            );
         }
-
         return connectionsMap;
+    }
+
+    private createPath(connections: int[]): Path {
+        return {
+            top: connections[0],
+            right: connections[1],
+            bottom: connections[2],
+            left: connections[3],
+            center: connections[4],
+            connectionToStart: 0,
+            occupied: null,
+        } as Path;
     }
 }
 

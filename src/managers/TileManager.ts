@@ -64,32 +64,37 @@ class TileManager {
         const tiles: Tile[] = [];
         const random: seedrandom.PRNG = seedrandom(session.seed);
         const veins: int[] = seededShuffle([9, 10, 10], session.seed); // 9 is gold, 10 are coal veins
-
         for (const item of preplacedTiles) {
-            // this is to turn coal veins into real coal paths
-            if (
-                this.reachedCoal.some(
-                    (coordinate) =>
-                        coordinate.x === item.coordinateX &&
-                        coordinate.y === item.coordinateY,
-                )
-            ) {
-                veins[veins.length - 1] = 12;
-            }
-
-            const tile: Tile = new Tile(random, item.type || veins.pop()!);
-            const tileDTO: TileDTO = {
-                id: tile.id,
-                rotation: item.rotation,
-                coordinateX: item.coordinateX,
-                coordinateY: item.coordinateY,
-                discarded: false,
-            } as TileDTO;
-
-            tile.apply(TileState.Placed, tileDTO);
-            tiles.push(tile);
+            tiles.push(this.createTile(item, veins, random));
         }
         return tiles;
+    }
+
+    private createTile(
+        item: (typeof preplacedTiles)[0],
+        veins: int[],
+        random: seedrandom.PRNG,
+    ): Tile {
+        // this is to turn coal veins into real coal paths
+        const isCoal: boolean = this.reachedCoal.some(
+            (coordinate) =>
+                coordinate.x === item.coordinateX &&
+                coordinate.y === item.coordinateY,
+        );
+        if (isCoal) {
+            veins[veins.length - 1] = 12;
+        }
+        const tile: Tile = new Tile(random, item.type || veins.pop()!);
+        const tileDTO: TileDTO = {
+            id: tile.id,
+            rotation: item.rotation,
+            coordinateX: item.coordinateX,
+            coordinateY: item.coordinateY,
+            discarded: false,
+        } as TileDTO;
+
+        tile.apply(TileState.Placed, tileDTO);
+        return tile;
     }
 
     public place(tile: Placeable): void {
@@ -116,7 +121,6 @@ class TileManager {
             const dtos: Nullable<TileDTO[]> = GeneralManager.getTiles();
             assert(session && dtos);
             const random: seedrandom.PRNG = seedrandom(session.seed);
-
             this.list = seededShuffle(
                 this.getUnfolded().map(
                     (config: TileConfig) => new Tile(random, config.type),
@@ -160,7 +164,6 @@ class TileManager {
         assert(players);
         const playerCount: number = players.length;
         let amountPerPlayer: int = 4;
-
         if (playerCount <= 7) {
             amountPerPlayer = 5;
         }

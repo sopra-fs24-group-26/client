@@ -110,11 +110,10 @@ export class GameScreen extends Phaser.Scene {
         const session: Nullable<Session> = SessionManager.get();
         const tiles: Nullable<Tile[]> = TileManager.getAll();
         assert(session && tiles);
-
-        if (
+        const isEnd: boolean =
             SessionManager.getReachedGold() ||
-            session.turnIndex === tiles.length
-        ) {
+            session.turnIndex === tiles.length;
+        if (isEnd) {
             this.scene.start("EndScreen");
             this.scene.remove("GameUiScreen");
             this.scene.remove("GameScreen");
