@@ -52,6 +52,10 @@ class PlayerManager {
         return players.filter((player: Player) => player.id !== this.getId());
     }
 
+    public getAvatarVariableByPlayer(player: Player): String {
+        return `avatar${player.orderIndex}`;
+    }
+
     public initialize(): void {
         this.listen();
     }

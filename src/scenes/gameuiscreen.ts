@@ -75,14 +75,27 @@ export class GameUiScreen extends Phaser.Scene {
         for (let i: int = 0; i < 9; i++) {
             this.load.image(`tile${i}`, `assets/tiles/tile${i}.png`);
         }
-        for (let i: int = 0; i < 5; i++) {
-            this.load.image(`profile${i}`, `assets/profiles/profile${i}.png`);
-        }
         this.load.image("trashCan", "assets/buttons/trashcan.png");
+        // Can't get rid of error message "Object is possibly null"
+        const allPlayers: Nullable<Player[]> = PlayerManager.getAll();
+        assert(allPlayers);
+        for (let i: int = 0; i < allPlayers.length; i++) {
+            let player: Player = allPlayers[i];
+            // Can specify more details to avatars like position, accessories, hair, clothing etc
+            this.load.image(
+                `avatar${player.orderIndex}`,
+                `https://api.dicebear.com/8.x/pixel-art/svg?seed=${player.name}&size=${GameUiScreen.profilePixels}`,
+            );
+        }
         this.load.image("ring", "assets/profiles/ring.png");
     }
 
+    // In displayProfiles, use: this.add.image(x,y,PlayerManager.getAvatarVariableByPlayer(allPlayers[i]));
+
     public create(): void {
+        //demo
+        this.add.image(100, 100, "avatar0");
+
         this.uiBackground = this.add.rectangle(
             ScreenWidth / 2,
             ScreenHeight - 100,
