@@ -91,18 +91,19 @@ export class GameScreen extends Phaser.Scene {
         const allTiles: Tile[] = TileManager.getAllInWorld();
 
         allTiles.forEach((tile: Tile) => {
-            if (tile.coordinateX !== null && tile.coordinateY !== null) {
-                assert(this.placedTilesContainer);
-                this.placedTilesContainer.add(
-                    this.add
-                        .image(
-                            tile.coordinateX * GameScreen.tilePixels,
-                            tile.coordinateY * GameScreen.tilePixels,
-                            `tile${tile.type}`,
-                        )
-                        .setAngle(tile.rotation * 90),
-                );
+            if (tile.coordinateX === null || tile.coordinateY === null) {
+                return;
             }
+            assert(this.placedTilesContainer);
+            this.placedTilesContainer.add(
+                this.add
+                    .image(
+                        tile.coordinateX * GameScreen.tilePixels,
+                        tile.coordinateY * GameScreen.tilePixels,
+                        `tile${tile.type}`,
+                    )
+                    .setAngle(tile.rotation * 90),
+            );
         });
     }
 

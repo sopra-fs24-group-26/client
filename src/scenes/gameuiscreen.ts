@@ -7,7 +7,6 @@ import { Tile } from "../entities/Tile";
 import TileManager from "../managers/TileManager";
 import SessionManager from "../managers/SessionManager";
 import AdjacencyManager from "../managers/AdjacencyManager";
-import { log } from "utilities/logger";
 
 export class GameUiScreen extends Phaser.Scene {
     private static tilePixels: int = 128;
@@ -81,19 +80,17 @@ export class GameUiScreen extends Phaser.Scene {
         );
         this.uiBackground.setInteractive();
         this.drawnTilesContainer = this.add.container();
-        this.scene
-            .get("GameScreen")
-            .events.on(
-                "cameraViewportChanged",
-                this.handleViewportChange,
-                this,
-            );
         assert(this.input.keyboard);
         this.input.keyboard.on("keydown-LEFT", () => this.turnTileLeft());
         this.input.keyboard.on("keydown-A", () => this.turnTileLeft());
         this.input.keyboard.on("keydown-RIGHT", () => this.turnTileRight());
         this.input.keyboard.on("keydown-D", () => this.turnTileRight());
-
+        const gamescreen: Phaser.Scene = this.scene.get("GameScreen");
+        gamescreen.events.on(
+            "cameraViewportChanged",
+            this.handleViewportChange,
+            this,
+        );
         this.events.on(
             "cameraViewportChanged",
             this.handleViewportChange,
@@ -102,63 +99,94 @@ export class GameUiScreen extends Phaser.Scene {
     }
 
     public displayDrawnTiles(): void {
-        assert(this.drawnTilesContainer);
+        assert(this.drawnTilesContainer && this.uiBackground);
         this.drawnTilesContainer.removeAll(true);
         const myTiles: Nullable<Tile[]> = TileManager.getInHand();
-        assert(myTiles && this.uiBackground);
+        assert(myTiles);
         const nrTiles: int = myTiles.length;
         const tileSpacing: int =
             (this.uiBackground.width - nrTiles * GameUiScreen.tilePixels) /
             (nrTiles + 1);
-
         for (let i: int = 0; i < nrTiles; i++) {
-            const tile: Phaser.GameObjects.Image = this.add.image(
-                this.uiBackground.getTopLeft().x +
-                    (tileSpacing + GameUiScreen.tilePixels / 2) +
-                    i * (GameUiScreen.tilePixels + tileSpacing),
-                ScreenHeight - 100,
-                `tile${myTiles[i].type}`,
+            const tile: Phaser.GameObjects.Image = this.createTile(
+                tileSpacing,
+                i,
+                myTiles[i].id,
+                myTiles[i].type,
             );
-            tile.setInteractive();
-            tile.on(
-                "pointerdown",
-                () => {
-                    this.dragObj = tile;
-                    this.dragObj.setDepth(Number.MAX_SAFE_INTEGER);
-                    this.currentTile.id = myTiles[i].id;
-                    this.currentTile.type = myTiles[i].type;
-                    this.toggleDrag();
-                },
-                this,
-            );
-            this.originalLocations.set(
+            this.createTrashcan(
+                tileSpacing,
+                i,
                 tile,
-                new Phaser.Math.Vector2(tile.x, tile.y),
+                myTiles[i].id,
+                myTiles[i].type,
             );
-            this.drawnTilesContainer.add(tile);
-
-            const trashCan: Phaser.GameObjects.Image = this.add.image(
-                this.uiBackground.getTopLeft().x +
-                    (tileSpacing + GameUiScreen.tilePixels / 2) +
-                    i * (GameUiScreen.tilePixels + tileSpacing) +
-                    (GameUiScreen.tilePixels - GameUiScreen.trashcanPixels) / 2,
-                ScreenHeight -
-                    100 +
-                    (GameUiScreen.tilePixels - GameUiScreen.trashcanPixels) / 2,
-                "trashCan",
-            );
-            interactify(trashCan, 1, () => {
-                if (this.dragObj !== null) {
-                    return;
-                }
-                trashCan.destroy();
-                this.dragObj = tile;
-                this.currentTile.id = myTiles[i].id;
-                this.currentTile.type = myTiles[i].type;
-                this.discardTile();
-            });
-            this.drawnTilesContainer.add(trashCan);
         }
+    }
+
+    private createTile(
+        spacing: int,
+        i: int,
+        id: UUID,
+        type: int,
+    ): Phaser.GameObjects.Image {
+        assert(this.uiBackground && this.drawnTilesContainer);
+        const tile: Phaser.GameObjects.Image = this.add.image(
+            this.uiBackground.getTopLeft().x +
+                (spacing + GameUiScreen.tilePixels / 2) +
+                i * (GameUiScreen.tilePixels + spacing),
+            ScreenHeight - 100,
+            `tile${type}`,
+        );
+        tile.setInteractive();
+        tile.on(
+            "pointerdown",
+            () => {
+                this.dragObj = tile;
+                this.dragObj.setDepth(Number.MAX_SAFE_INTEGER);
+                this.currentTile.id = id;
+                this.currentTile.type = type;
+                this.toggleDrag();
+            },
+            this,
+        );
+        this.originalLocations.set(
+            tile,
+            new Phaser.Math.Vector2(tile.x, tile.y),
+        );
+        this.drawnTilesContainer.add(tile);
+        return tile;
+    }
+
+    private createTrashcan(
+        spacing: int,
+        i: int,
+        tile: Phaser.GameObjects.Image,
+        id: UUID,
+        type: int,
+    ): void {
+        assert(this.uiBackground && this.drawnTilesContainer);
+        const trashCan: Phaser.GameObjects.Image = this.add.image(
+            this.uiBackground.getTopLeft().x +
+                (spacing + GameUiScreen.tilePixels / 2) +
+                i * (GameUiScreen.tilePixels + spacing) +
+                (GameUiScreen.tilePixels - GameUiScreen.trashcanPixels) / 2,
+            ScreenHeight -
+                100 +
+                (GameUiScreen.tilePixels - GameUiScreen.trashcanPixels) / 2,
+            "trashCan",
+        );
+        interactify(trashCan, 1, () => {
+            if (this.dragObj !== null) {
+                return;
+            }
+            trashCan.destroy();
+            this.dragObj = tile;
+            this.currentTile.id = id;
+            this.currentTile.type = type;
+            this.discardTile();
+        });
+        this.drawnTilesContainer.add(trashCan);
     }
 
     private toggleDrag(): void {
@@ -197,9 +225,27 @@ export class GameUiScreen extends Phaser.Scene {
     private doDragAction(): void {
         const activePointer: Phaser.Input.Pointer =
             this.game.input.activePointer;
+        const actionable: Tile | false = this.overActionable(
+            this.translateX(activePointer.x),
+            this.translateY(activePointer.y),
+        );
         assert(this.dragObj);
-        this.dragObj.x = this.snapX(activePointer.x);
-        this.dragObj.y = this.snapY(activePointer.y);
+        if (actionable) {
+            this.dragObj.x = this.snapX(activePointer.x);
+            this.dragObj.y = this.snapY(activePointer.y);
+        } else {
+            this.dragObj.x = activePointer.x;
+            this.dragObj.y = activePointer.y;
+        }
+    }
+
+    private overActionable(x: int, y: int): Tile | false {
+        return (
+            TileManager.getHiddenVeins().filter(
+                (tile: Tile) =>
+                    tile.coordinateX === x && tile.coordinateY === y,
+            )[0] || false
+        );
     }
 
     private doDragTile(): void {
@@ -232,14 +278,32 @@ export class GameUiScreen extends Phaser.Scene {
     }
 
     private stopDragAction(): void {
-        const overVein: boolean = true;
-        if (overVein) {
-            log("show ore");
-            this.discardTile();
-            //timer with display ore
+        const activePointer: Phaser.Input.Pointer =
+            this.game.input.activePointer;
+        const actionable: Tile | false = this.overActionable(
+            this.translateX(activePointer.x),
+            this.translateY(activePointer.y),
+        );
+        if (!actionable) {
+            this.setBackToOriginalPosition();
             return;
         }
+        this.displayOre(actionable);
+        this.discardTile();
         this.setBackToOriginalPosition();
+    }
+
+    private displayOre(actionable: Tile): void {
+        const gamescreen: Phaser.Scene = this.game.scene.getScene("GameScreen");
+        assert(actionable.coordinateX !== null);
+        assert(actionable.coordinateY !== null);
+        const duration: int = 5;
+        const hint: Phaser.GameObjects.Image = gamescreen.add.image(
+            actionable.coordinateX * GameUiScreen.tilePixels,
+            actionable.coordinateY * GameUiScreen.tilePixels,
+            `tile${actionable.type === 9 ? 13 : 12}`,
+        );
+        this.time.delayedCall(duration * 1_000, () => hint.destroy());
     }
 
     private stopDragTile(): void {

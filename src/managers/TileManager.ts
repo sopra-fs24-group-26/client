@@ -65,12 +65,12 @@ class TileManager {
         const random: seedrandom.PRNG = seedrandom(session.seed);
         const veins: int[] = seededShuffle([9, 10, 10], session.seed); // 9 is gold, 10 are coal veins
         for (const item of preplacedTiles) {
-            tiles.push(this.createTile(item, veins, random));
+            tiles.push(this.createPreplaced(item, veins, random));
         }
         return tiles;
     }
 
-    private createTile(
+    private createPreplaced(
         item: (typeof preplacedTiles)[0],
         veins: int[],
         random: seedrandom.PRNG,
@@ -92,9 +92,14 @@ class TileManager {
             coordinateY: item.coordinateY,
             discarded: false,
         } as TileDTO;
-
         tile.apply(TileState.Placed, tileDTO);
         return tile;
+    }
+
+    public getHiddenVeins(): Tile[] {
+        return this.getPreplaced().filter(
+            (tile: Tile) => tile.type === 9 || tile.type === 10,
+        );
     }
 
     public place(tile: Placeable): void {
