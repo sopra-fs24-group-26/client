@@ -44,6 +44,15 @@ class SessionManager {
         return session.turnIndex % playerCount === me.orderIndex;
     }
 
+    public isPlayersTurn(player: Player, playerCount: int): boolean {
+        const session: Nullable<SessionDTO> = GeneralManager.getSession();
+        assert(session);
+        if (session.turnIndex === null) {
+            return false;
+        }
+        return session.turnIndex % playerCount === player.orderIndex;
+    }
+
     public async initialize(): Promise<void> {
         await this.handleJoin();
         this.listen();
@@ -104,7 +113,7 @@ class SessionManager {
         const requestBody: string = session.id;
         await api.put("/start", requestBody);
     }
-    
+
     public setReachedGold(): void {
         this.reachedGold = true;
     }

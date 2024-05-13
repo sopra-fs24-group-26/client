@@ -81,8 +81,10 @@ export class GameScreen extends Phaser.Scene {
     }
 
     private displayPlacedTiles(): void {
+        if (!this.placedTilesContainer) {
+            return;
+        }
         AdjacencyManager.createAdjacencyMap();
-        assert(this.placedTilesContainer);
         this.placedTilesContainer.removeAll(true);
 
         const placedTiles: Nullable<Tile[]> = TileManager.getPlaced();
