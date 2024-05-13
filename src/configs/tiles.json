@@ -64,5 +64,15 @@
         "type": 12,
         "amount": 0,
         "connections": [1, 1, 1, 1, 1]
+    },
+    {
+        "type": 13,
+        "amount": 0,
+        "connections": [1, 1, 1, 1, 1]
+    },
+    {
+        "type": 14,
+        "amount": 6,
+        "connections": [0, 0, 0, 0, 0]
     }
 ]

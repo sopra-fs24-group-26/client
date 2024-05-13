@@ -30,7 +30,7 @@ export class GameScreen extends Phaser.Scene {
     }
 
     public preload(): void {
-        for (let i: int = 0; i < 13; i++) {
+        for (let i: int = 0; i < 15; i++) {
             this.load.image(`tile${i}`, `assets/tiles/tile${i}.png`);
         }
     }
@@ -91,18 +91,19 @@ export class GameScreen extends Phaser.Scene {
         const allTiles: Tile[] = TileManager.getAllInWorld();
 
         allTiles.forEach((tile: Tile) => {
-            if (tile.coordinateX !== null && tile.coordinateY !== null) {
-                assert(this.placedTilesContainer);
-                this.placedTilesContainer.add(
-                    this.add
-                        .image(
-                            tile.coordinateX * GameScreen.tilePixels,
-                            tile.coordinateY * GameScreen.tilePixels,
-                            `tile${tile.type}`,
-                        )
-                        .setAngle(tile.rotation * 90),
-                );
+            if (tile.coordinateX === null || tile.coordinateY === null) {
+                return;
             }
+            assert(this.placedTilesContainer);
+            this.placedTilesContainer.add(
+                this.add
+                    .image(
+                        tile.coordinateX * GameScreen.tilePixels,
+                        tile.coordinateY * GameScreen.tilePixels,
+                        `tile${tile.type}`,
+                    )
+                    .setAngle(tile.rotation * 90),
+            );
         });
     }
 
@@ -110,11 +111,10 @@ export class GameScreen extends Phaser.Scene {
         const session: Nullable<Session> = SessionManager.get();
         const tiles: Nullable<Tile[]> = TileManager.getAll();
         assert(session && tiles);
-
-        if (
+        const isEnd: boolean =
             SessionManager.getReachedGold() ||
-            session.turnIndex === tiles.length
-        ) {
+            session.turnIndex === tiles.length;
+        if (isEnd) {
             this.scene.start("EndScreen");
             this.scene.remove("GameUiScreen");
             this.scene.remove("GameScreen");

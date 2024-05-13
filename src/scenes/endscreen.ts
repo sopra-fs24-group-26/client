@@ -34,13 +34,13 @@ export class EndScreen extends Phaser.Scene {
         let text: string = "You loose";
         const me: Nullable<Player> = PlayerManager.getMe();
         assert(me);
-        if (
-            (me.role === Role.Miner && SessionManager.getReachedGold()) ||
-            (me.role === Role.Saboteur && !SessionManager.getReachedGold())
-        ) {
+        const minerWin: boolean =
+            me.role === Role.Miner && SessionManager.getReachedGold();
+        const saboteurWin: boolean =
+            me.role === Role.Saboteur && !SessionManager.getReachedGold();
+        if (minerWin || saboteurWin) {
             text = "You win baby";
         }
-
         this.add
             .text(ScreenWidth / 2, ScreenHeight / 2, text, {
                 fontFamily: "Arial",
