@@ -20,7 +20,7 @@ export class EndScreen extends Phaser.Scene {
 
     public create(): void {
         this.displayByRole();
-        //PlayerManager.removeId();
+        PlayerManager.removeId();
 
         const button: Phaser.GameObjects.Image = this.add
             .image(ScreenWidth / 2, ScreenHeight / 1.5, "quit")
@@ -33,6 +33,12 @@ export class EndScreen extends Phaser.Scene {
     }
 
     private displayByRole(): void {
+        const { showerOre, text } = this.displayData();
+        this.createShower(showerOre);
+        this.displayText(text);
+    }
+
+    private displayData() {
         let text: string = "You loose";
         let showerOre: string = "coalNugget";
         const me: Nullable<Player> = PlayerManager.getMe();
@@ -44,15 +50,7 @@ export class EndScreen extends Phaser.Scene {
             showerOre = "goldNugget";
             text = "You win baby";
         }
-        this.createShower(showerOre);
-        this.add
-            .text(ScreenWidth / 2, ScreenHeight / 2, text, {
-                fontFamily: "Arial",
-                fontSize: "100px",
-                color: "#ffd700",
-                fontStyle: "bold",
-            })
-            .setOrigin(0.5, 0.5);
+        return { showerOre, text };
     }
 
     private createShower(showerOre: string): void {
@@ -65,5 +63,16 @@ export class EndScreen extends Phaser.Scene {
             lifespan: 5000,
             gravityY: 200,
         });
+    }
+
+    private displayText(text: string) {
+        this.add
+            .text(ScreenWidth / 2, ScreenHeight / 2, text, {
+                fontFamily: "Arial",
+                fontSize: "100px",
+                color: "#ffd700",
+                fontStyle: "bold",
+            })
+            .setOrigin(0.5, 0.5);
     }
 }
