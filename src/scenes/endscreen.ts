@@ -39,7 +39,7 @@ export class EndScreen extends Phaser.Scene {
     }
 
     private displayData() {
-        let text: string = "You loose";
+        let text: string = "You loose!";
         let showerOre: string = "coalNugget";
         const me: Nullable<Player> = PlayerManager.getMe();
         assert(me);
@@ -48,7 +48,7 @@ export class EndScreen extends Phaser.Scene {
             (me.role === Role.Saboteur && !SessionManager.getReachedGold())
         ) {
             showerOre = "goldNugget";
-            text = "You win baby";
+            text = "You win!";
         }
         return { showerOre, text };
     }
@@ -56,9 +56,9 @@ export class EndScreen extends Phaser.Scene {
     private createShower(showerOre: string): void {
         this.add.particles(0, 100, showerOre, {
             x: { min: 0, max: ScreenWidth },
-            y: -400,
-            accelerationY: 500,
-            maxVelocityY: 700,
+            y: -250,
+            accelerationY: 300,
+            maxVelocityY: 300,
             quantity: 1,
             lifespan: 5000,
             gravityY: 200,
