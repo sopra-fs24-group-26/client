@@ -37,7 +37,7 @@ export class LobbyScreen extends Phaser.Scene {
     public create(): void {
         this.title = this.add
             .text(ScreenWidth / 2, ScreenHeight / 8, "Saboteur Lobby", {
-                fontFamily: "Goudy",
+                fontFamily: "Verdana",
                 fontSize: 38,
                 color: "#ffffff",
                 stroke: "#000000",
@@ -106,7 +106,7 @@ export class LobbyScreen extends Phaser.Scene {
     }
 
     private updateFrame(): void {
-        if (!this.scene || !this.scene.isActive()) {
+        if (!this.scene || !this.scene?.isActive?.()) {
             return;
         }
         assert(this.nameContainer);
@@ -124,7 +124,7 @@ export class LobbyScreen extends Phaser.Scene {
             this.nameContainer.add(
                 this.add
                     .text(ScreenWidth / 2, ypos, playername, {
-                        fontFamily: "Arial Black",
+                        fontFamily: "Verdana",
                         fontSize: 20,
                         color: "#e1e1e1",
                         stroke: "#000000",

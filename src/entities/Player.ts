@@ -8,40 +8,12 @@ export class Player {
     public readonly name: string;
     public readonly orderIndex: Nullable<int>;
     public readonly role: Nullable<Role>;
-    public readonly profile: Nullable<int>;
 
     public constructor(dto: PlayerDTO, playerCount: int, seed: string) {
         this.id = dto.id;
         this.name = dto.name;
         this.orderIndex = dto.orderIndex;
         this.role = this.getRole(playerCount, this.orderIndex, seed);
-        this.profile = this.getProfile(playerCount, this.orderIndex, seed);
-    }
-
-    private getProfile(
-        playerCount: int,
-        index: Nullable<int>,
-        seed: string,
-    ): Nullable<int> {
-        if (index === null) {
-            return null;
-        }
-        const profiles: int[] = this.generateProfiles(playerCount);
-        return seededShuffle(profiles, seed)[index];
-    }
-
-    private generateProfiles(playerCount: int): int[] {
-        const nrOfProfiles: int = 4;
-        let counter: int = 0;
-        let profiles: int[] = [];
-        while (profiles.length !== playerCount) {
-            if (counter === nrOfProfiles - 1) {
-                counter = 0;
-            }
-            profiles.push(counter);
-            counter++;
-        }
-        return profiles;
     }
 
     private getRole(

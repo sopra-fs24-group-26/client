@@ -75,10 +75,16 @@ export class GameUiScreen extends Phaser.Scene {
         for (let i: int = 0; i < 9; i++) {
             this.load.image(`tile${i}`, `assets/tiles/tile${i}.png`);
         }
-        for (let i: int = 0; i < 5; i++) {
-            this.load.image(`profile${i}`, `assets/profiles/profile${i}.png`);
-        }
         this.load.image("trashCan", "assets/buttons/trashcan.png");
+        const allPlayers: Nullable<Player[]> = PlayerManager.getAll();
+        assert(allPlayers);
+        for (let i: int = 0; i < allPlayers.length; i++) {
+            let player: Player = allPlayers[i];
+            this.load.image(
+                `avatar${player.orderIndex}`,
+                `https://api.dicebear.com/8.x/pixel-art/svg?seed=${player.name}&size=${GameUiScreen.profilePixels}&beardProbability=0&glassesProbability=0&hat=variant01&hatColor=ad6d3e&skinColor=a26d3d,b68655`,
+            );
+        }
         this.load.image("ring", "assets/profiles/ring.png");
     }
 
@@ -141,7 +147,8 @@ export class GameUiScreen extends Phaser.Scene {
             GameUiScreen.profilePixels / 2 +
             i * (GameUiScreen.profilePixels + spacing);
 
-        const profile = this.add.image(x, y, `profile${all[i].profile}`);
+        const profile = this.add.image(x, y, `avatar${all[i].orderIndex}`);
+        this.profilesContainer.add(profile);
         if (SessionManager.isPlayersTurn(all[i], count)) {
             this.profilesContainer.add(this.add.image(x, y, "ring"));
         }
@@ -150,7 +157,6 @@ export class GameUiScreen extends Phaser.Scene {
             name += " (Me)";
         }
         this.addName(x, y, name);
-        this.profilesContainer.add(profile);
     }
 
     private addRole(x: float, y: float, me: Player): void {
@@ -160,7 +166,7 @@ export class GameUiScreen extends Phaser.Scene {
             roleString = "Saboteur";
         }
         const roleText = this.add.text(
-            x - (roleString.length * 6.5) / 2,
+            x,
             y - GameUiScreen.profilePixels,
             roleString,
             {
@@ -170,27 +176,34 @@ export class GameUiScreen extends Phaser.Scene {
                 fontStyle: "bold",
             } as Phaser.Types.GameObjects.Text.TextStyle,
         );
+        roleText.setOrigin(0.5, 0.5);
         this.profilesContainer.add(roleText);
     }
 
     private addName(x: float, y: float, name: string): void {
         assert(this.profilesContainer);
         const nameText = this.add.text(
-            x - (name.length * 6) / 2,
-            y + GameUiScreen.profilePixels / 1.5,
+            x,
+            y + GameUiScreen.profilePixels / 1.2,
             name,
             {
                 fontFamily: "Verdana",
                 fontSize: "11px",
-                color: "#549b3d",
+                color: "#ffffff",
                 fontStyle: "bold",
+                align: "center",
             } as Phaser.Types.GameObjects.Text.TextStyle,
         );
+        nameText.setOrigin(0.5, 0);
+        nameText.setWordWrapWidth(GameUiScreen.profilePixels * 3);
         this.profilesContainer.add(nameText);
     }
 
     private displayDrawnTiles(): void {
-        assert(this.drawnTilesContainer && this.uiBackground);
+        if (!this.drawnTilesContainer) {
+            return;
+        }
+        assert(this.uiBackground);
         this.drawnTilesContainer.removeAll(true);
         const myTiles: Nullable<Tile[]> = TileManager.getInHand();
         assert(myTiles);
@@ -495,7 +508,7 @@ export class GameUiScreen extends Phaser.Scene {
 
     private displayErrorMessage(): void {
         this.wrongText = this.add.text(100, 100, "Oops! Path doesn't fit", {
-            fontFamily: "Arial",
+            fontFamily: "Verdana",
             fontSize: "24px",
             color: "#ff0000",
         } as Phaser.Types.GameObjects.Text.TextStyle);

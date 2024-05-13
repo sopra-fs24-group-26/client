@@ -74,7 +74,7 @@ export class EndScreen extends Phaser.Scene {
     private displayText(text: string): void {
         this.add
             .text(ScreenWidth / 2, ScreenHeight / 2, text, {
-                fontFamily: "Arial",
+                fontFamily: "Verdana",
                 fontSize: "100px",
                 color: "#fbfcfc",
                 fontStyle: "bold",
