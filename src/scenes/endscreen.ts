@@ -33,24 +33,25 @@ export class EndScreen extends Phaser.Scene {
     }
 
     private displayByRole(): void {
-        const { showerOre: showerOreType, text } = this.getDisplayData();
+        const { showerOreType, text } = this.getDisplayData();
         this.createShower(showerOreType);
         this.displayText(text);
     }
 
-    private getDisplayData() {
+    private getDisplayData(): { showerOreType: string; text: string } {
         let text: string = "You lose!";
         let showerOreType: string = "coalNugget";
         const me: Nullable<Player> = PlayerManager.getMe();
         assert(me);
-        if (
-            (me.role === Role.Miner && SessionManager.getReachedGold()) ||
-            (me.role === Role.Saboteur && !SessionManager.getReachedGold())
-        ) {
+        const minerWin: boolean =
+            me.role === Role.Miner && SessionManager.getReachedGold();
+        const saboteurWin: boolean =
+            me.role === Role.Saboteur && !SessionManager.getReachedGold();
+        if (minerWin || saboteurWin) {
             showerOreType = "goldNugget";
             text = "You win!";
         }
-        return { showerOre: showerOreType, text };
+        return { showerOreType, text };
     }
 
     private createShower(showerOre: string): void {
