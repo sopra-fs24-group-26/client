@@ -106,6 +106,9 @@ export class LobbyScreen extends Phaser.Scene {
     }
 
     public updateFrame(): void {
+        if (!this.scene || !this.scene.isActive()) {
+            return;
+        }
         assert(this.nameContainer);
         this.nameContainer.removeAll(true);
 
