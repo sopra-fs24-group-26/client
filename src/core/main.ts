@@ -20,6 +20,8 @@ const config: Phaser.Types.Core.GameConfig = {
     parent: "game-container",
     backgroundColor: "#463a40",
     scene: [TitleScreen, LobbyScreen, GameScreen, GameUiScreen, EndScreen],
+    pixelArt: true,
+    roundPixels: true
 };
 export const EventBus: Phaser.Events.EventEmitter =
     new Phaser.Events.EventEmitter();

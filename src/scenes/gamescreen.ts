@@ -107,7 +107,7 @@ export class GameScreen extends Phaser.Scene {
         });
     }
 
-    private checkGameEnd() {
+    private checkGameEnd(): void {
         const session: Nullable<Session> = SessionManager.get();
         const tiles: Nullable<Tile[]> = TileManager.getAll();
         assert(session && tiles);
