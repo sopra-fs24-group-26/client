@@ -33,44 +33,47 @@ export class EndScreen extends Phaser.Scene {
     }
 
     private displayByRole(): void {
-        const { showerOre, text } = this.displayData();
-        this.createShower(showerOre);
+        const { showerOre: showerOreType, text } = this.getDisplayData();
+        this.createShower(showerOreType);
         this.displayText(text);
     }
 
-    private displayData() {
+    private getDisplayData() {
         let text: string = "You loose!";
-        let showerOre: string = "coalNugget";
+        let showerOreType: string = "coalNugget";
         const me: Nullable<Player> = PlayerManager.getMe();
         assert(me);
         if (
             (me.role === Role.Miner && SessionManager.getReachedGold()) ||
             (me.role === Role.Saboteur && !SessionManager.getReachedGold())
         ) {
-            showerOre = "goldNugget";
+            showerOreType = "goldNugget";
             text = "You win!";
         }
-        return { showerOre, text };
+        return { showerOre: showerOreType, text };
     }
 
     private createShower(showerOre: string): void {
         this.add.particles(0, 100, showerOre, {
-            x: { min: 0, max: ScreenWidth },
+            x: {
+                min: 0,
+                max: ScreenWidth,
+            },
             y: -250,
             accelerationY: 300,
             maxVelocityY: 300,
             quantity: 1,
-            lifespan: 5000,
+            lifespan: 6000,
             gravityY: 200,
-        });
+        } as Phaser.Types.GameObjects.Particles.ParticleEmitterConfig);
     }
 
-    private displayText(text: string) {
+    private displayText(text: string): void {
         this.add
             .text(ScreenWidth / 2, ScreenHeight / 2, text, {
                 fontFamily: "Arial",
                 fontSize: "100px",
-                color: "#ffd700",
+                color: "#fbfcfc",
                 fontStyle: "bold",
             })
             .setOrigin(0.5, 0.5);
