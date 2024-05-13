@@ -78,7 +78,7 @@ export class EndScreen extends Phaser.Scene {
                 fontSize: "100px",
                 color: "#fbfcfc",
                 fontStyle: "bold",
-            })
+            } as Phaser.Types.GameObjects.Text.TextStyle)
             .setOrigin(0.5, 0.5);
     }
 }

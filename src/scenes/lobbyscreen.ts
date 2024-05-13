@@ -43,7 +43,7 @@ export class LobbyScreen extends Phaser.Scene {
                 stroke: "#000000",
                 strokeThickness: 8,
                 align: "center",
-            })
+            } as Phaser.Types.GameObjects.Text.TextStyle)
             .setOrigin(0.5);
 
         const quitButton: Phaser.GameObjects.Image = this.add.image(
@@ -105,7 +105,7 @@ export class LobbyScreen extends Phaser.Scene {
         this.scene.start("GameScreen");
     }
 
-    public updateFrame(): void {
+    private updateFrame(): void {
         if (!this.scene || !this.scene.isActive()) {
             return;
         }
@@ -130,7 +130,7 @@ export class LobbyScreen extends Phaser.Scene {
                         stroke: "#000000",
                         strokeThickness: 3,
                         fontStyle: fontstyle,
-                    })
+                    } as Phaser.Types.GameObjects.Text.TextStyle)
                     .setOrigin(0.5, 0.5),
             );
         }

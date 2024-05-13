@@ -111,44 +111,50 @@ export class GameUiScreen extends Phaser.Scene {
         );
     }
 
-    public displayProfiles(): void {
-        const allPlayers: Nullable<Player[]> = PlayerManager.getAll();
+    private displayProfiles(): void {
+        const all: Nullable<Player[]> = PlayerManager.getAll();
         const me: Nullable<Player> = PlayerManager.getMe();
         const session: Nullable<Session> = SessionManager.get();
-        assert(me && allPlayers && session && this.profilesContainer);
+        assert(me && all && session && this.profilesContainer);
         this.profilesContainer.removeAll(true);
-        const playerCount: int = allPlayers.length;
-
-        const profileSpacing: int =
-            (ScreenWidth - playerCount * GameUiScreen.profilePixels) /
-            (playerCount + 1);
+        const count: int = all.length;
+        const spacing: int =
+            (ScreenWidth - count * GameUiScreen.profilePixels) / (count + 1);
         const y: float = ScreenHeight / 10;
-
-        for (let i: int = 0; i < playerCount; i++) {
-            let name: string = allPlayers[i].name;
-            const x: float =
-                profileSpacing +
-                GameUiScreen.profilePixels / 2 +
-                i * (GameUiScreen.profilePixels + profileSpacing);
-
-            const profile = this.add.image(
-                x,
-                y,
-                `profile${allPlayers[i].profile}`,
-            );
-            if (SessionManager.isPlayersTurn(allPlayers[i], playerCount)) {
-                this.profilesContainer.add(this.add.image(x, y, "ring"));
-            }
-            if (allPlayers[i].orderIndex === me.orderIndex) {
-                this.addRole(x, y, me);
-                name += " (Me)";
-            }
-            this.addName(x, y, name);
-            this.profilesContainer.add(profile);
+        for (let i: int = 0; i < count; i++) {
+            this.displayPlayer(all, spacing, i, count, y, me);
         }
     }
 
-    public addRole(x: float, y: float, me: Player): void {
+    private displayPlayer(
+        all: Player[],
+        spacing: int,
+        i: int,
+        count: int,
+        y: float,
+        me: Player,
+    ): void {
+        assert(this.profilesContainer);
+        let name: string = all[i].name;
+        const x: float =
+            spacing +
+            GameUiScreen.profilePixels / 2 +
+            i * (GameUiScreen.profilePixels + spacing);
+
+        const profile = this.add.image(x, y, `profile${all[i].profile}`);
+        if (SessionManager.isPlayersTurn(all[i], count)) {
+            this.profilesContainer.add(this.add.image(x, y, "ring"));
+        }
+        if (all[i].orderIndex === me.orderIndex) {
+            this.addRole(x, y, me);
+            name += " (Me)";
+        }
+        this.addName(x, y, name);
+        this.profilesContainer.add(profile);
+    }
+
+    private addRole(x: float, y: float, me: Player): void {
+        assert(this.profilesContainer);
         let roleString: string = "Miner";
         if (me.role === Role.Saboteur) {
             roleString = "Saboteur";
@@ -162,12 +168,13 @@ export class GameUiScreen extends Phaser.Scene {
                 fontSize: "11px",
                 color: "#ffd700",
                 fontStyle: "bold",
-            },
+            } as Phaser.Types.GameObjects.Text.TextStyle,
         );
         this.profilesContainer.add(roleText);
     }
 
-    public addName(x: float, y: float, name: string): void {
+    private addName(x: float, y: float, name: string): void {
+        assert(this.profilesContainer);
         const nameText = this.add.text(
             x - (name.length * 6) / 2,
             y + GameUiScreen.profilePixels / 1.5,
@@ -177,12 +184,12 @@ export class GameUiScreen extends Phaser.Scene {
                 fontSize: "11px",
                 color: "#549b3d",
                 fontStyle: "bold",
-            },
+            } as Phaser.Types.GameObjects.Text.TextStyle,
         );
         this.profilesContainer.add(nameText);
     }
 
-    public displayDrawnTiles(): void {
+    private displayDrawnTiles(): void {
         assert(this.drawnTilesContainer && this.uiBackground);
         this.drawnTilesContainer.removeAll(true);
         const myTiles: Nullable<Tile[]> = TileManager.getInHand();
@@ -491,7 +498,7 @@ export class GameUiScreen extends Phaser.Scene {
             fontFamily: "Arial",
             fontSize: "24px",
             color: "#ff0000",
-        });
+        } as Phaser.Types.GameObjects.Text.TextStyle);
     }
 
     private turnTileLeft(): void {
