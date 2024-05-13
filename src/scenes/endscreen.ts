@@ -39,7 +39,7 @@ export class EndScreen extends Phaser.Scene {
     }
 
     private getDisplayData() {
-        let text: string = "You loose!";
+        let text: string = "You lose!";
         let showerOreType: string = "coalNugget";
         const me: Nullable<Player> = PlayerManager.getMe();
         assert(me);
@@ -65,6 +65,8 @@ export class EndScreen extends Phaser.Scene {
             quantity: 1,
             lifespan: 6000,
             gravityY: 200,
+            scale: { min: 0.2, max: 0.8 },
+            rotate: { start: 0, end: 360 },
         } as Phaser.Types.GameObjects.Particles.ParticleEmitterConfig);
     }
 
