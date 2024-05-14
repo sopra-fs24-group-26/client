@@ -1,6 +1,6 @@
 import { int, Nullable, UUID } from "definitions/utils";
 import PlayerManager from "../managers/PlayerManager";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { api } from "../utilities/api";
 import { JoinDTO, SessionDTO } from "definitions/dto";
 import GeneralManager from "./GeneralManager";
@@ -8,8 +8,6 @@ import { assert } from "utilities/utils";
 import { Session } from "entities/Session";
 import { EventEmitter } from "utilities/EventEmitter";
 import { Player } from "../entities/Player";
-import { log } from "utilities/logger";
-import { StartGame } from "core/main";
 
 class SessionManager {
     public readonly onSync: EventEmitter;
@@ -89,7 +87,6 @@ class SessionManager {
             location.pathname = "";
         } catch (error) {
             if (axios.isAxiosError(error) && error.response?.status) {
-                log(error);
                 alert(error.response?.data.message);
                 PlayerManager.delete();
                 return;
