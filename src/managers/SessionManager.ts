@@ -89,6 +89,7 @@ class SessionManager {
             if (axios.isAxiosError(error) && error.response?.status) {
                 alert(error.response?.data.message);
                 PlayerManager.delete();
+                location.pathname = "";
                 return;
             }
             alert("Unexpected error when joining game. Please try again.");
