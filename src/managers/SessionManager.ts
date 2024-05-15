@@ -87,7 +87,6 @@ class SessionManager {
             location.pathname = "";
         } catch (error) {
             if (axios.isAxiosError(error) && error.response?.status) {
-                alert(error.response?.data.message);
                 PlayerManager.delete();
                 return;
             }
