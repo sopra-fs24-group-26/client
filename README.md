@@ -36,6 +36,14 @@ Add additional notes about how to deploy this on a live system
 
 ## High-level components
 
+In the client repository, the three key components are Manager, Scenes and Entity. The entry point and main game flow are handled in the core folder. For usability and extendability, we also defined types, constants, and helper functions that are stored in several subfolders and play an important role in our project.
+
+### Manager
+
+The Manager layer is responsible for fetching session-related information from the server. On a constant time interval, the GeneralManager sends ping request and receives a data package with all the shared information. The data is then propagated to sub-managers, each stores and updates the information of one kind of entity.
+
+The AdjacencyManager handles the game logic. It builds the game world and checks valid tile placements.
+
 ## Roadmap
 
 ## Authors
