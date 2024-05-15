@@ -97,7 +97,7 @@ export class LobbyScreen extends Phaser.Scene {
         navigator.clipboard.writeText(link);
         const msg: Phaser.GameObjects.Text = this.add.text(
             ScreenWidth / 2,
-            ScreenHeight / 4,
+            ScreenHeight * 0.9,
             "Share link copied to clipboard",
             {
                 fontFamily: "Verdana",
