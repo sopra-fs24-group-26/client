@@ -47,21 +47,21 @@ export class LobbyScreen extends Phaser.Scene {
             .setOrigin(0.5);
 
         const quitButton: Phaser.GameObjects.Image = this.add.image(
-            ScreenWidth / 4,
+            ScreenWidth * 0.25,
             ScreenHeight / 1.25,
             "quit",
         );
         interactify(quitButton, 0.5, () => this.onQuitButton());
 
         const shareButton: Phaser.GameObjects.Image = this.add.image(
-            ScreenWidth / 2,
+            ScreenWidth * 0.5,
             ScreenHeight / 1.25,
             "share",
         );
         interactify(shareButton, 0.5, () => this.onShareButton());
 
         const startButton: Phaser.GameObjects.Image = this.add.image(
-            ScreenWidth / 1.25,
+            ScreenWidth * 0.75,
             ScreenHeight / 1.25,
             "start",
         );
