@@ -44,6 +44,10 @@ The Manager layer is responsible for fetching session-related information from t
 
 The AdjacencyManager handles the game logic. It builds the game world and checks valid tile placements.
 
+### Scene
+
+Our game mainly consists of title screen, lobby screen, game screen and end screen. Each screen is a scene. The user is directed to title screen on entry. If joining is accepted, the scene transitions to lobbyscreen, where the user can copy link to game session, check out tutorial, quit lobby, or start game. Once inside the game screen, the client displays the game state, co-player information and available tiles with the help of game UI screen. As soon as game ends, the user is ported to the end screen. Given that the browser holds valid player information, the user will be ported to the correct scene whenever the user reenters the game.
+
 ## Roadmap
 
 ## Authors
