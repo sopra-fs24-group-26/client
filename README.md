@@ -3,6 +3,8 @@
 A webversion of the board game Saboteur, project for the Software Engineering Lab FS24 at UZH. <br>
 Our focus was to implement something that would exite us, leading to the creation of a simple web version of a fun board game we had played together
 
+Official game rules: https://world-of-board-games.com.sg/docs/Saboteur-Amigo.pdf
+
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
@@ -34,6 +36,10 @@ Add additional notes about how to deploy this on a live system
 -   [Phaser](https://phaser.io/) - The Game Framework used
 -   [DiceBear](https://www.dicebear.com/) - Avatar library
 
+## Main user flow
+
+The user is directed to title screen on entry. If joining is accepted, the scene transitions to lobbyscreen, where the user can copy link to game session, check out tutorial, quit lobby, or start game. A random name and avatar is generated automatically for each player. Once every player has joined, any player can start the game. Inside the game, players are assigned a role and they see other players information as well as own playable tiles displayed on the screen. They take turn to place a tile (drag a tile to a valid spot), discard a tile(click on trash icon), or play an action card (eye). The session continues to stay in game state until a winning/ losing condition is reached. Then the players are ported according to their role to a victory scene where gold rains, or to a losing scene where coal pours down. Clicking on "quit" button will redirect players to title screen where they can start a new game. The user flow loops from here on.
+
 ## High-level components
 
 In the client repository, the three key components are Manager, Scenes and Entity. The entry point and main game flow are handled in the core folder. For usability and extendability, we also defined custom types, constants, and helper functions that are stored in several subfolders and play an important role in our project.
@@ -46,7 +52,7 @@ The AdjacencyManager handles the game logic. It builds the game world and checks
 
 ### Scene
 
-Our game mainly consists of title screen, lobby screen, game screen and end screen. Each screen is a scene. The user is directed to title screen on entry. If joining is accepted, the scene transitions to lobbyscreen, where the user can copy link to game session, check out tutorial, quit lobby, or start game. Once inside the game screen, the client displays the game state, co-player information and available tiles with the help of game UI screen. As soon as game ends, the user is ported to the end screen. Given that the browser holds valid player information, the user will be ported to the correct scene whenever the user reenters the game.
+Our game mainly consists of title screen, lobby screen, game screen and end screen. Each screen is a scene. The title screen is the entry scene. Players wait in the lobby screen for the game to start. Once inside the game screen, the client displays the game state, co-player information and available tiles together with game UI screen. As soon as game ends, the user is ported to the end screen. Given that the browser holds valid player information, the user will be ported to the correct scene whenever the user reenters the game.
 
 ### Entity
 
