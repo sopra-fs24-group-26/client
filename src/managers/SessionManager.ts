@@ -84,11 +84,7 @@ class SessionManager {
                 requestBody,
             );
             PlayerManager.saveId(response.data);
-        } catch (error) {
-            if (axios.isAxiosError(error) && error.response?.status) {
-                PlayerManager.delete();
-            }
-        }
+        } catch (error) {}
         location.pathname = "";
     }
 
