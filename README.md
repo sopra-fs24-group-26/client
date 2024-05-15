@@ -44,6 +44,8 @@ The user is directed to title screen on entry. If joining is accepted, the scene
 
 In the client repository, the three key components are Manager, Scenes and Entity. The entry point and main game flow are handled in the core folder. For usability and extendability, we also defined custom types, constants, and helper functions that are stored in several subfolders and play an important role in our project.
 
+Our project uses event-driven architecture patterns to communicate game state changes to different components. The Manager component interacts with the server. It emits event on change of Entity data they keep track of, Scenes that listen to these events will update information and behave accordingly.
+
 ### Manager
 
 The Manager layer is responsible for fetching session-related information from the server. On a constant time interval, the GeneralManager (https://github.com/sopra-fs24-group-26/client/blob/master/src/managers/GeneralManager.ts) sends ping request and receives a data package with all the shared information. The data is then propagated to sub-managers, each stores and updates the information of one kind of entity.
