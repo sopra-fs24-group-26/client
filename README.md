@@ -68,10 +68,12 @@ Real-world objects of the board game Saboteur are modeled as the following [Enti
 
 ## Roadmap - Ideas for future implementations
 
+-   Add more Actions to the game
 -   Make personalizable Avatar creation
 -   Add a timer to a players turn
 -   Add chat to game
 -   Add animations/more particles
+-   Add sound effects and music
 
 ## Pattern
 
@@ -109,7 +111,7 @@ See also the list of [contributors](https://github.com/sopra-fs24-group-26/serve
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 
