@@ -12,7 +12,8 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 
 Make sure you have the following installed:
-- npm
+
+-   npm
 
 ### Installing
 
@@ -53,17 +54,17 @@ Our project uses event-driven architecture patterns to communicate game state ch
 
 ### Manager
 
-The Manager layer is responsible for fetching session-related information from the server. On a constant time interval, the GeneralManager (https://github.com/sopra-fs24-group-26/client/blob/master/src/managers/GeneralManager.ts) sends ping request and receives a data package with all the shared information. The data is then propagated to sub-managers, each stores and updates the information of one kind of entity.
+The Manager layer is responsible for fetching session-related information from the server. On a constant time interval, the [GeneralManager](https://github.com/sopra-fs24-group-26/client/blob/master/src/managers/GeneralManager.ts) sends ping request and receives a data package with all the shared information. The data is then propagated to sub-managers, each stores and updates the information of one kind of entity.
 
-The AdjacencyManager(https://github.com/sopra-fs24-group-26/client/blob/master/src/managers/AdjacencyManager.ts) handles the game logic. It checks the validity of a tile placement action.
+The [AdjacencyManager](https://github.com/sopra-fs24-group-26/client/blob/master/src/managers/AdjacencyManager.ts) handles the game logic. It checks the validity of a tile placement action.
 
 ### Scene
 
-Our game mainly consists of title screen, lobby screen, game screen and end screen. Each screen is a scene (https://github.com/sopra-fs24-group-26/client/tree/master/src/scenes). The title screen is the entry scene. Players wait in the lobby screen for the game to start. Once inside the game screen, the client displays the game state, co-player information and available tiles together with game UI screen. As soon as game ends, the user is ported to the end screen. Given that the browser holds valid player information, the user will be ported to the correct scene whenever the user reenters the game.
+Our game mainly consists of title screen, lobby screen, game screen and end screen. [Each screen](https://github.com/sopra-fs24-group-26/client/tree/master/src/scenes) is a scene. The title screen is the entry scene. Players wait in the lobby screen for the game to start. Once inside the game screen, the client displays the game state, co-player information and available tiles together with game UI screen. As soon as game ends, the user is ported to the end screen. Given that the browser holds valid player information, the user will be ported to the correct scene whenever the user reenters the game.
 
 ### Entity
 
-Real-world entities of the board game Saboteur are modeled in the following ways in our project: a Player entity represents a player, a Session models a game and a Tile corresponds to a playing card (https://github.com/sopra-fs24-group-26/client/tree/master/src/entities). When a user clicks on "create Session" on title screen, a session entity and player entity are created. Upon new players joining the session, more player objects are created. Click on "start" in lobby screen triggers the game setup, the client instantiates a number of tiles for the given player count and sorts them on a shared seed. Whenever a tile is played, it's information is sent to server for update and share the information with every other player.
+Real-world objects of the board game Saboteur are modeled as the following [Entities](https://github.com/sopra-fs24-group-26/client/tree/master/src/entities) in our project: a Player entity represents a player, a Session models a game and a Tile corresponds to a playing card. When a user clicks on "create Session" on title screen, a session entity and player entity are created. Upon new players joining the session, more player objects are created. Click on "start" in lobby screen triggers the game setup, the client instantiates a number of tiles for the given player count and sorts them on a shared seed. Whenever a tile is played, it's information is sent to server for update and share the information with every other player.
 
 ## Roadmap - Ideas for future implementations
 
