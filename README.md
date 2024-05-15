@@ -12,8 +12,13 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 
 Make sure you have the following installed:
+- npm
 
 ### Installing
+
+1. Clone the repository
+2. Navigate to project directory and install all dependencies: npm install
+3. Run the client locally: npm run dev
 
 ## Deployment
 
