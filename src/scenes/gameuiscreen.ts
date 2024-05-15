@@ -295,7 +295,7 @@ export class GameUiScreen extends Phaser.Scene {
 
     private toggleDrag(): void {
         if (!this.isDraging && this.dragObj) {
-            if (this.wrongText) this.wrongText.destroy();
+            this.wrongText?.destroy();
             this.toggleTrashcansVisibility(false);
             this.input.on("pointermove", this.doDrag, this);
             this.dragObj.on("pointerdown", this.stopDrag, this);
@@ -507,39 +507,48 @@ export class GameUiScreen extends Phaser.Scene {
     }
 
     private displayErrorMessage(): void {
-        this.wrongText = this.add.text(100, 100, "Oops! Path doesn't fit", {
-            fontFamily: "Verdana",
-            fontSize: "24px",
-            color: "#ff0000",
-        } as Phaser.Types.GameObjects.Text.TextStyle);
+        const duration: int = 3;
+        this.wrongText = this.add.text(
+            ScreenWidth / 2,
+            ScreenHeight / 4,
+            "Oops! Path doesn't fit",
+            {
+                fontFamily: "Verdana",
+                fontSize: "36px",
+                fontStyle: "bold",
+                color: "#ff5b5b",
+                align: "center",
+            } as Phaser.Types.GameObjects.Text.TextStyle,
+        );
+        this.wrongText.setOrigin(0.5, 0.5);
+        this.time.delayedCall(duration * 1_000, () =>
+            this.wrongText?.destroy(),
+        );
     }
 
     private turnTileLeft(): void {
-        if (this.dragObj) {
-            this.dragObj.angle += -90;
-            this.currentTile.rotation = (this.currentTile.rotation - 1) % 4;
+        if (!this.dragObj) {
+            return;
         }
+        this.dragObj.angle += -90;
+        this.currentTile.rotation = (this.currentTile.rotation - 1) % 4;
     }
 
     private turnTileRight(): void {
-        if (this.dragObj) {
-            this.dragObj.angle += 90;
-            this.currentTile.rotation = (this.currentTile.rotation + 1) % 4;
+        if (!this.dragObj) {
+            return;
         }
+        this.dragObj.angle += 90;
+        this.currentTile.rotation = (this.currentTile.rotation + 1) % 4;
     }
 
     private toggleTrashcansVisibility(isVisable: boolean): void {
         assert(this.drawnTilesContainer);
-        this.drawnTilesContainer.iterate(
-            (image: {
-                texture: { key: string };
-                setVisible: (arg0: boolean) => void;
-            }): void => {
-                if (image.texture.key === "trashCan") {
-                    image.setVisible(isVisable);
-                }
-            },
-        );
+        this.drawnTilesContainer.iterate((image: Phaser.GameObjects.Image) => {
+            if (image.texture.key === "trashCan") {
+                image.setVisible(isVisable);
+            }
+        });
     }
 
     private cleanUp(): void {
