@@ -36,7 +36,7 @@ Add additional notes about how to deploy this on a live system
 
 ## High-level components
 
-In the client repository, the three key components are Manager, Scenes and Entity. The entry point and main game flow are handled in the core folder. For usability and extendability, we also defined types, constants, and helper functions that are stored in several subfolders and play an important role in our project.
+In the client repository, the three key components are Manager, Scenes and Entity. The entry point and main game flow are handled in the core folder. For usability and extendability, we also defined custom types, constants, and helper functions that are stored in several subfolders and play an important role in our project.
 
 ### Manager
 
@@ -47,6 +47,10 @@ The AdjacencyManager handles the game logic. It builds the game world and checks
 ### Scene
 
 Our game mainly consists of title screen, lobby screen, game screen and end screen. Each screen is a scene. The user is directed to title screen on entry. If joining is accepted, the scene transitions to lobbyscreen, where the user can copy link to game session, check out tutorial, quit lobby, or start game. Once inside the game screen, the client displays the game state, co-player information and available tiles with the help of game UI screen. As soon as game ends, the user is ported to the end screen. Given that the browser holds valid player information, the user will be ported to the correct scene whenever the user reenters the game.
+
+### Entity
+
+When a user clicks on "create Session" on title screen, a session entity and player entity are created. They represent a game and a player object. Upon new players joining the session, more player objects are created. Click on "start" in lobby screen triggers the game setup, the client instantiates a number of tiles for the given player count and sorts them on a shared seed. Whenever a tile is played, it's information is sent to server for update and share the information with every other player.
 
 ## Roadmap
 
