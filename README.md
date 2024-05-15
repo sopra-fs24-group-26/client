@@ -58,7 +58,12 @@ Our game mainly consists of title screen, lobby screen, game screen and end scre
 
 Real-world entities of the board game Saboteur are modeled in the following ways in our project: a Player entity represents a player, a Session models a game and a Tile corresponds to a playing card (https://github.com/sopra-fs24-group-26/client/tree/master/src/entities). When a user clicks on "create Session" on title screen, a session entity and player entity are created. Upon new players joining the session, more player objects are created. Click on "start" in lobby screen triggers the game setup, the client instantiates a number of tiles for the given player count and sorts them on a shared seed. Whenever a tile is played, it's information is sent to server for update and share the information with every other player.
 
-## Roadmap
+## Roadmap - Ideas for future implementations
+
+-   Make personalizable Avatar creation
+-   Add a timer to a players turn
+-   Add chat to game
+-   Add animations/more particles
 
 ## Authors
 
