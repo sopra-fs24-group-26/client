@@ -113,12 +113,16 @@ class SessionManager {
         await api.put("/start", requestBody);
     }
 
-    public setReachedGold(): void {
+    public reachGold(): void {
         this.reachedGold = true;
     }
 
     public getReachedGold(): boolean {
         return this.reachedGold;
+    }
+
+    public resetReachedGold(): void {
+        this.reachedGold = false;
     }
 }
 

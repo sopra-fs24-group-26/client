@@ -6,6 +6,7 @@ import { ScreenHeight, ScreenWidth } from "../core/main";
 import PlayerManager from "managers/PlayerManager";
 import { Player } from "entities/Player";
 import { Role } from "definitions/enums";
+import TileManager from "managers/TileManager";
 
 export class EndScreen extends Phaser.Scene {
     public constructor() {
@@ -21,6 +22,8 @@ export class EndScreen extends Phaser.Scene {
     public create(): void {
         this.displayByRole();
         PlayerManager.removeId();
+        TileManager.clearReachedCoal();
+        SessionManager.resetReachedGold();
 
         const button: Phaser.GameObjects.Image = this.add
             .image(ScreenWidth / 2, ScreenHeight / 1.5, "quit")
@@ -43,10 +46,9 @@ export class EndScreen extends Phaser.Scene {
         let showerOreType: string = "coalNugget";
         const me: Nullable<Player> = PlayerManager.getMe();
         assert(me);
-        const minerWin: boolean =
-            me.role === Role.Miner && SessionManager.getReachedGold();
-        const saboteurWin: boolean =
-            me.role === Role.Saboteur && !SessionManager.getReachedGold();
+        const reachedGold: boolean = SessionManager.getReachedGold();
+        const minerWin: boolean = me.role === Role.Miner && reachedGold;
+        const saboteurWin: boolean = me.role === Role.Saboteur && !reachedGold;
         if (minerWin || saboteurWin) {
             showerOreType = "goldNugget";
             text = "You win!";

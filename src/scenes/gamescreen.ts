@@ -24,9 +24,9 @@ export class GameScreen extends Phaser.Scene {
             this.displayPlacedTiles();
             this.checkGameEnd();
         });
-        this.events.on("destroy", () => {
-            TileManager.onSync.off(tileUpdateListener);
-        });
+        this.events.once("shutdown", () =>
+            TileManager.onSync.off(tileUpdateListener),
+        );
     }
 
     public preload(): void {
@@ -118,8 +118,7 @@ export class GameScreen extends Phaser.Scene {
             session.turnIndex === tiles.length;
         if (isEnd) {
             this.scene.start("EndScreen");
-            this.scene.remove("GameUiScreen");
-            this.scene.remove("GameScreen");
+            this.scene.stop("GameUiScreen");
         }
     }
 }

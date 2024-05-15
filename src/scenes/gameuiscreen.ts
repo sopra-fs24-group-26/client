@@ -66,9 +66,9 @@ export class GameUiScreen extends Phaser.Scene {
                 this.setAllTileNotInteractive();
             }
         });
-        this.events.on("destroy", () => {
-            TileManager.onSync.off(tileUpdateListener);
-        });
+        this.events.once("shutdown", () =>
+            TileManager.onSync.off(tileUpdateListener),
+        );
     }
 
     public preload(): void {
@@ -118,10 +118,13 @@ export class GameUiScreen extends Phaser.Scene {
     }
 
     private displayProfiles(): void {
+        if (!this.profilesContainer) {
+            return;
+        }
         const all: Nullable<Player[]> = PlayerManager.getAll();
         const me: Nullable<Player> = PlayerManager.getMe();
         const session: Nullable<Session> = SessionManager.get();
-        assert(me && all && session && this.profilesContainer);
+        assert(me && all && session);
         this.profilesContainer.removeAll(true);
         const count: int = all.length;
         const spacing: int =
