@@ -78,14 +78,13 @@ class SessionManager {
             sessionId: sessionId,
             playerName: PlayerManager.generateName(),
         } as JoinDTO;
-        const response: axios.AxiosResponse<UUID> = await api.post(
-            "/join",
-            requestBody,
-        );
-        if (!response.data) {
-            return;
-        }
-        PlayerManager.saveId(response.data);
+        try {
+            const response: axios.AxiosResponse<UUID> = await api.post(
+                "/join",
+                requestBody,
+            );
+            PlayerManager.saveId(response.data);
+        } catch (error) {}
         location.pathname = "";
     }
 
