@@ -46,17 +46,17 @@ In the client repository, the three key components are Manager, Scenes and Entit
 
 ### Manager
 
-The Manager layer is responsible for fetching session-related information from the server. On a constant time interval, the GeneralManager sends ping request and receives a data package with all the shared information. The data is then propagated to sub-managers, each stores and updates the information of one kind of entity.
+The Manager layer is responsible for fetching session-related information from the server. On a constant time interval, the GeneralManager (https://github.com/sopra-fs24-group-26/client/blob/master/src/managers/GeneralManager.ts) sends ping request and receives a data package with all the shared information. The data is then propagated to sub-managers, each stores and updates the information of one kind of entity.
 
-The AdjacencyManager handles the game logic. It builds the game world and checks valid tile placements.
+The AdjacencyManager(https://github.com/sopra-fs24-group-26/client/blob/master/src/managers/AdjacencyManager.ts) handles the game logic. It checks the validity of a tile placement action.
 
 ### Scene
 
-Our game mainly consists of title screen, lobby screen, game screen and end screen. Each screen is a scene. The title screen is the entry scene. Players wait in the lobby screen for the game to start. Once inside the game screen, the client displays the game state, co-player information and available tiles together with game UI screen. As soon as game ends, the user is ported to the end screen. Given that the browser holds valid player information, the user will be ported to the correct scene whenever the user reenters the game.
+Our game mainly consists of title screen, lobby screen, game screen and end screen. Each screen is a scene (https://github.com/sopra-fs24-group-26/client/tree/master/src/scenes). The title screen is the entry scene. Players wait in the lobby screen for the game to start. Once inside the game screen, the client displays the game state, co-player information and available tiles together with game UI screen. As soon as game ends, the user is ported to the end screen. Given that the browser holds valid player information, the user will be ported to the correct scene whenever the user reenters the game.
 
 ### Entity
 
-When a user clicks on "create Session" on title screen, a session entity and player entity are created. They represent a game and a player object. Upon new players joining the session, more player objects are created. Click on "start" in lobby screen triggers the game setup, the client instantiates a number of tiles for the given player count and sorts them on a shared seed. Whenever a tile is played, it's information is sent to server for update and share the information with every other player.
+Real-world entities of the board game Saboteur are modeled in the following ways in our project: a Player entity represents a player, a Session models a game and a Tile corresponds to a playing card (https://github.com/sopra-fs24-group-26/client/tree/master/src/entities). When a user clicks on "create Session" on title screen, a session entity and player entity are created. Upon new players joining the session, more player objects are created. Click on "start" in lobby screen triggers the game setup, the client instantiates a number of tiles for the given player count and sorts them on a shared seed. Whenever a tile is played, it's information is sent to server for update and share the information with every other player.
 
 ## Roadmap
 
