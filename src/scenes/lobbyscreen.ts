@@ -30,6 +30,7 @@ export class LobbyScreen extends Phaser.Scene {
         this.load.image("quit", "assets/buttons/quit.png");
         this.load.image("share", "assets/buttons/share.png");
         this.load.image("start", "assets/buttons/start.png");
+        this.load.image("gameRules", "assets/buttons/gameRules.png");
     }
 
     public create(): void {
@@ -45,21 +46,28 @@ export class LobbyScreen extends Phaser.Scene {
             .setOrigin(0.5);
 
         const quitButton: Phaser.GameObjects.Image = this.add.image(
-            ScreenWidth * 0.25,
+            ScreenWidth * 0.2,
             ScreenHeight / 1.25,
             "quit",
         );
         interactify(quitButton, 0.5, () => this.onQuitButton());
 
         const shareButton: Phaser.GameObjects.Image = this.add.image(
-            ScreenWidth * 0.5,
+            ScreenWidth * 0.4,
             ScreenHeight / 1.25,
             "share",
         );
         interactify(shareButton, 0.5, () => this.onShareButton());
 
+        const gameRulesButton: Phaser.GameObjects.Image = this.add.image(
+            ScreenWidth * 0.6,
+            ScreenHeight / 1.25,
+            "gameRules",
+        );
+        interactify(gameRulesButton, 0.5, () => this.onGameRulesButton());
+
         const startButton: Phaser.GameObjects.Image = this.add.image(
-            ScreenWidth * 0.75,
+            ScreenWidth * 0.8,
             ScreenHeight / 1.25,
             "start",
         );
@@ -86,6 +94,10 @@ export class LobbyScreen extends Phaser.Scene {
     private onQuitButton(): void {
         PlayerManager.delete();
         this.scene.start("TitleScreen");
+    }
+
+    private onGameRulesButton(): void {
+        this.scene.start("GameRulesScreen");
     }
 
     private onShareButton(): void {
