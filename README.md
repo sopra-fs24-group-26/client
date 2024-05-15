@@ -1,4 +1,63 @@
-# SoPra Lab FS24 Group 26 Client
+# Saboteur Web Version
+
+A webversion of the board game Saboteur, project for the Software Engineering Lab FS24 at UZH. <br>
+Our focus was to implement something that would exite us, leading to the creation of a simple web version of a fun board game we had played together
+
+## Getting Started
+
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+
+### Prerequisites
+
+Make sure you have the following installed:
+
+### Installing
+
+
+## Running the tests
+
+Explain how to run the automated tests for this system
+
+## Deployment
+
+Add additional notes about how to deploy this on a live system
+
+## Technologies used
+
+### Server
+
+-   [Spring Boot](https://spring.io/projects/spring-boot) - Framework for building Java-based web applications
+-   [Gradle](https://gradle.org/) - Build automation
+-   [JUnit](https://junit.org/junit5/) - Testing framework for Java
+-   [SonarQube](https://www.sonarqube.org/) - Code quality and security analysis tool
+-   [JaCoCo](https://www.jacoco.org/jacoco/) - Java Code Coverage Library
+
+### Client
+
+-   [npm](https://www.npmjs.com/) - Package manager
+-   [React](https://reactjs.org/) - JavaScript library for building user interfaces
+-   [Phaser](https://phaser.io/) - The Game Framework used
+-   [DiceBear](https://www.dicebear.com/) - Avatar library
+
+## Roadmap
+
+## Authors
+
+-   **Patric Brandao** - [Patertuck](https://github.com/Patertuck)
+-   **Noah Bussinger** - [C0DECYCLE](https://github.com/C0DECYCLE)
+-   **Leon Braga** - [Twhining](https://github.com/Twhining)
+-   **Ting-Chun Huang** - [paul891112](https://github.com/paul891112)
+-   **Roxane Jaecklin** - [Croxsy](https://github.com/Croxsy)
+
+See also the list of [contributors](https://github.com/sopra-fs24-group-26/server/contributors) who participated in this project.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+
+## Acknowledgments
+
+We thank the team of the Sopra FS24 modul for giving us the opportunity to freely work on a project
 
 ## Pattern
 **Issue:** "Userstory: Issue Summary" <br>
