@@ -44,13 +44,13 @@ Add additional notes about how to deploy this on a live system
 
 ## Main user flow
 
-The user is directed to title screen on entry. If joining is accepted, the scene transitions to lobbyscreen, where the user can copy link to game session, check out tutorial, quit lobby, or start game. A random name and avatar is generated automatically for each player. Once every player has joined, any player can start the game. Inside the game, players are assigned a role and they see other players information as well as own playable tiles displayed on the screen. They take turn to place a tile (drag a tile to a valid spot), discard a tile(click on trash icon), or play an action card (eye). The session continues to stay in game state until a winning/ losing condition is reached. Then the players are ported according to their role to a victory scene where gold rains, or to a losing scene where coal pours down. Clicking on "quit" button will redirect players to title screen where they can start a new game. The user flow loops from here on.
+The user is directed to title screen on entry. If joining is accepted, the scene transitions to lobbyscreen, where the user can copy link to game session, check out tutorial, quit lobby, or start game. A random name and avatar is generated automatically for each player. Once every player has joined, any player can start the game. Inside the game, players are assigned a role and they see other players information as well as own playable tiles displayed on the screen. They take turn to place a tile (drag a tile to a valid spot), discard a tile (click on trash icon), or play an action card (eye). The session continues to stay in game state until a winning/ losing condition is reached. Then the players are ported according to their role to a victory scene where gold rains, or to a losing scene where coal pours down. Clicking on "quit" button will redirect players to title screen where they can start a new game. The user flow loops from here on.
 
 ## High-level components
 
 In the client repository, the three key components are Manager, Scenes and Entity. The entry point and main game flow are handled in the core folder. For usability and extendability, we also defined custom types, constants, and helper functions that are stored in several subfolders and play an important role in our project.
 
-Our project uses event-driven architecture patterns to communicate game state changes to different components. The Manager component interacts with the server. It emits event on change of Entity data they keep track of, Scenes that listen to these events will update information and behave accordingly.
+Our project uses event-driven architecture patterns to communicate game state changes to different components. The Manager component interacts with the server. It emits event on changes of Entity data they keep track of, and Scenes that listen to these events will update information and behavior accordingly.
 
 ### Manager
 
