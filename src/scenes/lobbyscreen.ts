@@ -4,7 +4,6 @@ import SessionManager from "managers/SessionManager";
 import PlayerManager from "managers/PlayerManager";
 import { assert, interactify } from "utilities/utils";
 import { ScreenHeight, ScreenWidth } from "core/main";
-import GeneralManager from "managers/GeneralManager";
 import { Player } from "entities/Player";
 import { Session } from "entities/Session";
 
@@ -22,10 +21,9 @@ export class LobbyScreen extends Phaser.Scene {
         const updateListener: UUID = PlayerManager.onSync.on(() =>
             this.updateFrame(),
         );
-        // on scene destroy free listener
-        this.events.on("destroy", () => {
-            GeneralManager.onSync.off(updateListener);
-        });
+        this.events.once("shutdown", () =>
+            PlayerManager.onSync.off(updateListener),
+        );
     }
 
     public preload(): void {
@@ -82,6 +80,7 @@ export class LobbyScreen extends Phaser.Scene {
             this.scene.start("GameScreen");
             SessionManager.onSync.off(listener);
         });
+        this.events.once("shutdown", () => SessionManager.onSync.off(listener));
     }
 
     private onQuitButton(): void {

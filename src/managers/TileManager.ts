@@ -3,7 +3,7 @@ import GeneralManager from "./GeneralManager";
 import tileConfigs from "configs/tiles.json";
 import preplacedTiles from "configs/preplacedTiles.json";
 import { TileConfig } from "definitions/config";
-import { assert, seededShuffle } from "utilities/utils";
+import { assert, clear, seededShuffle } from "utilities/utils";
 import { PlayerDTO, SessionDTO, TileDTO } from "definitions/dto";
 import { Tile } from "entities/Tile";
 import seedrandom from "seedrandom";
@@ -197,6 +197,10 @@ class TileManager {
             return TileState.Drawn;
         }
         return TileState.Unused;
+    }
+
+    public clearReachedCoal(): void {
+        clear(this.reachedCoal);
     }
 }
 

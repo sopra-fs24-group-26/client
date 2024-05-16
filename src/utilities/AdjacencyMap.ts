@@ -198,7 +198,7 @@ export class AdjacencyMap {
             return;
         }
         if (this.goldKey.x === x && this.goldKey.y === y) {
-            SessionManager.setReachedGold();
+            SessionManager.reachGold();
         }
         const coal: boolean = this.coalKeys.some(
             (coordinate) => coordinate.x === x && coordinate.y === y,
