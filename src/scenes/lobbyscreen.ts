@@ -90,10 +90,25 @@ export class LobbyScreen extends Phaser.Scene {
     }
 
     private onShareButton(): void {
+        const duration: int = 3;
         const session: Nullable<Session> = SessionManager.get();
         assert(session);
         const link: string = `${location.origin}/${session.id}`;
         navigator.clipboard.writeText(link);
+        const msg: Phaser.GameObjects.Text = this.add.text(
+            ScreenWidth / 2,
+            ScreenHeight * 0.9,
+            "Share link copied to clipboard",
+            {
+                fontFamily: "Verdana",
+                fontSize: "36px",
+                fontStyle: "bold",
+                color: "#ffc65b",
+                align: "center",
+            } as Phaser.Types.GameObjects.Text.TextStyle,
+        );
+        msg.setOrigin(0.5, 0.5);
+        this.time.delayedCall(duration * 1_000, () => msg.destroy());
     }
 
     private async onStartButton(): Promise<void> {
