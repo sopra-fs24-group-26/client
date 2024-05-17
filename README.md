@@ -23,7 +23,12 @@ Make sure you have the following installed:
 
 ## Deployment
 
-Add additional notes about how to deploy this on a live system
+To deploy the Saboteur Web Version on a live system, we use GitHub Actions to automate the deployment process to a Google Cloud server. However, you are free to choose any deployment method or cloud service that suits your needs.
+Below is a brief outline of our deployment process:
+-   [Google Cloud Server](https://cloud.google.com/): Our application is hosted on a Google Cloud server, providing reliable and scalable infrastructure for running the game.
+-   [GitHub Actions Setup](https://cloud.google.com/blog/products/devops-sre/using-github-actions-with-google-cloud-deploy?hl=en): We use GitHub Actions for continuous integration and deployment. This ensures that our application is automatically tested and deployed whenever changes are pushed to the repository.
+
+Feel free to adapt the deployment process to your preferred environment or cloud provider.
 
 ## Technologies used
 
