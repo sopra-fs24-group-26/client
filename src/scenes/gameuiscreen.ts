@@ -16,7 +16,7 @@ export class GameUiScreen extends Phaser.Scene {
     private static tilePixels: int = 128;
     private static trashcanPixels: int = 30;
     private static profilePixels: int = 50;
-    private uiBackground: Nullable<Phaser.GameObjects.Rectangle>;
+    private uiBackground: Nullable<Phaser.GameObjects.Image>;
     private drawnTilesContainer: Nullable<Phaser.GameObjects.Container>;
     private profilesContainer: Nullable<Phaser.GameObjects.Container>;
     private topLeftX: int;
@@ -86,16 +86,17 @@ export class GameUiScreen extends Phaser.Scene {
             );
         }
         this.load.image("ring", "assets/profiles/ring.png");
+        this.load.image("uiBack", "assets/uiBackground.png");
     }
 
     public create(): void {
-        this.uiBackground = this.add.rectangle(
+        this.uiBackground = this.add.image(
             ScreenWidth / 2,
             ScreenHeight - 100,
-            ScreenWidth * 0.8,
-            200,
-            0x808080,
+            "uiBack",
         );
+        this.uiBackground.displayWidth = ScreenWidth * 0.8;
+
         this.uiBackground.setInteractive();
         this.drawnTilesContainer = this.add.container();
         this.profilesContainer = this.add.container();
@@ -212,7 +213,8 @@ export class GameUiScreen extends Phaser.Scene {
         assert(myTiles);
         const nrTiles: int = myTiles.length;
         const tileSpacing: int =
-            (this.uiBackground.width - nrTiles * GameUiScreen.tilePixels) /
+            (this.uiBackground.displayWidth -
+                nrTiles * GameUiScreen.tilePixels) /
             (nrTiles + 1);
         for (let i: int = 0; i < nrTiles; i++) {
             const tile: Phaser.GameObjects.Image = this.createTile(
