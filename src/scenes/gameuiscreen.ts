@@ -125,6 +125,21 @@ export class GameUiScreen extends Phaser.Scene {
             "controlsexplained",
         );
         this.controlsExplained.setVisible(false);
+
+        const quitButton: Phaser.GameObjects.Image = this.add.image(
+            ScreenWidth * 0.965,
+            ScreenHeight * 0.03,
+            "quit",
+        );
+        interactify(quitButton, 0.5, () => this.onQuitButton());
+    }
+
+    private onQuitButton(): void {
+        PlayerManager.removeId();
+        TileManager.clearReachedCoal();
+        SessionManager.resetReachedGold();
+        this.scene.stop("GameScreen");
+        this.scene.start("TitleScreen");
     }
 
     private displayProfiles(): void {

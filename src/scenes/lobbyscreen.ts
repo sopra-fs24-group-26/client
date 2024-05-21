@@ -27,7 +27,6 @@ export class LobbyScreen extends Phaser.Scene {
     }
 
     public preload(): void {
-        this.load.image("quit", "assets/buttons/quit.png");
         this.load.image("share", "assets/buttons/share.png");
         this.load.image("start", "assets/buttons/start.png");
         this.load.image("gamerules", "assets/buttons/gamerules.png");

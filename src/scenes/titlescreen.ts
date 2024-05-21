@@ -13,6 +13,7 @@ export class TitleScreen extends Phaser.Scene {
     public preload(): void {
         this.load.image("create", "assets/buttons/create.png");
         this.load.image("backdrop", "assets/sabo.png");
+        this.load.image("quit", "assets/buttons/quit.png");
         for (let i: int = 0; i < 10; i++) {
             this.load.image(
                 `avatar${i}`,
