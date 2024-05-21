@@ -127,8 +127,8 @@ export class GameUiScreen extends Phaser.Scene {
         this.controlsExplained.setVisible(false);
 
         const quitButton: Phaser.GameObjects.Image = this.add.image(
-            ScreenWidth * 0.965,
-            ScreenHeight * 0.03,
+            ScreenWidth - 50,
+            ScreenHeight / 2,
             "quit",
         );
         interactify(quitButton, 0.5, () => this.onQuitButton());
