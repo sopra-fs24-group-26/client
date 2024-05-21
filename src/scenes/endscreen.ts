@@ -1,4 +1,4 @@
-import { Nullable } from "definitions/utils";
+import { Nullable, float, int } from "definitions/utils";
 import SessionManager from "managers/SessionManager";
 import Phaser from "phaser";
 import { assert, interactify } from "../utilities/utils";
@@ -7,10 +7,19 @@ import PlayerManager from "managers/PlayerManager";
 import { Player } from "entities/Player";
 import { Role } from "definitions/enums";
 import TileManager from "managers/TileManager";
+import { GameUiScreen } from "./gameuiscreen";
+import { Session } from "entities/Session";
 
 export class EndScreen extends Phaser.Scene {
+    private profilesContainer: Nullable<Phaser.GameObjects.Container>;
+
     public constructor() {
         super("EndScreen");
+        this.profilesContainer = null;
+    }
+
+    public init(): void {
+        this.displayProfiles();
     }
 
     public preload(): void {
@@ -24,6 +33,8 @@ export class EndScreen extends Phaser.Scene {
         PlayerManager.removeId();
         TileManager.clearReachedCoal();
         SessionManager.resetReachedGold();
+        this.profilesContainer = this.add.container();
+        this.displayProfiles();
 
         const button: Phaser.GameObjects.Image = this.add
             .image(ScreenWidth / 2, ScreenHeight / 1.5, "quit")
@@ -82,5 +93,89 @@ export class EndScreen extends Phaser.Scene {
                 fontStyle: "bold",
             } as Phaser.Types.GameObjects.Text.TextStyle)
             .setOrigin(0.5, 0.5);
+    }
+
+    private displayProfiles(): void {
+        if (!this.profilesContainer) {
+            return;
+        }
+        const all: Nullable<Player[]> = PlayerManager.getAll();
+        const me: Nullable<Player> = PlayerManager.getMe();
+        const session: Nullable<Session> = SessionManager.get();
+        assert(me && all && session);
+        this.profilesContainer.removeAll(true);
+        const count: int = all.length;
+        const spacing: int =
+            (ScreenWidth - count * GameUiScreen.profilePixels) / (count + 1);
+        const y: float = ScreenHeight / 10;
+        for (let i = 0; i < count; i++) {
+            this.displayPlayer(all, spacing, i, y, me);
+        }
+    }
+
+    private displayPlayer(
+        all: Player[],
+        spacing: int,
+        i: int,
+        y: float,
+        me: Player,
+    ): void {
+        assert(this.profilesContainer);
+        const player: Player = all[i];
+        const x: float =
+            spacing +
+            GameUiScreen.profilePixels / 2 +
+            i * (GameUiScreen.profilePixels + spacing);
+
+        let name: string = player.name;
+        if (all[i].orderIndex === me.orderIndex) {
+            name += " (Me)";
+        }
+        const profile: Phaser.GameObjects.Image = this.add.image(
+            x,
+            y,
+            `avatar${player.orderIndex}`,
+        );
+        this.profilesContainer.add(profile);
+        this.addRole(x, y, player);
+        this.addName(x, y, name);
+    }
+
+    private addRole(x: float, y: float, player: Player): void {
+        assert(this.profilesContainer);
+        const roleString: string =
+            player.role === Role.Saboteur ? "Saboteur" : "Miner";
+        const roleText: Phaser.GameObjects.Text = this.add.text(
+            x,
+            y - GameUiScreen.profilePixels,
+            roleString,
+            {
+                fontFamily: "Verdana",
+                fontSize: "30px",
+                color: "#ffffff",
+                fontStyle: "bold",
+            } as Phaser.Types.GameObjects.Text.TextStyle,
+        );
+        roleText.setOrigin(0.5, 0.5);
+        this.profilesContainer.add(roleText);
+    }
+
+    private addName(x: float, y: float, name: string): void {
+        assert(this.profilesContainer);
+        const nameText: Phaser.GameObjects.Text = this.add.text(
+            x,
+            y + GameUiScreen.profilePixels / 1.2,
+            name,
+            {
+                fontFamily: "Verdana",
+                fontSize: "18px",
+                color: "#ffffff",
+                fontStyle: "bold",
+                align: "center",
+            } as Phaser.Types.GameObjects.Text.TextStyle,
+        );
+        nameText.setOrigin(0.5, 0);
+        nameText.setWordWrapWidth(GameUiScreen.profilePixels * 3);
+        this.profilesContainer.add(nameText);
     }
 }
