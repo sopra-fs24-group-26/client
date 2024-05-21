@@ -23,7 +23,6 @@ export class EndScreen extends Phaser.Scene {
     }
 
     public preload(): void {
-        this.load.image("quit", "assets/buttons/quit.png");
         this.load.image("goldNugget", "assets/particles/goldNugget.png");
         this.load.image("coalNugget", "assets/particles/coalNugget.png");
     }
@@ -37,7 +36,7 @@ export class EndScreen extends Phaser.Scene {
         SessionManager.resetReachedGold();
 
         const button: Phaser.GameObjects.Image = this.add
-            .image(ScreenWidth / 2, ScreenHeight / 1.5, "quit")
+            .image(ScreenWidth / 2, ScreenHeight / 1.5, "quit1")
             .setOrigin(0.5, 0.5);
         interactify(button, 0.5, () => this.onButton());
     }

@@ -45,7 +45,7 @@ export class LobbyScreen extends Phaser.Scene {
         const quitButton: Phaser.GameObjects.Image = this.add.image(
             ScreenWidth * 0.2,
             ScreenHeight / 1.25,
-            "quit",
+            "quit1",
         );
         interactify(quitButton, 0.5, () => this.onQuitButton());
 

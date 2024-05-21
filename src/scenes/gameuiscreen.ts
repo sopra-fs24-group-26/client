@@ -129,7 +129,7 @@ export class GameUiScreen extends Phaser.Scene {
         const quitButton: Phaser.GameObjects.Image = this.add.image(
             ScreenWidth - 50,
             ScreenHeight / 2,
-            "quit",
+            "quit2",
         );
         interactify(quitButton, 0.5, () => this.onQuitButton());
     }
