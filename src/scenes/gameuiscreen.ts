@@ -29,6 +29,9 @@ export class GameUiScreen extends Phaser.Scene {
     >;
     private wrongText: Nullable<Phaser.GameObjects.Text>;
     private isDraging: boolean;
+    private controlsButton: Nullable<Phaser.GameObjects.Image>;
+    private controlsExplained: Nullable<Phaser.GameObjects.Image>;
+    private isControlsShowing: boolean;
 
     public constructor() {
         super("GameUiScreen");
@@ -52,6 +55,9 @@ export class GameUiScreen extends Phaser.Scene {
         >();
         this.wrongText = null;
         this.isDraging = false;
+        this.controlsButton = null;
+        this.controlsExplained = null;
+        this.isControlsShowing = false;
     }
 
     public init(): void {
@@ -86,6 +92,9 @@ export class GameUiScreen extends Phaser.Scene {
             );
         }
         this.load.image("ring", "assets/profiles/ring.png");
+        this.load.image("controls", "assets/buttons/controls.png");
+        this.load.image("controlsexplained", "assets/controlsexplained.png");
+        this.load.image("close", "assets/buttons/close.png");
         this.load.image("uiBack", "assets/uiBackground.png");
     }
 
@@ -116,6 +125,15 @@ export class GameUiScreen extends Phaser.Scene {
             this.handleViewportChange,
             this,
         );
+
+        this.controlsButton = this.add.image(50, ScreenHeight / 2, "controls");
+        interactify(this.controlsButton, 0.5, () => this.toggleControls());
+        this.controlsExplained = this.add.image(
+            ScreenWidth / 2,
+            ScreenHeight / 2,
+            "controlsexplained",
+        );
+        this.controlsExplained.setVisible(false);
     }
 
     private displayProfiles(): void {
@@ -560,5 +578,13 @@ export class GameUiScreen extends Phaser.Scene {
         this.toggleTrashcansVisibility(true);
         this.dragObj = null;
         this.currentTile.rotation = 0;
+    }
+
+    private toggleControls(): void {
+        this.isControlsShowing = !this.isControlsShowing;
+        this.controlsExplained.setVisible(this.isControlsShowing);
+        this.controlsButton.setTexture(
+            this.isControlsShowing ? "close" : "controls",
+        );
     }
 }
