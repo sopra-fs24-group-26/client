@@ -125,7 +125,22 @@ export class LobbyScreen extends Phaser.Scene {
     private async onStartButton(): Promise<void> {
         const all: Nullable<Player[]> = PlayerManager.getAll();
         if (!all || all.length < 3) {
-            //return;
+            const duration: int = 3;
+            const msg: Phaser.GameObjects.Text = this.add.text(
+                ScreenWidth / 2,
+                ScreenHeight * 0.85,
+                "Can't start with less than 3 players",
+                {
+                    fontFamily: "Verdana",
+                    fontSize: "36px",
+                    fontStyle: "bold",
+                    color: "#ffc65b",
+                    align: "center",
+                } as Phaser.Types.GameObjects.Text.TextStyle,
+            );
+            msg.setOrigin(0.5, 0.5);
+            this.time.delayedCall(duration * 1_000, () => msg.destroy());
+            return;
         }
         await SessionManager.start();
         this.scene.start("GameScreen");
