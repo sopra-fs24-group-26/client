@@ -137,7 +137,7 @@ export class LobbyScreen extends Phaser.Scene {
             );
             msg.setOrigin(0.5, 0.5);
             this.time.delayedCall(duration * 1_000, () => msg.destroy());
-            //return;
+            return;
         }
         await SessionManager.start();
         this.scene.start("GameScreen");

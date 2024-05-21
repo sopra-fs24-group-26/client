@@ -195,12 +195,12 @@ export class GameUiScreen extends Phaser.Scene {
         }
         const roleText = this.add.text(
             x,
-            y - GameUiScreen.profilePixels,
+            y - GameUiScreen.profilePixels - 10,
             roleString,
             {
                 fontFamily: "Monocraft",
-                fontSize: "11px",
-                color: "#ffd700",
+                fontSize: "30px",
+                color: "#ffffff",
                 fontStyle: "bold",
             } as Phaser.Types.GameObjects.Text.TextStyle,
         );
@@ -216,7 +216,7 @@ export class GameUiScreen extends Phaser.Scene {
             name,
             {
                 fontFamily: "Monocraft",
-                fontSize: "11px",
+                fontSize: "18px",
                 color: "#ffffff",
                 fontStyle: "bold",
                 align: "center",
