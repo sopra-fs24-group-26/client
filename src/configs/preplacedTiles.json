@@ -9,8 +9,8 @@
     {
         "connections": [1, 1, 1, 1, 1],
         "rotation": 0,
-        "coordinateX": 8,
-        "coordinateY": -2
+        "coordinateX": 6,
+        "coordinateY": -3
     },
     {
         "connections": [1, 1, 1, 1, 1],
@@ -21,7 +21,7 @@
     {
         "connections": [1, 1, 1, 1, 1],
         "rotation": 0,
-        "coordinateX": 8,
-        "coordinateY": 2
+        "coordinateX": 6,
+        "coordinateY": 3
     }
 ]

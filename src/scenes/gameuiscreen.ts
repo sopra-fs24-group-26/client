@@ -13,9 +13,9 @@ import { Role } from "../definitions/enums";
 import { Session } from "../entities/Session";
 
 export class GameUiScreen extends Phaser.Scene {
-    private static tilePixels: int = 128;
-    private static trashcanPixels: int = 30;
-    private static profilePixels: int = 50;
+    public static readonly tilePixels: int = 128;
+    public static readonly trashcanPixels: int = 30;
+    public static readonly profilePixels: int = 50;
     private uiBackground: Nullable<Phaser.GameObjects.Image>;
     private drawnTilesContainer: Nullable<Phaser.GameObjects.Container>;
     private profilesContainer: Nullable<Phaser.GameObjects.Container>;
@@ -68,7 +68,7 @@ export class GameUiScreen extends Phaser.Scene {
             let isMyTurn: boolean = SessionManager.isMyTurn();
             this.displayDrawnTiles();
             this.displayProfiles();
-            if (!isMyTurn) {
+            if (!isMyTurn || SessionManager.getReachedGold()) {
                 this.setAllTileNotInteractive();
             }
         });
@@ -82,15 +82,6 @@ export class GameUiScreen extends Phaser.Scene {
             this.load.image(`tile${i}`, `assets/tiles/tile${i}.png`);
         }
         this.load.image("trashCan", "assets/buttons/trashcan.png");
-        const allPlayers: Nullable<Player[]> = PlayerManager.getAll();
-        assert(allPlayers);
-        for (let i: int = 0; i < allPlayers.length; i++) {
-            let player: Player = allPlayers[i];
-            this.load.image(
-                `avatar${player.orderIndex}`,
-                `https://api.dicebear.com/8.x/pixel-art/svg?seed=${player.name}&size=${GameUiScreen.profilePixels}&beardProbability=0&glassesProbability=0&hat=variant01&hatColor=ad6d3e&skinColor=a26d3d,b68655`,
-            );
-        }
         this.load.image("ring", "assets/profiles/ring.png");
         this.load.image("controls", "assets/buttons/controls.png");
         this.load.image("controlsexplained", "assets/controlsexplained.png");
@@ -134,6 +125,21 @@ export class GameUiScreen extends Phaser.Scene {
             "controlsexplained",
         );
         this.controlsExplained.setVisible(false);
+
+        const quitButton: Phaser.GameObjects.Image = this.add.image(
+            ScreenWidth - 50,
+            ScreenHeight / 2,
+            "quit",
+        );
+        interactify(quitButton, 0.5, () => this.onQuitButton());
+    }
+
+    private onQuitButton(): void {
+        PlayerManager.removeId();
+        TileManager.clearReachedCoal();
+        SessionManager.resetReachedGold();
+        this.scene.stop("GameScreen");
+        this.scene.start("TitleScreen");
     }
 
     private displayProfiles(): void {
@@ -189,12 +195,12 @@ export class GameUiScreen extends Phaser.Scene {
         }
         const roleText = this.add.text(
             x,
-            y - GameUiScreen.profilePixels,
+            y - GameUiScreen.profilePixels - 10,
             roleString,
             {
-                fontFamily: "Verdana",
-                fontSize: "11px",
-                color: "#ffd700",
+                fontFamily: "Monocraft",
+                fontSize: "30px",
+                color: "#ffffff",
                 fontStyle: "bold",
             } as Phaser.Types.GameObjects.Text.TextStyle,
         );
@@ -209,8 +215,8 @@ export class GameUiScreen extends Phaser.Scene {
             y + GameUiScreen.profilePixels / 1.2,
             name,
             {
-                fontFamily: "Verdana",
-                fontSize: "11px",
+                fontFamily: "Monocraft",
+                fontSize: "18px",
                 color: "#ffffff",
                 fontStyle: "bold",
                 align: "center",
@@ -536,7 +542,7 @@ export class GameUiScreen extends Phaser.Scene {
             ScreenHeight / 4,
             "Oops! Path doesn't fit",
             {
-                fontFamily: "Verdana",
+                fontFamily: "Monocraft",
                 fontSize: "36px",
                 fontStyle: "bold",
                 color: "#ff5b5b",
@@ -581,6 +587,7 @@ export class GameUiScreen extends Phaser.Scene {
     }
 
     private toggleControls(): void {
+        assert(this.controlsExplained && this.controlsButton);
         this.isControlsShowing = !this.isControlsShowing;
         this.controlsExplained.setVisible(this.isControlsShowing);
         this.controlsButton.setTexture(

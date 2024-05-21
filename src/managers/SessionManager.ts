@@ -108,7 +108,9 @@ class SessionManager {
 
     public async start(): Promise<void> {
         const session: Nullable<Session> = this.get();
-        assert(session);
+        if (!session) {
+            return;
+        }
         const requestBody: string = session.id;
         await api.put("/start", requestBody);
     }
