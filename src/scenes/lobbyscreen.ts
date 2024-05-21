@@ -36,9 +36,10 @@ export class LobbyScreen extends Phaser.Scene {
         this.title = this.add
             .text(ScreenWidth / 2, ScreenHeight / 8, "Saboteur Lobby", {
                 fontFamily: "VT323",
-                fontSize: 38,
+                fontSize: 50,
                 color: "#ffffff",
                 align: "center",
+                fontStyle: "bold",
             } as Phaser.Types.GameObjects.Text.TextStyle)
             .setOrigin(0.5);
 
@@ -153,17 +154,17 @@ export class LobbyScreen extends Phaser.Scene {
         const me: Nullable<Player> = PlayerManager.getMe();
         const others: Nullable<Player[]> = PlayerManager.getOthers();
         assert(me && this.title && others && this.nameContainer);
-        this.title.text = `Saboteur Lobby\n${me.name}`;
+        this.title.text = `Saboteur Lobby\n${me.name} (me)`;
 
         for (let i: int = 0; i < others.length; i++) {
-            let ypos: int = ScreenHeight / 4 + (i * ScreenHeight) / 20;
+            let ypos: int = ScreenHeight / 5 + (i * ScreenHeight) / 30;
             let playername: string = others[i].name;
             let fontstyle: string = "normal";
             this.nameContainer.add(
                 this.add
                     .text(ScreenWidth / 2, ypos, playername, {
                         fontFamily: "VT323",
-                        fontSize: 20,
+                        fontSize: 28,
                         color: "#ffffff",
                         fontStyle: fontstyle,
                     } as Phaser.Types.GameObjects.Text.TextStyle)
