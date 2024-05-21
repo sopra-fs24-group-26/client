@@ -30,7 +30,7 @@ export class LobbyScreen extends Phaser.Scene {
         this.load.image("quit", "assets/buttons/quit.png");
         this.load.image("share", "assets/buttons/share.png");
         this.load.image("start", "assets/buttons/start.png");
-        this.load.image("gameRules", "assets/buttons/gameRules.png");
+        this.load.image("gamerules", "assets/buttons/gamerules.png");
     }
 
     public create(): void {
@@ -62,7 +62,7 @@ export class LobbyScreen extends Phaser.Scene {
         const gameRulesButton: Phaser.GameObjects.Image = this.add.image(
             ScreenWidth * 0.6,
             ScreenHeight / 1.25,
-            "gameRules",
+            "gamerules",
         );
         interactify(gameRulesButton, 0.5, () => this.onGameRulesButton());
 
@@ -82,7 +82,7 @@ export class LobbyScreen extends Phaser.Scene {
         const listener: UUID = SessionManager.onSync.on(() => {
             const hasStarted: Nullable<boolean> = SessionManager.hasStarted();
             assert(hasStarted !== null);
-            if (!hasStarted) {
+            if (!hasStarted || this.scene.isActive("GameRulesScreen")) {
                 return;
             }
             this.scene.start("GameScreen");
