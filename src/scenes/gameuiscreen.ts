@@ -200,7 +200,7 @@ export class GameUiScreen extends Phaser.Scene {
             {
                 fontFamily: "VT323",
                 fontSize: "30px",
-                color: "#ffffff",
+                color: "#c06b0b",
                 fontStyle: "bold",
             } as Phaser.Types.GameObjects.Text.TextStyle,
         );

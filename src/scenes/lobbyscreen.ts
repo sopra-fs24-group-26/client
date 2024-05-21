@@ -9,11 +9,13 @@ import { Session } from "entities/Session";
 
 export class LobbyScreen extends Phaser.Scene {
     private title: Nullable<Phaser.GameObjects.Text>;
+    private meName: Nullable<Phaser.GameObjects.Text>;
     private nameContainer: Nullable<Phaser.GameObjects.Container>;
 
     public constructor() {
         super("LobbyScreen");
         this.title = null;
+        this.meName = null;
         this.nameContainer = null;
     }
 
@@ -37,9 +39,18 @@ export class LobbyScreen extends Phaser.Scene {
             .text(ScreenWidth / 2, ScreenHeight / 8, "Saboteur Lobby", {
                 fontFamily: "VT323",
                 fontSize: 50,
-                color: "#ffffff",
+                color: "#c06b0b",
                 align: "center",
                 fontStyle: "bold",
+            } as Phaser.Types.GameObjects.Text.TextStyle)
+            .setOrigin(0.5);
+
+        this.meName = this.add
+            .text(ScreenWidth / 2, ScreenHeight / 8 + 50, "", {
+                fontFamily: "VT323",
+                fontSize: 30,
+                color: "#ffffff",
+                align: "center",
             } as Phaser.Types.GameObjects.Text.TextStyle)
             .setOrigin(0.5);
 
@@ -153,18 +164,18 @@ export class LobbyScreen extends Phaser.Scene {
 
         const me: Nullable<Player> = PlayerManager.getMe();
         const others: Nullable<Player[]> = PlayerManager.getOthers();
-        assert(me && this.title && others && this.nameContainer);
-        this.title.text = `Saboteur Lobby\n${me.name} (me)`;
+        assert(me && this.meName && others && this.nameContainer);
+        this.meName.text = `${me.name} (me)`;
 
         for (let i: int = 0; i < others.length; i++) {
-            let ypos: int = ScreenHeight / 4 + (i * ScreenHeight) / 30;
+            let ypos: int = ScreenHeight / 8 + (i + 1) * 30 + 50
             let playername: string = others[i].name;
             let fontstyle: string = "normal";
             this.nameContainer.add(
                 this.add
                     .text(ScreenWidth / 2, ypos, playername, {
                         fontFamily: "VT323",
-                        fontSize: 28,
+                        fontSize: 30,
                         color: "#ffffff",
                         fontStyle: fontstyle,
                     } as Phaser.Types.GameObjects.Text.TextStyle)

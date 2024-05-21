@@ -20,6 +20,7 @@ export class GameRulesScreen extends Phaser.Scene {
 
     public create(): void {
         this.addTitle();
+        this.addScrollNote();
         this.addScrollableText();
 
         const backButton: Phaser.GameObjects.Image = this.add.image(
@@ -34,7 +35,18 @@ export class GameRulesScreen extends Phaser.Scene {
         this.add
             .text(ScreenWidth / 2, ScreenHeight / 8, "Saboteur Rules", {
                 fontFamily: "VT323",
-                fontSize: 38,
+                fontSize: 50,
+                color: "#c06b0b",
+                align: "center",
+            } as Phaser.Types.GameObjects.Text.TextStyle)
+            .setOrigin(0.5);
+    }
+
+    private addScrollNote(): void {
+        this.add
+            .text(ScreenWidth / 2, ScreenHeight / 8 + 35, "(Scroll to View)", {
+                fontFamily: "VT323",
+                fontSize: 25,
                 color: "#ffffff",
                 align: "center",
             } as Phaser.Types.GameObjects.Text.TextStyle)
@@ -44,7 +56,7 @@ export class GameRulesScreen extends Phaser.Scene {
     private addScrollableText(): void {
         const scrollAreaHeight: number = ScreenHeight / 2;
         const scrollAreaWidth: number = ScreenWidth * 0.8;
-        const scrollAreaY: number = ScreenHeight / 4;
+        const scrollAreaY: number = ScreenHeight / 8 + 70;
         const rules: string = this.getRules();
         this.scrollContainer = this.createScrollContainer(
             scrollAreaWidth,
@@ -77,7 +89,7 @@ export class GameRulesScreen extends Phaser.Scene {
     ): Phaser.GameObjects.Text {
         const rulesText: Phaser.GameObjects.Text = this.add.text(0, 0, rules, {
             fontFamily: "VT323",
-            fontSize: 20,
+            fontSize: 25,
             color: "#ffffff",
             wordWrap: { width: scrollAreaWidth - 20 },
         });
