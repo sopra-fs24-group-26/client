@@ -157,7 +157,7 @@ export class LobbyScreen extends Phaser.Scene {
         this.title.text = `Saboteur Lobby\n${me.name} (me)`;
 
         for (let i: int = 0; i < others.length; i++) {
-            let ypos: int = ScreenHeight / 5 + (i * ScreenHeight) / 30;
+            let ypos: int = ScreenHeight / 4 + (i * ScreenHeight) / 30;
             let playername: string = others[i].name;
             let fontstyle: string = "normal";
             this.nameContainer.add(
