@@ -106,7 +106,7 @@ export class EndScreen extends Phaser.Scene {
         const count: int = all.length;
         const spacing: int =
             (ScreenWidth - count * GameUiScreen.profilePixels) / (count + 1);
-        const y: float = ScreenHeight / 10;
+        const y: float = 80;
         for (let i = 0; i < count; i++) {
             this.displayPlayer(all, spacing, i, y, me);
         }
