@@ -86,7 +86,7 @@ export class EndScreen extends Phaser.Scene {
     private displayText(text: string): void {
         this.add
             .text(ScreenWidth / 2, ScreenHeight / 2, text, {
-                fontFamily: "Monocraft",
+                fontFamily: "VT323",
                 fontSize: "100px",
                 color: "#fbfcfc",
                 fontStyle: "bold",
@@ -149,7 +149,7 @@ export class EndScreen extends Phaser.Scene {
             y - GameUiScreen.profilePixels,
             roleString,
             {
-                fontFamily: "Monocraft",
+                fontFamily: "VT323",
                 fontSize: "30px",
                 color: "#ffffff",
                 fontStyle: "bold",
@@ -166,7 +166,7 @@ export class EndScreen extends Phaser.Scene {
             y + GameUiScreen.profilePixels / 1.2,
             name,
             {
-                fontFamily: "Monocraft",
+                fontFamily: "VT323",
                 fontSize: "18px",
                 color: "#ffffff",
                 fontStyle: "bold",

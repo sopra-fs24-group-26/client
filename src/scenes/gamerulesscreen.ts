@@ -33,7 +33,7 @@ export class GameRulesScreen extends Phaser.Scene {
     private addTitle(): void {
         this.add
             .text(ScreenWidth / 2, ScreenHeight / 8, "Saboteur Rules", {
-                fontFamily: "Monocraft",
+                fontFamily: "VT323",
                 fontSize: 38,
                 color: "#ffffff",
                 align: "center",
@@ -76,7 +76,7 @@ export class GameRulesScreen extends Phaser.Scene {
         rules: string,
     ): Phaser.GameObjects.Text {
         const rulesText: Phaser.GameObjects.Text = this.add.text(0, 0, rules, {
-            fontFamily: "Monocraft",
+            fontFamily: "VT323",
             fontSize: 20,
             color: "#ffffff",
             wordWrap: { width: scrollAreaWidth - 20 },
