@@ -27,7 +27,6 @@ export class LobbyScreen extends Phaser.Scene {
     }
 
     public preload(): void {
-        this.load.image("quit", "assets/buttons/quit.png");
         this.load.image("share", "assets/buttons/share.png");
         this.load.image("start", "assets/buttons/start.png");
         this.load.image("gamerules", "assets/buttons/gamerules.png");
@@ -36,11 +35,9 @@ export class LobbyScreen extends Phaser.Scene {
     public create(): void {
         this.title = this.add
             .text(ScreenWidth / 2, ScreenHeight / 8, "Saboteur Lobby", {
-                fontFamily: "Verdana",
+                fontFamily: "Monocraft",
                 fontSize: 38,
                 color: "#ffffff",
-                stroke: "#000000",
-                strokeThickness: 8,
                 align: "center",
             } as Phaser.Types.GameObjects.Text.TextStyle)
             .setOrigin(0.5);
@@ -111,7 +108,7 @@ export class LobbyScreen extends Phaser.Scene {
             ScreenHeight * 0.9,
             "Share link copied to clipboard",
             {
-                fontFamily: "Verdana",
+                fontFamily: "Monocraft",
                 fontSize: "36px",
                 fontStyle: "bold",
                 color: "#ffc65b",
@@ -125,7 +122,22 @@ export class LobbyScreen extends Phaser.Scene {
     private async onStartButton(): Promise<void> {
         const all: Nullable<Player[]> = PlayerManager.getAll();
         if (!all || all.length < 3) {
-            //return;
+            const duration: int = 3;
+            const msg: Phaser.GameObjects.Text = this.add.text(
+                ScreenWidth / 2,
+                ScreenHeight * 0.85,
+                "Can't start with less than 3 players",
+                {
+                    fontFamily: "Monocraft",
+                    fontSize: "36px",
+                    fontStyle: "bold",
+                    color: "#ffc65b",
+                    align: "center",
+                } as Phaser.Types.GameObjects.Text.TextStyle,
+            );
+            msg.setOrigin(0.5, 0.5);
+            this.time.delayedCall(duration * 1_000, () => msg.destroy());
+            return;
         }
         await SessionManager.start();
         this.scene.start("GameScreen");
@@ -150,11 +162,9 @@ export class LobbyScreen extends Phaser.Scene {
             this.nameContainer.add(
                 this.add
                     .text(ScreenWidth / 2, ypos, playername, {
-                        fontFamily: "Verdana",
+                        fontFamily: "Monocraft",
                         fontSize: 20,
-                        color: "#e1e1e1",
-                        stroke: "#000000",
-                        strokeThickness: 3,
+                        color: "#ffffff",
                         fontStyle: fontstyle,
                     } as Phaser.Types.GameObjects.Text.TextStyle)
                     .setOrigin(0.5, 0.5),

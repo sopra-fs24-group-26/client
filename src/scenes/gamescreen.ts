@@ -9,9 +9,9 @@ import SessionManager from "managers/SessionManager";
 import { Session } from "entities/Session";
 
 export class GameScreen extends Phaser.Scene {
+    public static readonly tilePixels: int = 128;
     private dragStart: Nullable<Phaser.Math.Vector2>;
     private placedTilesContainer: Nullable<Phaser.GameObjects.Container>;
-    private static tilePixels: int = 128;
 
     public constructor() {
         super("GameScreen");
@@ -102,7 +102,11 @@ export class GameScreen extends Phaser.Scene {
                     .image(
                         tile.coordinateX * GameScreen.tilePixels,
                         tile.coordinateY * GameScreen.tilePixels,
-                        `tile${tile.type}`,
+                        `tile${
+                            tile.type === 9 && SessionManager.getReachedGold()
+                                ? 13
+                                : tile.type
+                        }`,
                     )
                     .setAngle(tile.rotation * 90),
             );
@@ -117,8 +121,15 @@ export class GameScreen extends Phaser.Scene {
             SessionManager.getReachedGold() ||
             session.turnIndex === tiles.length;
         if (isEnd) {
+            this.endGame();
+        }
+    }
+
+    private endGame(): void {
+        const duration: int = 5;
+        this.time.delayedCall(duration * 1000, () => {
             this.scene.start("EndScreen");
             this.scene.stop("GameUiScreen");
-        }
+        });
     }
 }
