@@ -29,7 +29,6 @@ const config: Phaser.Types.Core.GameConfig = {
         EndScreen,
     ],
     pixelArt: true,
-    roundPixels: true,
 };
 export const EventBus: Phaser.Events.EventEmitter =
     new Phaser.Events.EventEmitter();

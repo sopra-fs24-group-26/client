@@ -30,11 +30,11 @@ export class EndScreen extends Phaser.Scene {
 
     public create(): void {
         this.displayByRole();
+        this.profilesContainer = this.add.container();
+        this.displayProfiles();
         PlayerManager.removeId();
         TileManager.clearReachedCoal();
         SessionManager.resetReachedGold();
-        this.profilesContainer = this.add.container();
-        this.displayProfiles();
 
         const button: Phaser.GameObjects.Image = this.add
             .image(ScreenWidth / 2, ScreenHeight / 1.5, "quit")
@@ -87,7 +87,7 @@ export class EndScreen extends Phaser.Scene {
     private displayText(text: string): void {
         this.add
             .text(ScreenWidth / 2, ScreenHeight / 2, text, {
-                fontFamily: "Verdana",
+                fontFamily: "Monocraft",
                 fontSize: "100px",
                 color: "#fbfcfc",
                 fontStyle: "bold",
@@ -150,7 +150,7 @@ export class EndScreen extends Phaser.Scene {
             y - GameUiScreen.profilePixels,
             roleString,
             {
-                fontFamily: "Verdana",
+                fontFamily: "Monocraft",
                 fontSize: "30px",
                 color: "#ffffff",
                 fontStyle: "bold",
@@ -167,7 +167,7 @@ export class EndScreen extends Phaser.Scene {
             y + GameUiScreen.profilePixels / 1.2,
             name,
             {
-                fontFamily: "Verdana",
+                fontFamily: "Monocraft",
                 fontSize: "18px",
                 color: "#ffffff",
                 fontStyle: "bold",

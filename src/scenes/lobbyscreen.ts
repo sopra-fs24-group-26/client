@@ -36,11 +36,9 @@ export class LobbyScreen extends Phaser.Scene {
     public create(): void {
         this.title = this.add
             .text(ScreenWidth / 2, ScreenHeight / 8, "Saboteur Lobby", {
-                fontFamily: "Verdana",
+                fontFamily: "Monocraft",
                 fontSize: 38,
                 color: "#ffffff",
-                stroke: "#000000",
-                strokeThickness: 8,
                 align: "center",
             } as Phaser.Types.GameObjects.Text.TextStyle)
             .setOrigin(0.5);
@@ -111,7 +109,7 @@ export class LobbyScreen extends Phaser.Scene {
             ScreenHeight * 0.9,
             "Share link copied to clipboard",
             {
-                fontFamily: "Verdana",
+                fontFamily: "Monocraft",
                 fontSize: "36px",
                 fontStyle: "bold",
                 color: "#ffc65b",
@@ -131,7 +129,7 @@ export class LobbyScreen extends Phaser.Scene {
                 ScreenHeight * 0.85,
                 "Can't start with less than 3 players",
                 {
-                    fontFamily: "Verdana",
+                    fontFamily: "Monocraft",
                     fontSize: "36px",
                     fontStyle: "bold",
                     color: "#ffc65b",
@@ -140,7 +138,7 @@ export class LobbyScreen extends Phaser.Scene {
             );
             msg.setOrigin(0.5, 0.5);
             this.time.delayedCall(duration * 1_000, () => msg.destroy());
-            return;
+            //return;
         }
         await SessionManager.start();
         this.scene.start("GameScreen");
@@ -165,11 +163,9 @@ export class LobbyScreen extends Phaser.Scene {
             this.nameContainer.add(
                 this.add
                     .text(ScreenWidth / 2, ypos, playername, {
-                        fontFamily: "Verdana",
+                        fontFamily: "Monocraft",
                         fontSize: 20,
-                        color: "#e1e1e1",
-                        stroke: "#000000",
-                        strokeThickness: 3,
+                        color: "#ffffff",
                         fontStyle: fontstyle,
                     } as Phaser.Types.GameObjects.Text.TextStyle)
                     .setOrigin(0.5, 0.5),

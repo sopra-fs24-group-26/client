@@ -183,7 +183,7 @@ export class GameUiScreen extends Phaser.Scene {
             y - GameUiScreen.profilePixels,
             roleString,
             {
-                fontFamily: "Verdana",
+                fontFamily: "Monocraft",
                 fontSize: "11px",
                 color: "#ffd700",
                 fontStyle: "bold",
@@ -200,7 +200,7 @@ export class GameUiScreen extends Phaser.Scene {
             y + GameUiScreen.profilePixels / 1.2,
             name,
             {
-                fontFamily: "Verdana",
+                fontFamily: "Monocraft",
                 fontSize: "11px",
                 color: "#ffffff",
                 fontStyle: "bold",
@@ -527,7 +527,7 @@ export class GameUiScreen extends Phaser.Scene {
             ScreenHeight / 4,
             "Oops! Path doesn't fit",
             {
-                fontFamily: "Verdana",
+                fontFamily: "Monocraft",
                 fontSize: "36px",
                 fontStyle: "bold",
                 color: "#ff5b5b",
