@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import { ScreenHeight, ScreenWidth } from "../core/main";
-import { interactify } from "../utilities/utils";
-import { int, Nullable } from "../definitions/utils";
+import { assert, interactify } from "../utilities/utils";
+import { float, Nullable } from "../definitions/utils";
 import GameRules from "configs/gameRules.json";
 
 export class GameRulesScreen extends Phaser.Scene {
@@ -48,7 +48,6 @@ export class GameRulesScreen extends Phaser.Scene {
         const scrollAreaWidth: number = ScreenWidth * 0.8;
         const scrollAreaY: number = ScreenHeight / 4;
         const rules: string = this.getRules();
-
         this.scrollContainer = this.createScrollContainer(
             scrollAreaWidth,
             scrollAreaY,
@@ -57,9 +56,7 @@ export class GameRulesScreen extends Phaser.Scene {
             scrollAreaWidth,
             rules,
         );
-
         this.scrollContainer.add(rulesText);
-
         if (rulesText.height <= scrollAreaHeight) {
             return;
         }
@@ -95,10 +92,10 @@ export class GameRulesScreen extends Phaser.Scene {
         scrollAreaHeight: number,
         scrollAreaY: number,
     ): void {
+        assert(this.scrollContainer);
         const maskShape: Phaser.GameObjects.Graphics = this.make.graphics({
             x: 0,
             y: 0,
-            add: false,
         });
         maskShape.fillStyle(0xffffff);
         maskShape.fillRect(
@@ -117,7 +114,12 @@ export class GameRulesScreen extends Phaser.Scene {
     ): void {
         this.input.on(
             "wheel",
-            (pointer, gameObjects, deltaX, deltaY, deltaZ): void => {
+            (
+                _pointer: Phaser.Input.Pointer,
+                _gameObjects: Phaser.GameObjects.DisplayList,
+                _deltaX: float,
+                deltaY: float,
+            ) => {
                 if (this.scrollContainer) {
                     this.scrollContainer.y -= deltaY;
                     this.scrollContainer.y = Phaser.Math.Clamp(

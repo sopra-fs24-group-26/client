@@ -1,8 +1,9 @@
-import { float, Nullable } from "definitions/utils";
+import { float, int, Nullable } from "definitions/utils";
 import SessionManager from "managers/SessionManager";
 import Phaser from "phaser";
 import { interactify } from "../utilities/utils";
 import { ScreenHeight, ScreenWidth } from "../core/main";
+import { GameUiScreen } from "./gameuiscreen";
 
 export class TitleScreen extends Phaser.Scene {
     public constructor() {
@@ -12,6 +13,12 @@ export class TitleScreen extends Phaser.Scene {
     public preload(): void {
         this.load.image("create", "assets/buttons/create.png");
         this.load.image("backdrop", "assets/sabo.png");
+        for (let i: int = 0; i < 10; i++) {
+            this.load.image(
+                `avatar${i}`,
+                `https://api.dicebear.com/8.x/pixel-art/svg?seed=${i}&size=${GameUiScreen.profilePixels}&beardProbability=0&glassesProbability=0&hat=variant01&hatColor=ad6d3e&skinColor=a26d3d,b68655`,
+            );
+        }
     }
 
     public create(): void {
