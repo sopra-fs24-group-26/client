@@ -35,7 +35,7 @@ export class LobbyScreen extends Phaser.Scene {
     public create(): void {
         this.title = this.add
             .text(ScreenWidth / 2, ScreenHeight / 8, "Saboteur Lobby", {
-                fontFamily: "Monocraft",
+                fontFamily: "VT323",
                 fontSize: 38,
                 color: "#ffffff",
                 align: "center",
@@ -108,7 +108,7 @@ export class LobbyScreen extends Phaser.Scene {
             ScreenHeight * 0.9,
             "Share link copied to clipboard",
             {
-                fontFamily: "Monocraft",
+                fontFamily: "VT323",
                 fontSize: "36px",
                 fontStyle: "bold",
                 color: "#ffc65b",
@@ -128,7 +128,7 @@ export class LobbyScreen extends Phaser.Scene {
                 ScreenHeight * 0.85,
                 "Can't start with less than 3 players",
                 {
-                    fontFamily: "Monocraft",
+                    fontFamily: "VT323",
                     fontSize: "36px",
                     fontStyle: "bold",
                     color: "#ffc65b",
@@ -162,7 +162,7 @@ export class LobbyScreen extends Phaser.Scene {
             this.nameContainer.add(
                 this.add
                     .text(ScreenWidth / 2, ypos, playername, {
-                        fontFamily: "Monocraft",
+                        fontFamily: "VT323",
                         fontSize: 20,
                         color: "#ffffff",
                         fontStyle: fontstyle,
