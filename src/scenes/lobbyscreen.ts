@@ -106,7 +106,7 @@ export class LobbyScreen extends Phaser.Scene {
         const link: string = `${location.origin}/${session.id}`;
         navigator.clipboard.writeText(link);
         const msg: Phaser.GameObjects.BitmapText = this.add
-            .bitmapText(ScreenWidth / 2, ScreenHeight * 0.9, Font)
+            .bitmapText(ScreenWidth / 2, ScreenHeight / 1.25 + 60, Font)
             .setTint(0xffc65b)
             .setText("Share link copied to clipboard")
             .setFontSize(36)
@@ -120,7 +120,7 @@ export class LobbyScreen extends Phaser.Scene {
         if (!all || all.length < 3) {
             const duration: int = 3;
             const msg: Phaser.GameObjects.BitmapText = this.add
-                .bitmapText(ScreenWidth / 2, ScreenHeight * 0.85, Font)
+                .bitmapText(ScreenWidth / 2, ScreenHeight / 1.25 + 110, Font)
                 .setTint(0xffc65b)
                 .setText("Can't start with less than 3 players")
                 .setFontSize(36)

@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import { Font, ScreenHeight, ScreenWidth } from "../core/main";
 import { assert, interactify } from "../utilities/utils";
-import { float, Nullable } from "../definitions/utils";
+import { float, int, Nullable } from "../definitions/utils";
 import GameRules from "configs/gameRules.json";
 
 export class GameRulesScreen extends Phaser.Scene {
@@ -52,9 +52,9 @@ export class GameRulesScreen extends Phaser.Scene {
     }
 
     private addScrollableText(): void {
-        const scrollAreaHeight: number = ScreenHeight / 2;
-        const scrollAreaWidth: number = ScreenWidth * 0.8;
-        const scrollAreaY: number = ScreenHeight / 8 + 70;
+        const scrollAreaHeight: int = ScreenHeight / 2;
+        const scrollAreaWidth: int = ScreenWidth * 0.8;
+        const scrollAreaY: int = ScreenHeight / 8 + 70;
         const rules: string = this.getRules();
         this.scrollContainer = this.createScrollContainer(
             scrollAreaWidth,
@@ -73,8 +73,8 @@ export class GameRulesScreen extends Phaser.Scene {
     }
 
     private createScrollContainer(
-        scrollAreaWidth: number,
-        scrollAreaY: number,
+        scrollAreaWidth: int,
+        scrollAreaY: int,
     ): Phaser.GameObjects.Container {
         const container: Phaser.GameObjects.Container = this.add.container(
             ScreenWidth / 2,
@@ -85,7 +85,7 @@ export class GameRulesScreen extends Phaser.Scene {
     }
 
     private createRulesText(
-        scrollAreaWidth: number,
+        scrollAreaWidth: int,
         rules: string,
     ): Phaser.GameObjects.BitmapText {
         return this.add
@@ -98,9 +98,9 @@ export class GameRulesScreen extends Phaser.Scene {
     }
 
     private createScrollMask(
-        scrollAreaWidth: number,
-        scrollAreaHeight: number,
-        scrollAreaY: number,
+        scrollAreaWidth: int,
+        scrollAreaHeight: int,
+        scrollAreaY: int,
     ): void {
         assert(this.scrollContainer);
         const maskShape: Phaser.GameObjects.Graphics = this.make.graphics({
@@ -120,7 +120,7 @@ export class GameRulesScreen extends Phaser.Scene {
 
     private setupScrolling(
         rulesText: Phaser.GameObjects.BitmapText,
-        scrollAreaHeight: number,
+        scrollAreaHeight: int,
     ): void {
         this.input.on(
             "wheel",
@@ -134,7 +134,7 @@ export class GameRulesScreen extends Phaser.Scene {
                     this.scrollContainer.y -= deltaY;
                     this.scrollContainer.y = Phaser.Math.Clamp(
                         this.scrollContainer.y,
-                        ScreenHeight / 4 - rulesText.height + scrollAreaHeight,
+                        ScreenHeight / 4 - rulesText.height + scrollAreaHeight - 100,
                         ScreenHeight / 4,
                     );
                 }

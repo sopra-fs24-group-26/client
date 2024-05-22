@@ -154,9 +154,8 @@ export class GameUiScreen extends Phaser.Scene {
         const count: int = all.length;
         const spacing: int =
             (ScreenWidth - count * GameUiScreen.profilePixels) / (count + 1);
-        const y: float = ScreenHeight / 10;
         for (let i: int = 0; i < count; i++) {
-            this.displayPlayer(all, spacing, i, count, y, me);
+            this.displayPlayer(all, spacing, i, count, me);
         }
     }
 
@@ -165,7 +164,6 @@ export class GameUiScreen extends Phaser.Scene {
         spacing: int,
         i: int,
         count: int,
-        y: float,
         me: Player,
     ): void {
         assert(this.profilesContainer);
@@ -173,6 +171,7 @@ export class GameUiScreen extends Phaser.Scene {
             spacing +
             GameUiScreen.profilePixels / 2 +
             i * (GameUiScreen.profilePixels + spacing);
+        const y: float = 80;
         const profile: Phaser.GameObjects.Image = this.add.image(
             x,
             y,
