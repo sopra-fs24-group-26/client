@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { ScreenHeight, ScreenWidth } from "../core/main";
+import { Font, ScreenHeight, ScreenWidth } from "../core/main";
 import { assert, interactify } from "../utilities/utils";
 import { float, Nullable } from "../definitions/utils";
 import GameRules from "configs/gameRules.json";
@@ -33,23 +33,21 @@ export class GameRulesScreen extends Phaser.Scene {
 
     private addTitle(): void {
         this.add
-            .text(ScreenWidth / 2, ScreenHeight / 8, "Saboteur Rules", {
-                fontFamily: "VT323",
-                fontSize: 50,
-                color: "#c06b0b",
-                align: "center",
-            } as Phaser.Types.GameObjects.Text.TextStyle)
+            .bitmapText(ScreenWidth / 2, ScreenHeight / 8, Font)
+            .setTint(0xc06b0b)
+            .setText("Saboteur Rules")
+            .setFontSize(50)
+            .setCenterAlign()
             .setOrigin(0.5);
     }
 
     private addScrollNote(): void {
         this.add
-            .text(ScreenWidth / 2, ScreenHeight / 8 + 35, "(Scroll to View)", {
-                fontFamily: "VT323",
-                fontSize: 25,
-                color: "#ffffff",
-                align: "center",
-            } as Phaser.Types.GameObjects.Text.TextStyle)
+            .bitmapText(ScreenWidth / 2, ScreenHeight / 8 + 35, Font)
+            .setTint(0xffffff)
+            .setText("Scroll to View")
+            .setFontSize(25)
+            .setCenterAlign()
             .setOrigin(0.5);
     }
 
@@ -62,7 +60,7 @@ export class GameRulesScreen extends Phaser.Scene {
             scrollAreaWidth,
             scrollAreaY,
         );
-        const rulesText: Phaser.GameObjects.Text = this.createRulesText(
+        const rulesText: Phaser.GameObjects.BitmapText = this.createRulesText(
             scrollAreaWidth,
             rules,
         );
@@ -78,7 +76,10 @@ export class GameRulesScreen extends Phaser.Scene {
         scrollAreaWidth: number,
         scrollAreaY: number,
     ): Phaser.GameObjects.Container {
-        const container = this.add.container(ScreenWidth / 2, scrollAreaY);
+        const container: Phaser.GameObjects.Container = this.add.container(
+            ScreenWidth / 2,
+            scrollAreaY,
+        );
         container.setSize(scrollAreaWidth, ScreenHeight / 2);
         return container;
     }
@@ -86,15 +87,14 @@ export class GameRulesScreen extends Phaser.Scene {
     private createRulesText(
         scrollAreaWidth: number,
         rules: string,
-    ): Phaser.GameObjects.Text {
-        const rulesText: Phaser.GameObjects.Text = this.add.text(0, 0, rules, {
-            fontFamily: "VT323",
-            fontSize: 25,
-            color: "#ffffff",
-            wordWrap: { width: scrollAreaWidth - 20 },
-        });
-        rulesText.setOrigin(0.5, 0);
-        return rulesText;
+    ): Phaser.GameObjects.BitmapText {
+        return this.add
+            .bitmapText(0, 0, Font)
+            .setTint(0xffffff)
+            .setText(rules)
+            .setFontSize(25)
+            .setOrigin(0.5, 0)
+            .setMaxWidth(scrollAreaWidth - 20);
     }
 
     private createScrollMask(
@@ -119,7 +119,7 @@ export class GameRulesScreen extends Phaser.Scene {
     }
 
     private setupScrolling(
-        rulesText: Phaser.GameObjects.Text,
+        rulesText: Phaser.GameObjects.BitmapText,
         scrollAreaHeight: number,
     ): void {
         this.input.on(

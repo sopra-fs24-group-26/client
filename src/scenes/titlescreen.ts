@@ -11,6 +11,11 @@ export class TitleScreen extends Phaser.Scene {
     }
 
     public preload(): void {
+        this.load.bitmapFont(
+            "YosterIsland",
+            "assets/fonts/YosterIslandRegBitmap.png",
+            "assets/fonts/YosterIslandRegBitmap.fnt",
+        );
         this.load.image("create", "assets/buttons/create.png");
         this.load.image("backdrop", "assets/sabo.png");
         this.load.image("quit1", "assets/buttons/quit1.png");
