@@ -2,7 +2,7 @@ import { Nullable, float, int } from "definitions/utils";
 import SessionManager from "managers/SessionManager";
 import Phaser from "phaser";
 import { assert, interactify } from "../utilities/utils";
-import { ScreenHeight, ScreenWidth } from "../core/main";
+import { Font, ScreenHeight, ScreenWidth } from "../core/main";
 import PlayerManager from "managers/PlayerManager";
 import { Player } from "entities/Player";
 import { Role } from "definitions/enums";
@@ -85,13 +85,12 @@ export class EndScreen extends Phaser.Scene {
 
     private displayText(text: string): void {
         this.add
-            .text(ScreenWidth / 2, ScreenHeight / 2, text, {
-                fontFamily: "VT323",
-                fontSize: "100px",
-                color: "#fbfcfc",
-                fontStyle: "bold",
-            } as Phaser.Types.GameObjects.Text.TextStyle)
-            .setOrigin(0.5, 0.5);
+            .bitmapText(ScreenWidth / 2, ScreenHeight / 2, Font)
+            .setTint(0xfbfcfc)
+            .setText(text)
+            .setFontSize(100)
+            .setCenterAlign()
+            .setOrigin(0.5);
     }
 
     private displayProfiles(): void {
@@ -106,7 +105,7 @@ export class EndScreen extends Phaser.Scene {
         const count: int = all.length;
         const spacing: int =
             (ScreenWidth - count * GameUiScreen.profilePixels) / (count + 1);
-        const y: float = ScreenHeight / 10;
+        const y: float = 80;
         for (let i = 0; i < count; i++) {
             this.displayPlayer(all, spacing, i, y, me);
         }
@@ -144,37 +143,26 @@ export class EndScreen extends Phaser.Scene {
         assert(this.profilesContainer);
         const roleString: string =
             player.role === Role.Saboteur ? "Saboteur" : "Miner";
-        const roleText: Phaser.GameObjects.Text = this.add.text(
-            x,
-            y - GameUiScreen.profilePixels,
-            roleString,
-            {
-                fontFamily: "VT323",
-                fontSize: "30px",
-                color: "#ffffff",
-                fontStyle: "bold",
-            } as Phaser.Types.GameObjects.Text.TextStyle,
-        );
-        roleText.setOrigin(0.5, 0.5);
+        const roleText: Phaser.GameObjects.BitmapText = this.add
+            .bitmapText(x, y - GameUiScreen.profilePixels + 10, Font)
+            .setTint(0xc06b0b)
+            .setText(roleString)
+            .setFontSize(30)
+            .setCenterAlign()
+            .setOrigin(0.5, 1);
         this.profilesContainer.add(roleText);
     }
 
     private addName(x: float, y: float, name: string): void {
         assert(this.profilesContainer);
-        const nameText: Phaser.GameObjects.Text = this.add.text(
-            x,
-            y + GameUiScreen.profilePixels / 1.2,
-            name,
-            {
-                fontFamily: "VT323",
-                fontSize: "18px",
-                color: "#ffffff",
-                fontStyle: "bold",
-                align: "center",
-            } as Phaser.Types.GameObjects.Text.TextStyle,
-        );
-        nameText.setOrigin(0.5, 0);
-        nameText.setWordWrapWidth(GameUiScreen.profilePixels * 3);
+        const nameText: Phaser.GameObjects.BitmapText = this.add
+            .bitmapText(x, y + GameUiScreen.profilePixels - 10, Font)
+            .setTint(0xffffff)
+            .setText(name)
+            .setFontSize(18)
+            .setCenterAlign()
+            .setOrigin(0.5, 0)
+            .setMaxWidth(GameUiScreen.profilePixels * 3);
         this.profilesContainer.add(nameText);
     }
 }

@@ -3,18 +3,16 @@ import Phaser from "phaser";
 import SessionManager from "managers/SessionManager";
 import PlayerManager from "managers/PlayerManager";
 import { assert, interactify } from "utilities/utils";
-import { ScreenHeight, ScreenWidth } from "core/main";
+import { Font, ScreenHeight, ScreenWidth } from "core/main";
 import { Player } from "entities/Player";
 import { Session } from "entities/Session";
 
 export class LobbyScreen extends Phaser.Scene {
-    private title: Nullable<Phaser.GameObjects.Text>;
-    private nameContainer: Nullable<Phaser.GameObjects.Container>;
+    private text: Nullable<Phaser.GameObjects.BitmapText>;
 
     public constructor() {
         super("LobbyScreen");
-        this.title = null;
-        this.nameContainer = null;
+        this.text = null;
     }
 
     public init(): void {
@@ -33,15 +31,20 @@ export class LobbyScreen extends Phaser.Scene {
     }
 
     public create(): void {
-        this.title = this.add
-            .text(ScreenWidth / 2, ScreenHeight / 8, "Saboteur Lobby", {
-                fontFamily: "VT323",
-                fontSize: 50,
-                color: "#ffffff",
-                align: "center",
-                fontStyle: "bold",
-            } as Phaser.Types.GameObjects.Text.TextStyle)
+        this.add
+            .bitmapText(ScreenWidth / 2, ScreenHeight / 8, Font)
+            .setTint(0xc06b0b)
+            .setText("Saboteur Lobby")
+            .setFontSize(50)
+            .setCenterAlign()
             .setOrigin(0.5);
+        this.text = this.add
+            .bitmapText(ScreenWidth / 2, ScreenHeight / 8 + 50, Font)
+            .setTint(0xffffff)
+            .setText("")
+            .setFontSize(30)
+            .setCenterAlign()
+            .setOrigin(0.5, 0);
 
         const quitButton: Phaser.GameObjects.Image = this.add.image(
             ScreenWidth * 0.2,
@@ -70,8 +73,6 @@ export class LobbyScreen extends Phaser.Scene {
             "start",
         );
         interactify(startButton, 0.5, () => this.onStartButton());
-
-        this.nameContainer = this.add.container();
 
         this.portToCorrectScene();
     }
@@ -104,19 +105,13 @@ export class LobbyScreen extends Phaser.Scene {
         assert(session);
         const link: string = `${location.origin}/${session.id}`;
         navigator.clipboard.writeText(link);
-        const msg: Phaser.GameObjects.Text = this.add.text(
-            ScreenWidth / 2,
-            ScreenHeight * 0.9,
-            "Share link copied to clipboard",
-            {
-                fontFamily: "VT323",
-                fontSize: "36px",
-                fontStyle: "bold",
-                color: "#ffc65b",
-                align: "center",
-            } as Phaser.Types.GameObjects.Text.TextStyle,
-        );
-        msg.setOrigin(0.5, 0.5);
+        const msg: Phaser.GameObjects.BitmapText = this.add
+            .bitmapText(ScreenWidth / 2, ScreenHeight / 1.25 + 60, Font)
+            .setTint(0xffc65b)
+            .setText("Share link copied to clipboard")
+            .setFontSize(36)
+            .setCenterAlign()
+            .setOrigin(0.5);
         this.time.delayedCall(duration * 1_000, () => msg.destroy());
     }
 
@@ -124,19 +119,13 @@ export class LobbyScreen extends Phaser.Scene {
         const all: Nullable<Player[]> = PlayerManager.getAll();
         if (!all || all.length < 3) {
             const duration: int = 3;
-            const msg: Phaser.GameObjects.Text = this.add.text(
-                ScreenWidth / 2,
-                ScreenHeight * 0.85,
-                "Can't start with less than 3 players",
-                {
-                    fontFamily: "VT323",
-                    fontSize: "36px",
-                    fontStyle: "bold",
-                    color: "#ffc65b",
-                    align: "center",
-                } as Phaser.Types.GameObjects.Text.TextStyle,
-            );
-            msg.setOrigin(0.5, 0.5);
+            const msg: Phaser.GameObjects.BitmapText = this.add
+                .bitmapText(ScreenWidth / 2, ScreenHeight / 1.25 + 110, Font)
+                .setTint(0xffc65b)
+                .setText("Can't start with less than 3 players")
+                .setFontSize(36)
+                .setCenterAlign()
+                .setOrigin(0.5);
             this.time.delayedCall(duration * 1_000, () => msg.destroy());
             return;
         }
@@ -148,28 +137,13 @@ export class LobbyScreen extends Phaser.Scene {
         if (!this.scene || !this.scene?.isActive?.()) {
             return;
         }
-        assert(this.nameContainer);
-        this.nameContainer.removeAll(true);
-
         const me: Nullable<Player> = PlayerManager.getMe();
         const others: Nullable<Player[]> = PlayerManager.getOthers();
-        assert(me && this.title && others && this.nameContainer);
-        this.title.text = `Saboteur Lobby\n${me.name} (me)`;
-
+        assert(me && others && this.text);
+        let text: string = `${me.name}\n\nOthers:`;
         for (let i: int = 0; i < others.length; i++) {
-            let ypos: int = ScreenHeight / 4 + (i * ScreenHeight) / 30;
-            let playername: string = others[i].name;
-            let fontstyle: string = "normal";
-            this.nameContainer.add(
-                this.add
-                    .text(ScreenWidth / 2, ypos, playername, {
-                        fontFamily: "VT323",
-                        fontSize: 28,
-                        color: "#ffffff",
-                        fontStyle: fontstyle,
-                    } as Phaser.Types.GameObjects.Text.TextStyle)
-                    .setOrigin(0.5, 0.5),
-            );
+            text = `${text}\n${others[i].name}`;
         }
+        this.text.setText(text);
     }
 }

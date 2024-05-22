@@ -1,4 +1,4 @@
-import { ScreenHeight, ScreenWidth } from "core/main";
+import { Font, ScreenHeight, ScreenWidth } from "core/main";
 import Phaser from "phaser";
 import { assert, interactify } from "utilities/utils";
 import { Placeable } from "../definitions/adjacency";
@@ -27,7 +27,7 @@ export class GameUiScreen extends Phaser.Scene {
         Phaser.GameObjects.Image,
         Phaser.Math.Vector2
     >;
-    private wrongText: Nullable<Phaser.GameObjects.Text>;
+    private wrongText: Nullable<Phaser.GameObjects.BitmapText>;
     private isDraging: boolean;
     private controlsButton: Nullable<Phaser.GameObjects.Image>;
     private controlsExplained: Nullable<Phaser.GameObjects.Image>;
@@ -154,9 +154,8 @@ export class GameUiScreen extends Phaser.Scene {
         const count: int = all.length;
         const spacing: int =
             (ScreenWidth - count * GameUiScreen.profilePixels) / (count + 1);
-        const y: float = ScreenHeight / 10;
         for (let i: int = 0; i < count; i++) {
-            this.displayPlayer(all, spacing, i, count, y, me);
+            this.displayPlayer(all, spacing, i, count, me);
         }
     }
 
@@ -165,26 +164,27 @@ export class GameUiScreen extends Phaser.Scene {
         spacing: int,
         i: int,
         count: int,
-        y: float,
         me: Player,
     ): void {
         assert(this.profilesContainer);
-        let name: string = all[i].name;
         const x: float =
             spacing +
             GameUiScreen.profilePixels / 2 +
             i * (GameUiScreen.profilePixels + spacing);
-
-        const profile = this.add.image(x, y, `avatar${all[i].orderIndex}`);
+        const y: float = 80;
+        const profile: Phaser.GameObjects.Image = this.add.image(
+            x,
+            y,
+            `avatar${all[i].orderIndex}`,
+        );
         this.profilesContainer.add(profile);
         if (SessionManager.isPlayersTurn(all[i], count)) {
             this.profilesContainer.add(this.add.image(x, y, "ring"));
         }
         if (all[i].orderIndex === me.orderIndex) {
             this.addRole(x, y, me);
-            name += " (Me)";
         }
-        this.addName(x, y, name);
+        this.addName(x, y, all[i].name);
     }
 
     private addRole(x: float, y: float, me: Player): void {
@@ -193,37 +193,26 @@ export class GameUiScreen extends Phaser.Scene {
         if (me.role === Role.Saboteur) {
             roleString = "Saboteur";
         }
-        const roleText = this.add.text(
-            x,
-            y - GameUiScreen.profilePixels - 10,
-            roleString,
-            {
-                fontFamily: "VT323",
-                fontSize: "30px",
-                color: "#ffffff",
-                fontStyle: "bold",
-            } as Phaser.Types.GameObjects.Text.TextStyle,
-        );
-        roleText.setOrigin(0.5, 0.5);
+        const roleText: Phaser.GameObjects.BitmapText = this.add
+            .bitmapText(x, y - GameUiScreen.profilePixels + 10, Font)
+            .setTint(0xc06b0b)
+            .setText(roleString)
+            .setFontSize(30)
+            .setCenterAlign()
+            .setOrigin(0.5, 1);
         this.profilesContainer.add(roleText);
     }
 
     private addName(x: float, y: float, name: string): void {
         assert(this.profilesContainer);
-        const nameText = this.add.text(
-            x,
-            y + GameUiScreen.profilePixels / 1.2,
-            name,
-            {
-                fontFamily: "VT323",
-                fontSize: "18px",
-                color: "#ffffff",
-                fontStyle: "bold",
-                align: "center",
-            } as Phaser.Types.GameObjects.Text.TextStyle,
-        );
-        nameText.setOrigin(0.5, 0);
-        nameText.setWordWrapWidth(GameUiScreen.profilePixels * 3);
+        const nameText: Phaser.GameObjects.BitmapText = this.add
+            .bitmapText(x, y + GameUiScreen.profilePixels - 10, Font)
+            .setTint(0xffffff)
+            .setText(name)
+            .setFontSize(18)
+            .setCenterAlign()
+            .setOrigin(0.5, 0)
+            .setMaxWidth(GameUiScreen.profilePixels * 3);
         this.profilesContainer.add(nameText);
     }
 
@@ -537,19 +526,13 @@ export class GameUiScreen extends Phaser.Scene {
 
     private displayErrorMessage(): void {
         const duration: int = 3;
-        this.wrongText = this.add.text(
-            ScreenWidth / 2,
-            ScreenHeight / 4,
-            "Oops! Path doesn't fit",
-            {
-                fontFamily: "VT323",
-                fontSize: "36px",
-                fontStyle: "bold",
-                color: "#ff5b5b",
-                align: "center",
-            } as Phaser.Types.GameObjects.Text.TextStyle,
-        );
-        this.wrongText.setOrigin(0.5, 0.5);
+        this.wrongText = this.add
+            .bitmapText(ScreenWidth / 2, ScreenHeight / 4, Font)
+            .setTint(0xff5b5b)
+            .setText("Oops! Path doesn't fit")
+            .setFontSize(36)
+            .setCenterAlign()
+            .setOrigin(0.5);
         this.time.delayedCall(duration * 1_000, () =>
             this.wrongText?.destroy(),
         );

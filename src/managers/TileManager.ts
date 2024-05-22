@@ -41,7 +41,7 @@ class TileManager {
         const me: Nullable<Player> = PlayerManager.getMe();
         const all: Nullable<Tile[]> = this.list;
         assert(me && all && players);
-        const playerCount: number = players.length;
+        const playerCount: int = players.length;
         return all.filter(
             (tile: Tile, index: int) =>
                 tile.state === TileState.Drawn &&
@@ -167,7 +167,7 @@ class TileManager {
     private getInitialAmount(): int {
         const players: Nullable<PlayerDTO[]> = GeneralManager.getPlayers();
         assert(players);
-        const playerCount: number = players.length;
+        const playerCount: int = players.length;
         let amountPerPlayer: int = 4;
         if (playerCount <= 7) {
             amountPerPlayer = 5;

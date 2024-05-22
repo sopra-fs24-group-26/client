@@ -14,6 +14,8 @@ import { GameRulesScreen } from "../scenes/gamerulesscreen";
 export const ScreenWidth: int = document.body.clientWidth;
 export const ScreenHeight: int = document.body.clientHeight;
 
+export const Font: string = "YosterIsland";
+
 const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
     width: ScreenWidth,
